@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.footer {
+    line-height: 1.5rem;
+}
+
+@layer components {
+    .card-header {
+        @apply px-8 py-4 border-b-2 border-base-300;
+    }
+}
