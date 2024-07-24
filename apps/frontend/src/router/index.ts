@@ -12,6 +12,11 @@ const router = createRouter({
             component: HomeView
         },
         {
+            path: '/auth/register-confirm',
+            name: 'register-confirm',
+            component: () => import('../views/auth/RegisterConfirmationView.vue')
+        },
+        {
             path: '/auth',
             name: 'auth',
             component: () => import('../views/AuthView.vue'),
