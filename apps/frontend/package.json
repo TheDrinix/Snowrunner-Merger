@@ -12,9 +12,13 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@vee-validate/yup": "^4.13.2",
+    "axios": "^1.7.2",
     "pinia": "^2.1.7",
+    "vee-validate": "^4.13.2",
     "vue": "^3.4.29",
-    "vue-router": "^4.3.3"
+    "vue-router": "^4.3.3",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
