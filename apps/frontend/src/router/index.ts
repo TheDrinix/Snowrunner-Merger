@@ -12,6 +12,11 @@ const router = createRouter({
             component: HomeView
         },
         {
+            path: '/auth/google/callback',
+            name: 'google-callback',
+            component: () => import('../views/auth/GoogleCallbackView.vue')
+        },
+        {
             path: '/auth/register-confirm',
             name: 'register-confirm',
             component: () => import('../views/auth/RegisterConfirmationView.vue')

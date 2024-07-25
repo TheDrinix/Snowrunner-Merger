@@ -20,7 +20,7 @@ const emit = defineEmits<{
     </div>
     <label class="transition-all input input-bordered flex items-center gap-2" :class="{ 'input-error': !!error }">
       <slot name="icon-prepend"></slot>
-      <input @input="emit('update:modelValue', $event.target?.value)" :type="type ?? 'text'" class="w-full" :name :autocomplete :placeholder />
+      <input :value="modelValue" @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)" :type="type ?? 'text'" class="w-full" :name :autocomplete :placeholder />
       <slot name="icon-append"></slot>
     </label>
   </div>
