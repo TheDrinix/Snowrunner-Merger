@@ -22,7 +22,9 @@ export const useUserStore = defineStore('user', {
             this.accessTokenExpires = new Date(Date.now() + data.expiresIn * 1000);
         },
         async refreshToken() {
-            const res = await this.axios.post<LoginResponse>('/auth/refresh');
+            const res = await this.axios.post<LoginResponse>('/auth/refresh', {}, {
+                withCredentials: true
+            });
 
             if (res.status === 200) {
                 this.signIn(res.data);

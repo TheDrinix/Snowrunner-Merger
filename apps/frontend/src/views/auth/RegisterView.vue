@@ -6,6 +6,7 @@ import * as yup from "yup";
 import {inject, ref} from "vue";
 import axios, {type AxiosInstance} from "axios";
 import {useRouter} from "vue-router";
+import Icon from "@/components/icon.vue";
 
 const http = inject<AxiosInstance>("axios", axios.create());
 const loading = ref(false);
@@ -53,6 +54,8 @@ const handleRegister = async () => {
     username: username.value,
     email: email.value,
     password: password.value
+  }, {
+    withCredentials: true
   });
 
 
@@ -73,10 +76,26 @@ const handleRegister = async () => {
     </div>
     <form @submit.prevent="handleRegister">
       <div class="flex flex-col gap-4">
-        <TextInput v-model="username" name="username" placeholder="Username" autocomplete="username" :error="errors.username" />
-        <TextInput v-model="email" name="email" placeholder="Email" autocomplete="email" :error="errors.email" />
-        <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password" />
-        <TextInput v-model="confirmPassword" name="confirmPassword" placeholder="Confirm password" type="password" autocomplete="password" :error="errors.confirmPassword" />
+        <TextInput v-model="username" name="username" placeholder="Username" autocomplete="username" :error="errors.username">
+          <template #icon-prepend>
+            <Icon name="person" />
+          </template>
+        </TextInput>
+        <TextInput v-model="email" name="email" placeholder="Email" autocomplete="email" :error="errors.email">
+          <template #icon-prepend>
+            <Icon name="mail" />
+          </template>
+        </TextInput>
+        <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password">
+          <template #icon-prepend>
+            <Icon name="lock" />
+          </template>
+        </TextInput>
+        <TextInput v-model="confirmPassword" name="confirmPassword" placeholder="Confirm password" type="password" autocomplete="password" :error="errors.confirmPassword">
+          <template #icon-prepend>
+            <Icon name="lock" />
+          </template>
+        </TextInput>
         <div class="flex justify-center">
           <button :disabled="loading" type="submit" class="btn btn-primary btn-wide transition-all">
             Register

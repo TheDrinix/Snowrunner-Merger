@@ -7,6 +7,7 @@ import axios, {type AxiosInstance} from "axios";
 import {inject} from "vue";
 import {useUserStore} from "@/stores/userStore";
 import type {LoginResponse} from "@/types/auth";
+import Icon from "@/components/icon.vue";
 
 const schema = toTypedSchema(
   yup.object({
@@ -42,6 +43,8 @@ const handleLogin = async () => {
   const res = await http.post<LoginResponse>("/auth/login", {
     email: email.value,
     password: password.value
+  }, {
+    withCredentials: true
   });
 
   if (res.status < 300) {
@@ -61,8 +64,16 @@ const handleLogin = async () => {
     </div>
     <form @submit.prevent="handleLogin">
       <div class="flex flex-col gap-4">
-        <TextInput v-model="email" name="email" placeholder="Email" type="email" autocomplete="email" :error="errors.email" />
-        <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password" />
+        <TextInput v-model="email" name="email" placeholder="Email" type="email" autocomplete="email" :error="errors.email">
+          <template #icon-prepend>
+            <Icon name="mail" />
+          </template>
+        </TextInput>
+        <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password">
+          <template #icon-prepend>
+            <Icon name="lock" />
+          </template>
+        </TextInput>
         <div class="flex justify-center">
           <button type="submit" class="btn btn-primary btn-wide">Login</button>
         </div>
