@@ -6,13 +6,15 @@ import {useUserStore} from "@/stores/userStore";
 export function useHttp() {
     const http = inject<AxiosInstance>('axios', axios.create());
 
-    const userStore = useUserStore();
+    http.interceptors.request.use(async (config) => {
+        const userStore = useUserStore();
 
-    http.interceptors.request.use(config => {
         if (userStore.isAuthenticated) {
-            userStore.getAccessToken().then(token => {
+            const token = await userStore.getAccessToken();
+
+            if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
-            });
+            }
         }
 
         return config;

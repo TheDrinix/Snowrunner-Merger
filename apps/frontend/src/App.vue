@@ -2,14 +2,7 @@
 import { RouterView } from 'vue-router'
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
-import {onBeforeMount} from "vue";
-import {useUserStore} from "@/stores/userStore";
 
-const userStore = useUserStore();
-
-onBeforeMount(async () => {
-  await userStore.refreshToken();
-});
 </script>
 
 <template>

@@ -14,10 +14,20 @@ const user = computed(() => userStore.user);
   <header>
     <nav class="navbar bg-base-200">
       <div class="container mx-auto">
-        <div class="flex-1">
+        <div class="flex flex-1 items-center">
           <RouterLink :to="{ name: 'home'}">Snowrunner merger</RouterLink>
-          <div class="inline-flex" v-if="isAuthenticated">
-            <span class="px-2 text-2xl">|</span>
+          <div>
+            <div class="h-8 divider divider-horizontal mr-1" />
+          </div>
+          <div class="inline-flex items-center" v-if="isAuthenticated">
+            <ul class="px-0 menu menu-horizontal bg-base-200 rounded-box">
+              <li>
+                <RouterLink :to="{ name: 'groups' }" exact-active-class="active">Groups</RouterLink>
+              </li>
+              <li>
+                <RouterLink :to="{ name: 'groups' }">Groups</RouterLink>
+              </li>
+            </ul>
           </div>
         </div>
         <div class="flex-none">
