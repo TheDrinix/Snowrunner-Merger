@@ -2,7 +2,6 @@ import {defineStore} from "pinia";
 import type {LoginResponse, UserStore} from "@/types/auth";
 
 const defaultState = {
-    isAuthenticated: false,
     user: undefined,
     accessToken: undefined,
     accessTokenExpires: undefined
@@ -11,12 +10,14 @@ const defaultState = {
 export const useUserStore = defineStore('user', {
     state: (): UserStore => ({...defaultState}),
     getters: {
+        isAuthenticated(state) {
+            return !(!state.accessTokenExpires || state.accessTokenExpires < new Date());
+        }
     },
     actions: {
         signIn(data: LoginResponse) {
             console.log(data);
 
-            this.isAuthenticated = true;
             this.user = data.user;
             this.accessToken = data.accessToken;
             this.accessTokenExpires = new Date(Date.now() + data.expiresIn * 1000);
@@ -29,7 +30,7 @@ export const useUserStore = defineStore('user', {
             if (res.status === 200) {
                 this.signIn(res.data);
             } else {
-                this.$state = {...defaultState};
+                this.$state = {...defaultState, accessTokenExpires: new Date(0)};
             }
         },
         async getAccessToken() {

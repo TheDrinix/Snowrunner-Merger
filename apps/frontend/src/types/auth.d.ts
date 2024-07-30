@@ -1,10 +1,10 @@
 export interface User {
+    id: string;
     email: string;
     username: string;
 }
 
 export interface UserStore {
-    isAuthenticated: boolean;
     user?: User;
     accessToken?: string;
     accessTokenExpires?: Date;
