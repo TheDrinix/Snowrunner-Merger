@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
-import type {Group, GroupsStore} from "@/types/groups";
+import type {Group, GroupData, GroupsStore} from "@/types/groups";
 import {useUserStore} from "@/stores/userStore";
+import type {StoredSave} from "@/types/saves";
 
 const defaultState: GroupsStore = {
     groups: new Map()
@@ -33,10 +34,25 @@ export const useGroupsStore = defineStore('groups', {
         }
     },
     actions: {
-        storeGroups(groups: Group[]) {
-            groups.forEach(group => {
+        storeGroups(groups: GroupData[]) {
+            groups.forEach(data => {
+                const group = {
+                    ...data,
+                    saves: []
+                };
+
                 this.groups.set(group.id, group);
             });
+        },
+        storeGroupSaves(groupId: string, saves: StoredSave[]) {
+            const group = this.groups.get(groupId);
+
+            if (group) {
+                group.saves = saves;
+                group.lastLoadedSavesAt = new Date();
+
+                this.groups.set(groupId, group);
+            }
         }
     }
 });
