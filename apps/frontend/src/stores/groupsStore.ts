@@ -53,6 +53,25 @@ export const useGroupsStore = defineStore('groups', {
 
                 this.groups.set(groupId, group);
             }
+        },
+        deleteGroupSave(groupId: string, saveIdx: number) {
+            const group = this.groups.get(groupId);
+
+            if (group) {
+                group.saves.splice(saveIdx, 1);
+
+                this.groups.set(groupId, group);
+            }
+        },
+        clearSaves(groupId: string) {
+            const group = this.groups.get(groupId);
+
+            if (group) {
+                group.saves = [];
+                group.lastLoadedSavesAt = new Date(0);
+
+                this.groups.set(groupId, group);
+            }
         }
     }
 });

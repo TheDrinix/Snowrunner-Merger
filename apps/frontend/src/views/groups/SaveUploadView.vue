@@ -2,26 +2,28 @@
 import {useRoute, useRouter} from "vue-router";
 import {computed, ref} from "vue";
 import {useGroupsStore} from "@/stores/groupsStore";
-import JSZip from "jszip";
 import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
+import JSZip from "jszip";
 import {useHttp} from "@/composables/useHttp";
 
 const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
-const http = useHttp();
+const http = useHttp()
 
 const groupId = computed(() => {
   return route.params.id as string;
-});
+})
 
-const saveNumber = computed<number>(() => {
-  return (route.query.saveNumber as string | undefined) ? parseInt(route.query.saveNumber as string) : 0;
-});
+const saveSlot = computed<number | undefined>(() => {
+  const saveNumberStr = route.query.saveNumber as string | undefined;
+
+  return saveNumberStr ? parseInt(saveNumberStr) : undefined;
+})
 
 const group = computed(() => {
   return groupsStore.getGroup(groupId.value);
-});
+})
 
 if (!group.value) {
   router.push({name: 'groups'});
@@ -32,16 +34,17 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const formData = ref<{
   files?: FileList,
   saveNumber?: number,
-  outputSaveNumber?: number
+  description?: string
 }>({});
-const canMerge = computed(() => {
-  return !!formData.value.files && formData.value.saveNumber != undefined && formData.value.outputSaveNumber != undefined;
+
+const canUpload = computed(() => {
+  return !!formData.value.files && formData.value.saveNumber != undefined && formData.value.description != undefined;
 });
 const availableSaves = ref<number[]>([]);
 const error = ref<string | null>(null);
 
 const handleFolderChange = async (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
+  const files = (event.target as HTMLInputElement).files
 
   if (!files) return;
 
@@ -60,52 +63,46 @@ const handleFolderChange = async (event: Event) => {
 
   formData.value.files = files;
   formData.value.saveNumber = availableSaves.value[0];
-  formData.value.outputSaveNumber = 0;
 }
 
-const handleSaveMerge = async () => {
-  if (!formData.value.files || formData.value.saveNumber === undefined || formData.value.outputSaveNumber === undefined) return;
+const handleSaveUpload = async () => {
+  if (!formData.value.files || formData.value.saveNumber === undefined || !formData.value.description) return;
 
-  const regex = generateSaveRegex(formData.value.saveNumber)
+  const regex = generateSaveRegex(formData.value.saveNumber);
 
   const zip = new JSZip();
 
   for (let file of formData.value.files) {
     if (regex.test(file.name)) {
-      console.log(`Passed: ${file.name}`)
       zip.file(file.name, file);
     }
   }
 
   const zipBlob = await zip.generateAsync({type: "blob"});
 
-  const body = new FormData();
+  const body = new FormData()
 
-  body.set('saveNumber', formData.value.saveNumber.toString());
-  body.set('outputSaveNumber', formData.value.outputSaveNumber.toString());
-  body.set('save', zipBlob);
+  body.append("save", zipBlob, "saves.zip");
+  body.append("description", formData.value.description);
+  body.append("saveNumber", formData.value.saveNumber.toString());
 
-  const res = await http.post(`/groups/${groupId.value}/merge`, body, {
+  const params = new URLSearchParams();
+
+  if (saveSlot.value !== undefined) {
+    params.append("saveSlot", saveSlot.value.toString());
+  }
+
+  const res = await http.post(`/groups/${groupId.value}/upload`, body, {
     headers: {
-      'Content-Type': 'multipart/form-data'
+      "Content-Type": "multipart/form-data"
     },
-    params: {
-      storedSaveNumber: saveNumber.value
-    },
-    responseType: 'blob'
+    params,
   });
 
   if (res.status < 300) {
-    const url = window.URL.createObjectURL(res.data);
+    groupsStore.clearSaves(groupId.value);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.setAttribute('download', `merged_save.zip`);
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    await router.push({name: "group-manage", params: {id: groupId.value}});
   }
 }
 </script>
@@ -117,7 +114,7 @@ const handleSaveMerge = async () => {
     </div>
     <div class="card-body flex-col-reverse lg:gap-4 lg:flex-row">
       <div class="w-full lg:w-1/2 xl:w-3/5">
-        <form @submit.prevent="handleSaveMerge">
+        <form @submit.prevent="handleSaveUpload">
           <div class="flex flex-col gap-4">
             <div class="alert alert-error" v-if="error">
               {{error}}
@@ -138,15 +135,13 @@ const handleSaveMerge = async () => {
             </div>
             <div class="form-control w-full" v-if="availableSaves.length">
               <div class="label">
-                <span class="label-text">Select output save number</span>
+                <span class="label-text">Enter a save description</span>
               </div>
-              <select name="outputSaveNumber" class="select select-bordered" v-model="formData.outputSaveNumber">
-                <option v-for="i in 4" :key="i - 1" :value="i - 1">Save slot {{i}}</option>
-              </select>
+              <textarea class="textarea textarea-bordered w-full min-h-8 resize-none" v-model="formData.description" />
             </div>
             <div class="flex justify-center">
-              <button :disabled="!canMerge" type="submit" class="btn btn-primary btn-wide transition-all">
-                Merge
+              <button :disabled="!canUpload" type="submit" class="btn btn-primary btn-wide transition-all">
+                Upload
               </button>
             </div>
           </div>
@@ -156,9 +151,9 @@ const handleSaveMerge = async () => {
         <h3 class="text-lg font-medium">Instructions</h3>
         <ol class="list-decimal ml-6">
           <li class="my-1"><p>Select your save by going to:</p><p>Documents -> My games -> Snowrunner -> base -> storage</p><p>There you'll see a folder named using bunch of random alphanumeric character, that's your save folder</p></li>
-          <li class="my-1">After selecting the folder, select save number which you want to merge</li>
+          <li class="my-1">After selecting the folder, select save number which you want to upload</li>
           <li class="my-1">Select the output save number</li>
-          <li class="my-1">Click merge</li>
+          <li class="my-1">Click upload</li>
         </ol>
       </div>
     </div>

@@ -19,3 +19,11 @@ export const validateSaveFiles = (fileNames: string[]): number[] => {
 
     return mapFilesCount > 0 ? saveFileNumbers : [];
 }
+
+export const generateSaveRegex = (saveNumber: number): RegExp => {
+    const prefix = saveNumber ? saveNumber + '_' : '';
+
+    const regexString = `(CompleteSave${saveNumber}\\.dat)|(\\b${prefix}(fog|sts)_.*\\.dat\\b)`;
+
+    return new RegExp(regexString, 'm');
+}

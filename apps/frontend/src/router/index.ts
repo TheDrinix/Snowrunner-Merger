@@ -73,6 +73,14 @@ const router = createRouter({
                     name: 'group-save-merge',
                     component: () => import('../views/groups/SaveMergeView.vue'),
                 },
+                {
+                    path: 'upload',
+                    name: 'group-save-upload',
+                    component: () => import('../views/groups/SaveUploadView.vue'),
+                    meta: {
+                        validateGroupOwner: true
+                    }
+                }
             ],
         }
     ]
