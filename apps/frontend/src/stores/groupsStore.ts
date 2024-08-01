@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {Group, GroupData, GroupsStore} from "@/types/groups";
+import type {GroupData, GroupsStore} from "@/types/groups";
 import {useUserStore} from "@/stores/userStore";
 import type {StoredSave} from "@/types/saves";
 
@@ -62,6 +62,9 @@ export const useGroupsStore = defineStore('groups', {
 
                 this.groups.set(groupId, group);
             }
+        },
+        removeGroup(groupId: string) {
+          this.groups.delete(groupId);
         },
         clearSaves(groupId: string) {
             const group = this.groups.get(groupId);

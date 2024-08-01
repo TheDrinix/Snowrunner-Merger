@@ -5,6 +5,7 @@ export interface GroupData {
     name: string;
     members: GroupMember[];
     owner: GroupMember;
+    ownerId: string;
 }
 
 export interface Group {
@@ -12,6 +13,7 @@ export interface Group {
     name: string;
     members: GroupMember[];
     owner: GroupMember;
+    ownerId: string;
     saves: StoredSave[];
     lastLoadedSavesAt?: Date;
 }
