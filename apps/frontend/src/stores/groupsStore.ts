@@ -44,6 +44,9 @@ export const useGroupsStore = defineStore('groups', {
                 this.groups.set(group.id, group);
             });
         },
+        storeGroup(group: GroupData) {
+            this.groups.set(group.id, {...group, saves: []});
+        },
         storeGroupSaves(groupId: string, saves: StoredSave[]) {
             const group = this.groups.get(groupId);
 

@@ -23,8 +23,22 @@ http.get<IGroup[]>("/groups")
 const joinedGroups = computed(() => groupsStore.getJoinedGroups);
 const ownedGroups = computed(() => groupsStore.getOwnedGroups);
 
+const groupJoinCode = ref("");
+
+const isValidCode = computed(() => {
+  const regex = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/mi
+
+  return regex.test(groupJoinCode.value);
+})
+
 const handleJoinGroup = () => {
-  alert('This will eventually do something lol');
+  http.post(`/groups/${groupJoinCode.value}/join`)
+    .then(res => {
+      if (res.status < 300) {
+        groupsStore.storeGroup(res.data);
+        groupJoinCode.value = "";
+      }
+    });
 }
 </script>
 
@@ -40,10 +54,10 @@ const handleJoinGroup = () => {
             <div v-if="false" class="alert alert-error"></div>
             <div class="join">
               <div class="w-full">
-                <input class="input input-bordered join-item w-full" placeholder="Enter a group code to join" />
+                <input v-model="groupJoinCode" class="input input-bordered join-item w-full" placeholder="Enter a group code to join" />
               </div>
               <div>
-                <button class="btn btn-neutral join-item">Join</button>
+                <button :disabled="!isValidCode" class="btn btn-neutral join-item">Join</button>
               </div>
             </div>
           </div>

@@ -34,7 +34,7 @@ const isConfirmLeaveModalOpen = ref(false);
 const loading = ref(true);
 const http = useHttp();
 
-if (!group.value?.lastLoadedSavesAt || group.value.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5) {
+if (group.value && (!group.value.lastLoadedSavesAt || group.value.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5)) {
   http.get(`/groups/${group.value?.id}/saves`)
     .then(res => {
       if (res.status < 300) {

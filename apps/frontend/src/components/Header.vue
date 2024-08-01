@@ -25,7 +25,7 @@ const user = computed(() => userStore.user);
                 <RouterLink :to="{ name: 'groups' }" exact-active-class="active">Groups</RouterLink>
               </li>
               <li>
-                <RouterLink :to="{ name: 'groups' }">Groups</RouterLink>
+                <RouterLink :to="{ name: 'group-create' }" exact-active-class="active">Create a group</RouterLink>
               </li>
             </ul>
           </div>
@@ -37,7 +37,8 @@ const user = computed(() => userStore.user);
                 <Icon name="person" />
                 {{ user?.username }}
               </div>
-              <ul tabindex="0" class="menu dropdown-content bg-base-100 rounded-box z-[1] mt-4 min-w-52 p-2 shadow">
+              <ul tabindex="0" class="menu dropdown-content bg-base-200 rounded-box z-[1] mt-4 min-w-52 p-2 shadow">
+                <div class="divider" />
                 <li>
                   <button>
                     <Icon name="account_circle" />
