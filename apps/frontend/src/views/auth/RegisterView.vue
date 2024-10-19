@@ -50,22 +50,25 @@ const handleRegister = async () => {
   console.log("Registering user...");
   loading.value = true;
 
-  const res = await http.post("/auth/register", {
-    username: username.value,
-    email: email.value,
-    password: password.value
-  }, {
-    withCredentials: true
-  });
+  try {
+    const res = await http.post("/auth/register", {
+      username: username.value,
+      email: email.value,
+      password: password.value
+    }, {
+      withCredentials: true
+    });
 
+    await router.push({ name: 'register-confirm' })
+  } catch (e) {
+    console.error("Failed to register user");
+
+    if (e.response.status === 409) {
+      errors.value.email = "Email already in use";
+    }
+  }
 
   loading.value = false;
-  if (res.status < 300) {
-    console.log("User registered successfully");
-    await router.push({ name: 'register-confirm' })
-  } else {
-    console.error("Failed to register user");
-  }
 }
 </script>
 

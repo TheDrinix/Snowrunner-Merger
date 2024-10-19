@@ -28,32 +28,36 @@ const http = useHttp();
 if (!group.value?.lastLoadedSavesAt || group.value.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5) {
   http.get(`/groups/${group.value?.id}/saves`)
     .then(res => {
-      if (res.status < 300) {
-        groupsStore.storeGroupSaves(group.value?.id, res.data);
-        loading.value = false;
-      } else router.push({name: 'groups'});
+      groupsStore.storeGroupSaves(group.value?.id, res.data);
+      loading.value = false;
+    })
+    .catch(e => {
+      router.push({name: 'groups'});
     });
 }
 
 const handleSaveDelete = async (saveIdx: number) => {
   const saveId = group.value?.saves[saveIdx].id;
 
-  const res = await http.delete(`/groups/${groupId.value}/saves/${saveId}`)
+  try {
+    const res = await http.delete(`/groups/${groupId.value}/saves/${saveId}`);
 
-  if (res.status < 300) {
     groupsStore.deleteGroupSave(groupId.value, saveIdx);
+  } catch (e) {
+    console.error('Failed to delete save');
   }
 }
 
 const isConfirmDeleteModalOpen = ref(false);
 
 const handleGroupDelete = async () => {
-  const res = await http.delete(`/groups/${groupId.value}`);
+  try {
+    const res = await http.delete(`/groups/${groupId.value}`);
 
-  if (res.status < 300) {
     groupsStore.removeGroup(groupId.value);
-    await router.push({name: 'groups'});
   }
+
+  await router.push({name: 'groups'});
 }
 </script>
 
@@ -75,16 +79,14 @@ const handleGroupDelete = async () => {
         </div>
       </Modal>
     </div>
-    <div class="card-body" v-if="group?.saves.length">
-      <GroupSave v-if="group.saves.length" v-for="(save, idx) in group.saves" :key="save.id" :save="save" :idx="idx" :groupId="groupId">
+    <div class="card-body">
+      <GroupSave v-if="group?.saves.length" v-for="(save, idx) in group.saves" :key="save.id" :save="save" :idx="idx" :groupId="groupId">
         <template #actions>
           <RouterLink v-if="group.saves.length >= 3" :to="{name: 'group-save-upload', query: { saveNumber: idx }, params: { id: groupId }}" class="btn btn-outline btn-secondary">Replace</RouterLink>
-          <button class="btn btn-outline btn-secondary w-full" @click="() => group ? handleSaveDelete(idx) : ''">Delete</button>
+          <button class="btn btn-outline btn-secondary w-full" @click="() => handleSaveDelete(idx)">Delete</button>
         </template>
       </GroupSave>
       <h2 v-else class="text-lg font-medium">There are currently no stored saves in this group</h2>
-    </div>
-    <div class="card-body" v-else>
     </div>
   </div>
 </template>

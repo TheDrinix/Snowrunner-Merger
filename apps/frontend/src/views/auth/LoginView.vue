@@ -4,10 +4,13 @@ import {toTypedSchema} from "@vee-validate/yup";
 import * as yup from "yup";
 import {useForm} from "vee-validate";
 import axios, {type AxiosInstance} from "axios";
-import {inject} from "vue";
+import {inject, ref, watch} from "vue";
 import {useUserStore} from "@/stores/userStore";
 import type {LoginResponse} from "@/types/auth";
 import Icon from "@/components/icon.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
 
 const schema = toTypedSchema(
   yup.object({
@@ -30,29 +33,43 @@ const { errors, defineField } = useForm({
 const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
 
+const error = ref("");
+
+watch(route.query.error, (value: string) => {
+  if (value) {
+    error.value = value;
+  }
+});
+
 const http = inject<AxiosInstance>("axios", axios.create());
 const userStore = useUserStore();
 
 const handleLogin = async () => {
+  error.value = "";
+
   if (errors.value.email || errors.value.password) {
     return;
   }
 
-  console.log("Logging in...");
+  try {
+    const res = await http.post<LoginResponse>("/auth/login", {
+      email: email.value,
+      password: password.value
+    }, {
+      withCredentials: true
+    });
 
-  const res = await http.post<LoginResponse>("/auth/login", {
-    email: email.value,
-    password: password.value
-  }, {
-    withCredentials: true
-  });
-
-  if (res.status < 300) {
-    console.log("User logged in successfully");
-    console.log(res.data)
     userStore.signIn(res.data);
-  } else {
+  } catch (e) {
     console.error("Failed to log in user");
+
+    if (e.response.status === 401) {
+      error.value = "Invalid email or password";
+    }
+
+    if (e.response.status === 400) {
+      error.value = "Email not confirmed";
+    }
   }
 }
 </script>
@@ -69,11 +86,17 @@ const handleLogin = async () => {
             <Icon name="mail" />
           </template>
         </TextInput>
-        <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password">
-          <template #icon-prepend>
+        <div>
+          <div class="label">
+            <span v-if="error" class="label-text text-error">{{errors.password}}</span>
+            <span class="ml-auto label-text"><RouterLink :to="{name: 'reset-password-request'}" class="link text-blue-400 transition-colors">Forgot password</RouterLink></span>
+          </div>
+          <label class="transition-all input input-bordered flex items-center gap-2" :class="{ 'input-error': !!error }">
             <Icon name="lock" />
-          </template>
-        </TextInput>
+            <input v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" class="w-full" />
+            <slot name="icon-append"></slot>
+          </label>
+        </div>
         <div class="flex justify-center">
           <button type="submit" class="btn btn-primary btn-wide">Login</button>
         </div>

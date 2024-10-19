@@ -85,7 +85,7 @@ const handleSaveMerge = async () => {
   body.set('outputSaveNumber', formData.value.outputSaveNumber.toString());
   body.set('save', zipBlob);
 
-  const res = await http.post(`/groups/${groupId.value}/merge`, body, {
+  const cfg = {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
@@ -93,9 +93,11 @@ const handleSaveMerge = async () => {
       storedSaveNumber: saveNumber.value
     },
     responseType: 'blob'
-  });
+  };
 
-  if (res.status < 300) {
+  try {
+    const res = await http.post(`/groups/${groupId.value}/merge`, body, cfg);
+
     const url = window.URL.createObjectURL(res.data);
 
     const a = document.createElement('a');
@@ -106,6 +108,8 @@ const handleSaveMerge = async () => {
 
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error(e);
   }
 }
 </script>

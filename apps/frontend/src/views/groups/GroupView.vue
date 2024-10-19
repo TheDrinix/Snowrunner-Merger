@@ -37,21 +37,24 @@ const http = useHttp();
 if (group.value && (!group.value.lastLoadedSavesAt || group.value.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5)) {
   http.get(`/groups/${group.value?.id}/saves`)
     .then(res => {
-      if (res.status < 300) {
-        groupsStore.storeGroupSaves(group.value?.id, res.data);
-        loading.value = false;
-      } else router.push({name: 'groups'});
+      groupsStore.storeGroupSaves(group.value?.id, res.data);
+      loading.value = false;
+    })
+    .catch(err => {
+      router.push({name: 'groups'});
     });
 }
 
 const handleGroupLeave = () => {
   http.delete(`/groups/${group.value?.id}/leave`)
     .then(res => {
-      if (res.status < 300) {
-        groupsStore.removeGroup(groupId.value);
-        router.push({name: 'groups'});
-      }
-    });
+      groupsStore.removeGroup(groupId.value);
+    })
+    .catch(e =>
+      console.error(e)
+    );
+
+  router.push({name: 'groups'});
 }
 </script>
 

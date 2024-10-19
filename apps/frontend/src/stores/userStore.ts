@@ -23,13 +23,13 @@ export const useUserStore = defineStore('user', {
             this.accessTokenExpires = new Date(Date.now() + data.expiresIn * 1000);
         },
         async refreshToken() {
-            const res = await this.axios.post<LoginResponse>('/auth/refresh', {}, {
-                withCredentials: true
-            });
+            try {
+                const res = await this.axios.post<LoginResponse>('/auth/refresh', {}, {
+                    withCredentials: true
+                });
 
-            if (res.status === 200) {
                 this.signIn(res.data);
-            } else {
+            } catch (e) {
                 this.$state = {...defaultState, accessTokenExpires: new Date(0)};
             }
         },

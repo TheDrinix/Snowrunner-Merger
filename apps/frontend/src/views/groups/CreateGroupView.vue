@@ -12,10 +12,12 @@ const isLoading = ref(true);
 
 http.get<IGroup[]>("/groups")
   .then(res => {
-    if (res.status < 300) groupsStore.storeGroups(res.data);
-    else router.push({name: "login"});
+    groupsStore.storeGroups(res.data);
 
     isLoading.value = false;
+  })
+  .catch(e => {
+    router.push({name: "login"});
   });
 
 const ownedGroups = computed(() => groupsStore.getOwnedGroups);
@@ -25,13 +27,17 @@ const groupName = ref("");
 const handleCreateGroup = () => {
   http.post("/groups", {name: groupName.value})
     .then(res => {
-      if (res.status < 300) {
-        groupsStore.storeGroup(res.data);
-        groupName.value = "";
+      groupsStore.storeGroup(res.data);
+      groupName.value = "";
 
-        router.push({name: 'group-manage', params: {id: res.data.id}});
+      router.push({name: 'group-manage', params: {id: res.data.id}});
+    })
+    .catch(e => {
+      if (e.response.status === 401) {
+        router.push({name: 'login'});
       }
-    });
+      // TODO handle error when having too many groups
+    })
 }
 </script>
 

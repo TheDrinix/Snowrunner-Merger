@@ -13,12 +13,14 @@ const router = useRouter();
 const isLoading = ref(true);
 
 http.get<IGroup[]>("/groups")
-    .then(res => {
-        if (res.status < 300) groupsStore.storeGroups(res.data);
-        else router.push({name: "login"});
+  .then(res => {
+    groupsStore.storeGroups(res.data);
 
-        isLoading.value = false;
-    });
+    isLoading.value = false;
+  })
+  .catch(e => {
+    router.push({name: "login"});
+  });
 
 const joinedGroups = computed(() => groupsStore.getJoinedGroups);
 const ownedGroups = computed(() => groupsStore.getOwnedGroups);
@@ -34,10 +36,11 @@ const isValidCode = computed(() => {
 const handleJoinGroup = () => {
   http.post(`/groups/${groupJoinCode.value}/join`)
     .then(res => {
-      if (res.status < 300) {
-        groupsStore.storeGroup(res.data);
-        groupJoinCode.value = "";
-      }
+      groupsStore.storeGroup(res.data);
+      groupJoinCode.value = "";
+    })
+    .catch(e => {
+      console.error(e);
     });
 }
 </script>

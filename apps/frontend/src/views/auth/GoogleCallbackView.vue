@@ -20,19 +20,19 @@ onBeforeMount(async () => {
   console.log('Google sign-in successful');
 
   // Exchange the Google code for an access token
-  const res = await http.get<LoginResponse>('/auth/google/signin/callback', {
-    params: {
-      code,
-      state
-    },
-    withCredentials: true
-  });
+  try {
+    const res = await http.get<LoginResponse>('/auth/google/signin/callback', {
+      params: {
+        code,
+        state
+      },
+      withCredentials: true
+    });
 
-  if (res.status < 300) {
-    console.log('User logged in successfully');
     userStore.signIn(res.data);
-  } else {
-    console.error('Failed to log in user');
+  } catch (e) {
+    console.error('Failed to exchange Google code for access token');
+    await router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
   }
 
   await router.push({ name: 'home' });

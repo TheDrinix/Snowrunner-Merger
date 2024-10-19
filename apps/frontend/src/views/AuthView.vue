@@ -2,13 +2,11 @@
 import {useRoute, useRouter} from "vue-router";
 import {computed} from "vue";
 import {useHttp} from "@/composables/useHttp";
-import {useUserStore} from "@/stores/userStore";
 
 const route = useRoute();
 const router = useRouter();
 
 const http = useHttp();
-const userStore = useUserStore();
 
 if (route.name == 'auth') {
   router.push({name: 'login'});
@@ -19,17 +17,16 @@ const title = computed(() => {
 })
 
 const handleGoogleSignIn = async () => {
-  const googleSignInUrl = await http.get<string>('/auth/google/signin', {
-    withCredentials: true
-  });
+  try {
+    const googleSignInUrl = await http.get<string>('/auth/google/signin/', {
+      withCredentials: true
+    });
 
-  if (googleSignInUrl.status != 200) {
+    // Redirect the user to the Google sign-in page
+    window.location.href = googleSignInUrl.data;
+  } catch (e) {
     console.error('Failed to get Google sign-in URL');
-    return;
   }
-
-  // Redirect the user to the Google sign-in page
-  window.location.href = googleSignInUrl.data;
 }
 </script>
 
@@ -44,7 +41,7 @@ const handleGoogleSignIn = async () => {
       <div>
         <h3>Sign-in using an external service:</h3>
         <div class="mt-2">
-          <button @click="handleGoogleSignIn" class="btn btn-outline gap-0">
+          <button @click="handleGoogleSignIn" class="btn btn-ghost gap-0">
             <img class="w-8 h-8" src="/google.svg" alt="Google icon">
             Google
           </button>
