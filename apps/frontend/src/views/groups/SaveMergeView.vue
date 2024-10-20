@@ -132,21 +132,23 @@ const handleSaveMerge = async () => {
               </div>
               <input class="file-input file-input-bordered w-full" ref="fileInput" type="file" webkitdirectory directory @change="handleFolderChange" />
             </div>
-            <div class="form-control w-full" v-if="availableSaves.length">
-              <div class="label">
-                <span class="label-text">Select which save you want to merge</span>
+            <div class="p-0 m-0 transition-all overflow-hidden" :class="{'max-h-48': availableSaves.length, 'max-h-0': !availableSaves.length}">
+              <div class="form-control w-full">
+                <div class="label">
+                  <span class="label-text">Select which save you want to merge</span>
+                </div>
+                <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber" :disabled="availableSaves.length">
+                  <option v-for="save in availableSaves" :key="save" :value="save">Save {{save + 1}}</option>
+                </select>
               </div>
-              <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber">
-                <option v-for="save in availableSaves" :key="save" :value="save">Save {{save + 1}}</option>
-              </select>
-            </div>
-            <div class="form-control w-full" v-if="availableSaves.length">
-              <div class="label">
-                <span class="label-text">Select output save number</span>
+              <div class="form-control w-full">
+                <div class="label">
+                  <span class="label-text">Select output save number</span>
+                </div>
+                <select name="outputSaveNumber" class="select select-bordered" v-model="formData.outputSaveNumber" :disabled="availableSaves.length">
+                  <option v-for="i in 4" :key="i - 1" :value="i - 1">Save slot {{i}}</option>
+                </select>
               </div>
-              <select name="outputSaveNumber" class="select select-bordered" v-model="formData.outputSaveNumber">
-                <option v-for="i in 4" :key="i - 1" :value="i - 1">Save slot {{i}}</option>
-              </select>
             </div>
             <div class="flex justify-center">
               <button :disabled="!canMerge" type="submit" class="btn btn-primary btn-wide transition-all">

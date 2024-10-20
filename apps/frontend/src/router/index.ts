@@ -20,19 +20,48 @@ const router = createRouter({
         {
             path: '/auth/google/callback',
             name: 'google-callback',
-            component: () => import('../views/auth/GoogleCallbackView.vue')
+            component: () => import('../views/auth/GoogleCallbackView.vue'),
+            meta: {
+                bypassAuth: true
+            }
         },
         {
             path: '/auth/register-confirm',
             name: 'register-confirm',
-            component: () => import('../views/auth/RegisterConfirmationView.vue')
+            component: () => import('../views/auth/RegisterConfirmationView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
+            path: '/auth/reset-password',
+            children: [
+                {
+                    path: '',
+                    name: 'reset-password',
+                    component: () => import('../views/auth/ResetPasswordView.vue')
+                },
+                {
+                    path: 'confirm',
+                    name: 'reset-password-confirm',
+                    component: () => import('../views/auth/PasswordResetConfirmationView.vue')
+                },
+                {
+                    path: 'request',
+                    name: 'reset-password-request',
+                    component: () => import('../views/auth/RequestPasswordResetView.vue')
+                }
+            ],
+            meta: {
+                bypassAuth: true
+            }
         },
         {
             path: '/auth',
             name: 'auth',
             component: () => import('../views/AuthView.vue'),
             meta: {
-              bypassAuth: true
+                bypassAuth: true
             },
             children: [
                 {
