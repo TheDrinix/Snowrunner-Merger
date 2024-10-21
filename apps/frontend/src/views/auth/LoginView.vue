@@ -4,7 +4,7 @@ import {toTypedSchema} from "@vee-validate/yup";
 import * as yup from "yup";
 import {useForm} from "vee-validate";
 import axios, {type AxiosInstance} from "axios";
-import {inject, ref, watch} from "vue";
+import {computed, inject, ref, watch} from "vue";
 import {useUserStore} from "@/stores/userStore";
 import type {LoginResponse} from "@/types/auth";
 import Icon from "@/components/icon.vue";
@@ -33,13 +33,21 @@ const { errors, defineField } = useForm({
 const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
 
-const error = ref("");
+const routeError = computed(() => {
+  return route.query.error ?? "";
+})
 
-watch(route.query.error, (value: string) => {
+const error = ref(routeError.value);
+
+watch(routeError, (value: string) => {
   if (value) {
     error.value = value;
   }
 });
+
+const msg = computed(() => {
+  return route.query.msg ?? "";
+})
 
 const http = inject<AxiosInstance>("axios", axios.create());
 const userStore = useUserStore();
@@ -81,6 +89,12 @@ const handleLogin = async () => {
     </div>
     <form @submit.prevent="handleLogin">
       <div class="flex flex-col gap-4">
+        <div class="alert alert-error" v-if="error">
+          <span>{{error}}</span>
+        </div>
+        <div class="alert alert-success" v-if="msg && !error">
+          <span>{{msg}}</span>
+        </div>
         <TextInput v-model="email" name="email" placeholder="Email" type="email" autocomplete="email" :error="errors.email">
           <template #icon-prepend>
             <Icon name="mail" />
@@ -88,10 +102,10 @@ const handleLogin = async () => {
         </TextInput>
         <div>
           <div class="label">
-            <span v-if="error" class="label-text text-error">{{errors.password}}</span>
+            <span class="label-text text-error">{{errors.password}}</span>
             <span class="ml-auto label-text"><RouterLink :to="{name: 'reset-password-request'}" class="link text-blue-400 transition-colors">Forgot password</RouterLink></span>
           </div>
-          <label class="transition-all input input-bordered flex items-center gap-2" :class="{ 'input-error': !!error }">
+          <label class="transition-all input input-bordered flex items-center gap-2" :class="{ 'input-error': !!errors.password }">
             <Icon name="lock" />
             <input v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" class="w-full" />
             <slot name="icon-append"></slot>

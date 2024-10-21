@@ -55,6 +55,8 @@ const handleGroupDelete = async () => {
     const res = await http.delete(`/groups/${groupId.value}`);
 
     groupsStore.removeGroup(groupId.value);
+  } catch (e) {
+    console.error(e)
   }
 
   await router.push({name: 'groups'});
