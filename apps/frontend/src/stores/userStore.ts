@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import type {LoginResponse, UserStore} from "@/types/auth";
+import {useGroupsStore} from "@/stores/groupsStore";
 
 const defaultState = {
     user: undefined,
@@ -39,6 +40,13 @@ export const useUserStore = defineStore('user', {
             }
 
             return this.accessToken;
+        },
+        logout() {
+            this.$state = {...defaultState};
+
+            const groupsStore = useGroupsStore();
+
+            groupsStore.clearStore();
         }
     }
 });

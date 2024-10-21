@@ -78,6 +78,9 @@ export const useGroupsStore = defineStore('groups', {
 
                 this.groups.set(groupId, group);
             }
+        },
+        clearStore() {
+            this.$state = {...defaultState};
         }
     }
 });

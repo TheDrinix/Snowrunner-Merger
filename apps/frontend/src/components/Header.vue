@@ -2,12 +2,16 @@
 import {useUserStore} from "@/stores/userStore";
 import {computed} from "vue";
 import Icon from "@/components/icon.vue";
+import {breakpointsTailwind, useBreakpoints} from "@vueuse/core";
+import {useRouter} from "vue-router";
+import HeaderDropdown from "@/components/HeaderDropdown.vue";
 
 const userStore = useUserStore();
+const breakpoints = useBreakpoints(breakpointsTailwind);
+
+const smAndSmaller = breakpoints.smallerOrEqual('sm');
 
 const isAuthenticated = computed(() => userStore.isAuthenticated);
-
-const user = computed(() => userStore.user);
 </script>
 
 <template>
@@ -16,10 +20,10 @@ const user = computed(() => userStore.user);
       <div class="container mx-auto">
         <div class="flex flex-1 items-center">
           <RouterLink :to="{ name: 'home'}">Snowrunner merger</RouterLink>
-          <div>
-            <div class="h-8 divider divider-horizontal mr-1" />
-          </div>
-          <div class="inline-flex items-center" v-if="isAuthenticated">
+          <div class="inline-flex items-center" v-if="isAuthenticated && !smAndSmaller">
+            <div>
+              <div class="h-8 divider divider-horizontal mr-1" />
+            </div>
             <ul class="px-0 menu menu-horizontal bg-base-200 rounded-box">
               <li>
                 <RouterLink :to="{ name: 'groups' }" exact-active-class="active">Groups</RouterLink>
@@ -32,27 +36,7 @@ const user = computed(() => userStore.user);
         </div>
         <div class="flex-none">
           <div v-if="isAuthenticated">
-            <div class="dropdown dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost">
-                <Icon name="person" />
-                {{ user?.username }}
-              </div>
-              <ul tabindex="0" class="menu dropdown-content bg-base-200 rounded-box z-[1] mt-4 min-w-52 p-2 shadow">
-                <div class="divider" />
-                <li>
-                  <button>
-                    <Icon name="account_circle" />
-                    Account
-                  </button>
-                </li>
-                <li>
-                  <button>
-                    <Icon name="logout" />
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
+            <HeaderDropdown />
           </div>
           <div v-else>
             <RouterLink class="btn btn-ghost" :to="{ name: 'login' }">Sign in</RouterLink>
