@@ -13,7 +13,12 @@ export default {
         require('daisyui')
     ],
     daisyui: {
-        themes: ["light", "dark", "dracula"]
+        themes: ["nord", "dracula", {
+            dim: {
+                ...require("daisyui/src/theming/themes")["dim"],
+                primary: "rgb(72,218,230)"
+            }
+        }]
     }
 }
 
