@@ -9,6 +9,7 @@ const http = useHttp();
 const groupsStore = useGroupsStore();
 const router = useRouter();
 const isLoading = ref(true);
+const err = ref('');
 
 http.get<IGroup[]>("/groups")
   .then(res => {
@@ -37,6 +38,9 @@ const handleCreateGroup = () => {
         router.push({name: 'login'});
       }
       // TODO handle error when having too many groups
+      if (e.response.status === 409) {
+        err.value = "You already own maximum amount of groups"
+      }
     })
 }
 </script>
@@ -53,6 +57,11 @@ const handleCreateGroup = () => {
         </div>
       </div>
       <form @submit.prevent="handleCreateGroup">
+        <div v-if="err">
+          <div class="alert alert-error">
+            {{err}}
+          </div>
+        </div>
         <div class="form-control">
           <label class="label">
             <span class="label-text">Group name</span>

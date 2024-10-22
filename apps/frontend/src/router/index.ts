@@ -34,6 +34,14 @@ const router = createRouter({
             }
         },
         {
+            path: '/auth/confirm-email',
+            name: 'email-confirm',
+            component: () => import('../views/auth/EmailConfirmView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
             path: '/auth/reset-password',
             children: [
                 {

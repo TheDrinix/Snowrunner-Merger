@@ -6,11 +6,19 @@ import {useForm} from "vee-validate";
 import axios, {type AxiosInstance} from "axios";
 import {computed, inject, ref, watch} from "vue";
 import {useUserStore} from "@/stores/userStore";
-import type {LoginResponse} from "@/types/auth";
+import {type LoginResponse} from "@/types/auth";
 import Icon from "@/components/icon.vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+
+enum LoginErrorType {
+  NONE,
+  INVALID_CREDENTIALS,
+  EMAIL_NOT_CONFIRMED,
+  EXTERNAL
+}
 
 const route = useRoute();
+const router = useRouter();
 
 const schema = toTypedSchema(
   yup.object({
@@ -37,11 +45,17 @@ const routeError = computed(() => {
   return route.query.error ?? "";
 })
 
-const error = ref(routeError.value);
+const error = ref({
+  msg: routeError.value,
+  type: LoginErrorType.NONE
+});
 
 watch(routeError, (value: string) => {
   if (value) {
-    error.value = value;
+    error.value = {
+      msg: value,
+      type: LoginErrorType.EMAIL_NOT_CONFIRMED
+    };
   }
 });
 
@@ -53,7 +67,10 @@ const http = inject<AxiosInstance>("axios", axios.create());
 const userStore = useUserStore();
 
 const handleLogin = async () => {
-  error.value = "";
+  error.value = {
+    msg: "",
+    type: LoginErrorType.NONE
+  };
 
   if (errors.value.email || errors.value.password) {
     return;
@@ -68,16 +85,37 @@ const handleLogin = async () => {
     });
 
     userStore.signIn(res.data);
+
+    router.push({name: 'groups'})
   } catch (e) {
     console.error("Failed to log in user");
 
     if (e.response.status === 401) {
-      error.value = "Invalid email or password";
+      error.value = {
+        msg: "Invalid email or password",
+        type: LoginErrorType.INVALID_CREDENTIALS
+      };
     }
 
-    if (e.response.status === 400) {
-      error.value = "Email not confirmed";
+    if (e.response.status === 403) {
+      error.value = {
+        msg: "Your account's email is not confirmed",
+        type: LoginErrorType.EMAIL_NOT_CONFIRMED
+      };
     }
+  }
+}
+
+const handleConfirmationResend = async () => {
+  error.value = {
+    msg: '',
+    type: LoginErrorType.NONE
+  }
+
+  try {
+    await http.post('/auth/resend-confirmation', { email: email.value });
+  } catch (e) {
+    console.error(e);
   }
 }
 </script>
@@ -89,8 +127,11 @@ const handleLogin = async () => {
     </div>
     <form @submit.prevent="handleLogin">
       <div class="flex flex-col gap-4">
-        <div class="alert alert-error" v-if="error">
-          <span>{{error}}</span>
+        <div class="alert alert-error font-bold" v-if="error.msg">
+          <div>
+            <p>{{error.msg}}</p>
+            <p v-if="error.type === LoginErrorType.EMAIL_NOT_CONFIRMED">Click <a @click="handleConfirmationResend" class="link text-blue-700">here</a> to resend confirmation email to the entered email address</p>
+          </div>
         </div>
         <div class="alert alert-success" v-if="msg && !error">
           <span>{{msg}}</span>

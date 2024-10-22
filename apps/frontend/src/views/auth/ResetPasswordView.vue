@@ -53,7 +53,7 @@ const [confirmPassword, confirmPasswordAttrs] = defineField("confirmPassword");
 
 const loading = ref(false);
 const isFormValid = computed(() => {
-  return !errors.value.password && !errors.value.confirmPassword;
+  return !!password.value && !!confirmPassword.value && !errors.value.password && !errors.value.confirmPassword;
 })
 
 const handlePasswordReset = async () => {
