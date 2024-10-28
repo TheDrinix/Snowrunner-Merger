@@ -42,7 +42,7 @@ const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
 
 const routeError = computed(() => {
-  return route.query.error ?? "";
+  return route.query.error?.toString ?? "";
 })
 
 const error = ref({

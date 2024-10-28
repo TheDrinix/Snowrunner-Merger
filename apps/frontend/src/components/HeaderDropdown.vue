@@ -3,31 +3,15 @@ import Icon from "@/components/icon.vue";
 import {useUserStore} from "@/stores/userStore";
 import {computed} from "vue";
 import {breakpointsTailwind, useBreakpoints} from "@vueuse/core";
-import {useHttp} from "@/composables/useHttp";
-import {useRouter} from "vue-router";
+import {useLogout} from "@/composables/useLogout";
 
 const userStore = useUserStore();
 const breakpoints = useBreakpoints(breakpointsTailwind);
-const http = useHttp();
-const router = useRouter();
+const logout = useLogout();
 
 const smAndSmaller = breakpoints.smallerOrEqual('sm');
 
 const user = computed(() => userStore.user);
-
-const handleLogout = async () => {
-  try {
-    await http.post('/auth/logout', {}, {
-      withCredentials: true
-    });
-  } catch (e) {
-    console.error(e);
-  }
-
-  userStore.logout();
-
-  router.push({name: 'home'});
-}
 </script>
 
 <template>
@@ -47,13 +31,13 @@ const handleLogout = async () => {
         <div class="divider my-2" />
       </template>
       <li>
-        <button>
+        <RouterLink :to="{ name: 'account' }" exact-active-class="active">
           <Icon name="account_circle" />
           Account
-        </button>
+        </RouterLink>
       </li>
       <li>
-        <button @click="handleLogout">
+        <button @click="logout">
           <Icon name="logout" />
           Logout
         </button>
