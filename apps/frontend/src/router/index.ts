@@ -129,6 +129,22 @@ const router = createRouter({
                     }
                 }
             ],
+        },
+        {
+            path: '/privacy',
+            name: 'privacy',
+            component: () => import('../views/PrivacyView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
+            path: '/terms-of-use',
+            name: 'tos',
+            component: () => import('../views/TosView.vue'),
+            meta: {
+                bypassAuth: true
+            }
         }
     ]
 })
