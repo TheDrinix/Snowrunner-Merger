@@ -4,10 +4,12 @@ import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Icon from "@/components/icon.vue";
 import {useHttp} from "@/composables/useHttp";
+import {useToaster} from "@/stores/toastStore";
 
 const route = useRoute();
 const router = useRouter();
 const http = useHttp();
+const { createToast } = useToaster();
 
 const email = ref(route.query.email ?? "");
 watch(() => route.query.email, (value: string) => {
@@ -26,8 +28,10 @@ const handlePasswordReset = async () => {
     });
 
     await router.push({name: "reset-password-confirm"});
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error');
+    }
   }
 
   isLoading.value = false;

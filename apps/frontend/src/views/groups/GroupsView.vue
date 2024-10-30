@@ -6,11 +6,13 @@ import type {GroupData as IGroup} from "@/types/groups";
 import Group from "@/components/groups/Group.vue";
 import GroupLoading from "@/components/groups/GroupLoading.vue";
 import {useRouter} from "vue-router";
+import {useToaster} from "@/stores/toastStore";
 
 const http = useHttp();
 const groupsStore = useGroupsStore();
 const router = useRouter();
 const isLoading = ref(true);
+const {createToast} = useToaster();
 
 http.get<IGroup[]>("/groups")
   .then(res => {
@@ -40,7 +42,9 @@ const handleJoinGroup = () => {
       groupJoinCode.value = "";
     })
     .catch(e => {
-      console.error(e);
+      if (e.response.data.title) {
+        createToast(e.response.data.title, 'error');
+      }
     });
 }
 </script>

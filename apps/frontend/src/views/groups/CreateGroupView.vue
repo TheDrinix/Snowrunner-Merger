@@ -4,10 +4,13 @@ import {useGroupsStore} from "@/stores/groupsStore";
 import {useRouter} from "vue-router";
 import {computed, ref} from "vue";
 import type {GroupData as IGroup} from "@/types/groups";
+import {useToaster} from "@/stores/toastStore";
 
 const http = useHttp();
 const groupsStore = useGroupsStore();
 const router = useRouter();
+const {createToast} = useToaster();
+
 const isLoading = ref(true);
 const err = ref('');
 
@@ -33,13 +36,15 @@ const handleCreateGroup = () => {
 
       router.push({name: 'group-manage', params: {id: res.data.id}});
     })
-    .catch(e => {
+    .catch((e: any) => {
       if (e.response.status === 401) {
         router.push({name: 'login'});
-      }
-      // TODO handle error when having too many groups
-      if (e.response.status === 409) {
+      } else if (e.response.status === 409) {
         err.value = "You already own maximum amount of groups"
+      } else {
+        if (e.response.data.title) {
+          createToast(e.response.data.title, 'error');
+        }
       }
     })
 }

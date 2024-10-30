@@ -29,17 +29,16 @@ http.post('/auth/verify-email', {
   userId: userId.value,
   token: token.value
 }).then(() => {
-    loading.value = false;
+  loading.value = false;
+  err.value = false;
 
-    startRedirect();
+  startRedirect();
 }).catch(() => {
-    err.value = false;
+    err.value = true;
     loading.value = false;
 
     startRedirect();
 })
-
-err.value = false;
 
 onBeforeUnmount(() => {
   stopRedirect();

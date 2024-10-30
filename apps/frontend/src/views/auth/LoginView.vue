@@ -9,6 +9,7 @@ import {useUserStore} from "@/stores/userStore";
 import {type LoginResponse} from "@/types/auth";
 import Icon from "@/components/icon.vue";
 import {useRoute, useRouter} from "vue-router";
+import {useToaster} from "@/stores/toastStore";
 
 enum LoginErrorType {
   NONE,
@@ -19,6 +20,7 @@ enum LoginErrorType {
 
 const route = useRoute();
 const router = useRouter();
+const {createToast} = useToaster();
 
 const schema = toTypedSchema(
   yup.object({
@@ -95,12 +97,15 @@ const handleLogin = async () => {
         msg: "Invalid email or password",
         type: LoginErrorType.INVALID_CREDENTIALS
       };
-    }
-
-    if (e.response.status === 403) {
+    } else if (e.response.status === 403) {
       error.value = {
         msg: "Your account's email is not confirmed",
         type: LoginErrorType.EMAIL_NOT_CONFIRMED
+      };
+    } else {
+      error.value = {
+        msg: "An error occurred while logging in",
+        type: LoginErrorType.EXTERNAL
       };
     }
   }
@@ -114,8 +119,10 @@ const handleConfirmationResend = async () => {
 
   try {
     await http.post('/auth/resend-confirmation', { email: email.value });
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error');
+    }
   }
 }
 </script>

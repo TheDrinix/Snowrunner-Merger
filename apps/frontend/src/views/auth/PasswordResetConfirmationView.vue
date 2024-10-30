@@ -1,7 +1,4 @@
 <script setup lang="ts">
-const host = window.location.origin;
-
-console.log(host)
 </script>
 
 <template>

@@ -5,11 +5,13 @@ import {useGroupsStore} from "@/stores/groupsStore";
 import JSZip from "jszip";
 import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
 import {useHttp} from "@/composables/useHttp";
+import {useToaster} from "@/stores/toastStore";
 
 const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
 const http = useHttp();
+const { createToast } = useToaster();
 
 const groupId = computed(() => {
   return route.params.id as string;
@@ -108,8 +110,10 @@ const handleSaveMerge = async () => {
 
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error', 10000);
+    }
   }
 }
 </script>

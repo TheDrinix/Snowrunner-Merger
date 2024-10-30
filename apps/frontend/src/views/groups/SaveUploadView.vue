@@ -5,11 +5,13 @@ import {useGroupsStore} from "@/stores/groupsStore";
 import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
 import JSZip from "jszip";
 import {useHttp} from "@/composables/useHttp";
+import {useToaster} from "@/stores/toastStore";
 
 const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
 const http = useHttp()
+const {createToast} = useToaster();
 
 const groupId = computed(() => {
   return route.params.id as string;
@@ -92,17 +94,21 @@ const handleSaveUpload = async () => {
     params.append("saveSlot", saveSlot.value.toString());
   }
 
-  const res = await http.post(`/groups/${groupId.value}/upload`, body, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    },
-    params,
-  });
+  try {
+    await http.post(`/groups/${groupId.value}/upload`, body, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      params,
+    });
 
-  if (res.status < 300) {
     groupsStore.clearSaves(groupId.value);
 
     await router.push({name: "group-manage", params: {id: groupId.value}});
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error', 10000);
+    }
   }
 }
 </script>

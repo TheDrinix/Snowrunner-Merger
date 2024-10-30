@@ -5,10 +5,12 @@ import {useGroupsStore} from "@/stores/groupsStore";
 import {useHttp} from "@/composables/useHttp";
 import GroupSave from "@/components/groups/GroupSave.vue";
 import Modal from "@/components/Modal.vue";
+import {useToaster} from "@/stores/toastStore";
 
 const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
+const {createToast} = useToaster();
 
 const groupId = computed(() => {
   return route.params.id as string;
@@ -40,11 +42,13 @@ const handleSaveDelete = async (saveIdx: number) => {
   const saveId = group.value?.saves[saveIdx].id;
 
   try {
-    const res = await http.delete(`/groups/${groupId.value}/saves/${saveId}`);
+    await http.delete(`/groups/${groupId.value}/saves/${saveId}`);
 
     groupsStore.deleteGroupSave(groupId.value, saveIdx);
-  } catch (e) {
-    console.error('Failed to delete save');
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error');
+    }
   }
 }
 
@@ -52,11 +56,13 @@ const isConfirmDeleteModalOpen = ref(false);
 
 const handleGroupDelete = async () => {
   try {
-    const res = await http.delete(`/groups/${groupId.value}`);
+    await http.delete(`/groups/${groupId.value}`);
 
     groupsStore.removeGroup(groupId.value);
-  } catch (e) {
-    console.error(e)
+  } catch (e: any) {
+    if (e.response.data.title) {
+      createToast(e.response.data.title, 'error');
+    }
   }
 
   await router.push({name: 'groups'});

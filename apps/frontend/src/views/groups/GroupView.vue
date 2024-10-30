@@ -7,11 +7,13 @@ import GroupSave from "@/components/groups/GroupSave.vue";
 import GroupSaveLoading from "@/components/groups/GroupSaveLoading.vue";
 import {useUserStore} from "@/stores/userStore";
 import Modal from "@/components/Modal.vue";
+import {useToaster} from "@/stores/toastStore";
 
 const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
 const userStore = useUserStore();
+const {createToast} = useToaster();
 
 const groupId = computed(() => {
   return route.params.id as string;
@@ -31,16 +33,21 @@ const isOwner = computed(() => {
 
 const isConfirmLeaveModalOpen = ref(false);
 
-const loading = ref(true);
+const loading = ref(false);
 const http = useHttp();
 
 if (group.value && (!group.value.lastLoadedSavesAt || group.value.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5)) {
+  loading.value = true;
   http.get(`/groups/${group.value?.id}/saves`)
     .then(res => {
       groupsStore.storeGroupSaves(group.value?.id, res.data);
       loading.value = false;
     })
-    .catch(err => {
+    .catch((e: any) => {
+      if (e.response.data.title) {
+        createToast(e.response.data.title, 'error');
+      }
+
       router.push({name: 'groups'});
     });
 }
@@ -50,9 +57,11 @@ const handleGroupLeave = () => {
     .then(res => {
       groupsStore.removeGroup(groupId.value);
     })
-    .catch(e =>
-      console.error(e)
-    );
+    .catch(e => {
+      if (e.response.data.title) {
+        createToast(e.response.data.title, 'error');
+      }
+    });
 
   router.push({name: 'groups'});
 }
