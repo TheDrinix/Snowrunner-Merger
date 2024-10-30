@@ -53,8 +53,8 @@ const btnSizeClass = computed(() => {
              :autocomplete
              :placeholder
       />
-      <button class="btn btn-primary join-item btn-sm" :class="[btnSizeClass]">Submit</button>
-      <button class="btn btn-secondary join-item btn-sm" :class="[btnSizeClass]">Cancel</button>
+      <button @click="emit('update')" class="btn btn-primary join-item btn-sm" :class="[btnSizeClass]">Submit</button>
+      <button @click="emit('cancel')" class="btn btn-secondary join-item btn-sm" :class="[btnSizeClass]">Cancel</button>
     </div>
   </div>
 </template>

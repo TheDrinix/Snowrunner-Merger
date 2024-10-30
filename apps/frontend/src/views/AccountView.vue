@@ -8,15 +8,20 @@ import * as yup from "yup";
 import {useForm} from "vee-validate";
 import Modal from "@/components/Modal.vue";
 import {useLogout} from "@/composables/useLogout";
+import {useHttp} from "@/composables/useHttp";
+import {useToaster} from "@/stores/toastStore";
+import type {User} from "@/types/auth";
+import router from "@/router";
 
 const userStore = useUserStore();
 const logout = useLogout();
+const http = useHttp();
+const { createToast } = useToaster();
 
 const passwordSchema = toTypedSchema(
   yup.object({
     currentPassword: yup
-        .string()
-        .required("Current password is required"),
+        .string(),
     newPassword: yup
         .string()
         .required("New password is required")
@@ -29,19 +34,35 @@ const passwordSchema = toTypedSchema(
   })
 );
 
+const usernameSchema = toTypedSchema(
+  yup.object({
+    username: yup
+        .string()
+        .required("Username is required")
+        .min(3, "Username must be at least 3 characters")
+  })
+);
+
 const passwordForm = useForm({
   validationSchema: passwordSchema
+});
+
+const usernameForm = useForm({
+  validationSchema: usernameSchema
 });
 
 const [currentPassword, currentPasswordAttrs] = passwordForm.defineField("currentPassword");
 const [newPassword, newPasswordAttrs] = passwordForm.defineField("newPassword");
 const [confirmPassword, confirmPasswordAttrs] = passwordForm.defineField("confirmPassword");
 
+const [username, usernameAttrs] = usernameForm.defineField("username");
+
 const isAccountDeleteModalOpen = ref(false);
 
 const user = computed(() => userStore.user);
 
 const updating = ref(0);
+const isLoading = ref(false);
 
 const isPasswordFormValid = computed(() => {
   return passwordForm.isFieldValid('currentPassword')
@@ -50,7 +71,25 @@ const isPasswordFormValid = computed(() => {
 })
 
 const handleUsernameUpdate = async () => {
+  const validation = await usernameForm.validate();
 
+  if (!validation.valid) return;
+
+  isLoading.value = true;
+
+  try {
+    const res = await http.patch<User>('/user/username', { username: username.value });
+    console.log(res);
+
+    userStore.storeUser(res.data);
+
+    createToast('Username updated successfully', 'success');
+  } catch (e: any) {
+    createToast(e.response.data.title, 'error');
+  } finally {
+    isLoading.value = false;
+    updating.value = 0;
+  }
 }
 
 const handlePasswordUpdate = async () => {
@@ -58,11 +97,38 @@ const handlePasswordUpdate = async () => {
 
   if (!validation.valid) return;
 
+  isLoading.value = true;
 
+  try {
+    await http.patch<User>('/user/password', {
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value
+    });
+
+    createToast('Password updated successfully', 'success');
+  } catch (e: any) {
+    createToast(e.response?.data.title, 'error', 10000);
+  } finally {
+    isLoading.value = false;
+    updating.value = 0;
+  }
 }
 
 const handleAccountDelete = async () => {
+  isLoading.value = true;
 
+  try {
+    await http.delete('/user');
+    userStore.logout();
+
+    createToast('Account deleted successfully', 'success');
+    router.push({ name: 'home' });
+  } catch (e: any) {
+    createToast(e.response.data.title, 'error');
+  } finally {
+    isLoading.value = false;
+    isAccountDeleteModalOpen.value = false;
+  }
 }
 </script>
 
@@ -81,14 +147,14 @@ const handleAccountDelete = async () => {
             <button @click="() => updating = 1" class="btn btn-primary btn-sm">Change</button>
           </div>
           <div v-else>
-            <UpdateInput size="sm" name="username" placeholder="Username" @update="handleUsernameUpdate" @cancel="() => updating = 0" />
+            <UpdateInput v-model="username" size="sm" name="username" placeholder="Username" @update="handleUsernameUpdate" @cancel="() => updating = 0" :error="usernameForm.errors.value.username" />
           </div>
           <div class="w-full flex justify-between" v-if="updating != 2">
             <span>Password: ********</span>
             <button class="btn btn-primary btn-sm" @click="() => updating = 2">Change</button>
           </div>
           <div v-else>
-            <form @submit.prevent>
+            <form @submit.prevent="handlePasswordUpdate">
               <TextInput v-model="currentPassword" name="current-password" placeholder="Current password" :error="passwordForm.errors.value.currentPassword" />
               <TextInput v-model="newPassword" name="new-password" placeholder="New password" :error="passwordForm.errors.value.newPassword" />
               <TextInput v-model="confirmPassword" name="confirm-password" placeholder="Confirm new password" :error="passwordForm.errors.value.confirmPassword" />
@@ -107,7 +173,7 @@ const handleAccountDelete = async () => {
             <div class="p-4">
               <h3 class="text-lg font-bold">Are you sure you want to delete your account?</h3>
               <div class="flex justify-end gap-4 mt-4">
-                <button class="btn btn-error btn-sm">Delete</button>
+                <button @click="handleAccountDelete" class="btn btn-error btn-sm">Delete</button>
                 <button @click="() => isAccountDeleteModalOpen = false" class="btn btn-secondary btn-sm">Cancel</button>
               </div>
             </div>

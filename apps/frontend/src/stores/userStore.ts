@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {LoginResponse, UserStore} from "@/types/auth";
+import type {LoginResponse, User, UserStore} from "@/types/auth";
 import {useGroupsStore} from "@/stores/groupsStore";
 
 const defaultState = {
@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', {
     getters: {
         isAuthenticated(state) {
             return !(!state.accessTokenExpires || state.accessTokenExpires < new Date());
-        }
+        },
     },
     actions: {
         signIn(data: LoginResponse) {
@@ -47,6 +47,9 @@ export const useUserStore = defineStore('user', {
             const groupsStore = useGroupsStore();
 
             groupsStore.clearStore();
+        },
+        storeUser(user: User) {
+            this.user = user;
         }
     }
 });
