@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
 import Toaster from "@/components/Toaster.vue";
+import CookieConsent from "@/components/CookieConsent.vue";
 
 </script>
 
@@ -16,6 +17,7 @@ import Toaster from "@/components/Toaster.vue";
     </div>
     <Footer />
     <Toaster />
+    <CookieConsent />
   </div>
 </template>
 
