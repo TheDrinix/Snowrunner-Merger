@@ -11,7 +11,7 @@ import Icon from "@/components/icon.vue";
 const http = inject<AxiosInstance>("axios", axios.create());
 const loading = ref(false);
 
-const { errors, defineField } = useForm({
+const { errors, defineField, setErrors, validate } = useForm({
   validationSchema: toTypedSchema(
       yup.object({
         username: yup
@@ -43,15 +43,16 @@ const [confirmPassword, confirmPasswordAttrs] = defineField("confirmPassword");
 const router = useRouter();
 
 const handleRegister = async () => {
-  if (errors.value.confirmPassword || errors.value.email || errors.value.password || errors.value.username) {
+  const validation = await validate();
+
+  if (!validation.valid) {
     return;
   }
 
-  console.log("Registering user...");
   loading.value = true;
 
   try {
-    const res = await http.post("/auth/register", {
+    await http.post("/auth/register", {
       username: username.value,
       email: email.value,
       password: password.value
@@ -60,11 +61,22 @@ const handleRegister = async () => {
     });
 
     await router.push({ name: 'register-confirm' })
-  } catch (e) {
+  } catch (e: any) {
     console.error("Failed to register user");
 
-    if (e.response.status === 409) {
-      errors.value.email = "Email already in use";
+    switch (e.response.status) {
+      case 400:
+        for (const [key, value] of Object.entries(e.response.data.errors)) {
+          if (typeof value === "string") {
+            setErrors({ [key]: value });
+          } else if (Array.isArray(value)) {
+            setErrors({ [key]: value[0] });
+          }
+        }
+        break;
+      case 409:
+        setErrors({ email: "Email already in use" });
+        break
     }
   }
 
