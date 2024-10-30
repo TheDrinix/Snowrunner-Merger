@@ -87,7 +87,7 @@ const handleLogin = async () => {
     userStore.signIn(res.data);
 
     router.push({name: 'groups'})
-  } catch (e) {
+  } catch (e: any) {
     console.error("Failed to log in user");
 
     if (e.response.status === 401) {

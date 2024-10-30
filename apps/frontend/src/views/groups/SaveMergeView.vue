@@ -137,7 +137,7 @@ const handleSaveMerge = async () => {
                 <div class="label">
                   <span class="label-text">Select which save you want to merge</span>
                 </div>
-                <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber" :disabled="availableSaves.length">
+                <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber" :disabled="!availableSaves.length">
                   <option v-for="save in availableSaves" :key="save" :value="save">Save {{save + 1}}</option>
                 </select>
               </div>
@@ -145,7 +145,7 @@ const handleSaveMerge = async () => {
                 <div class="label">
                   <span class="label-text">Select output save number</span>
                 </div>
-                <select name="outputSaveNumber" class="select select-bordered" v-model="formData.outputSaveNumber" :disabled="availableSaves.length">
+                <select name="outputSaveNumber" class="select select-bordered" v-model="formData.outputSaveNumber" :disabled="!availableSaves.length">
                   <option v-for="i in 4" :key="i - 1" :value="i - 1">Save slot {{i}}</option>
                 </select>
               </div>
