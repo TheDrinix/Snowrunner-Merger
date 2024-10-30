@@ -3,10 +3,17 @@ const year = new Date().getFullYear();
 </script>
 
 <template>
-  <footer class="footer p-4 bg-base-200 absolute bottom-0">
-    <aside class="items-center grid-flow-col">
-      <p class="h-6">&copy; {{year}} - SnowrunnerSaveMerger<!-- - <a class="inline underline" asp-area="" asp-page="/Privacy">Privacy</a>--></p>
-    </aside>
+  <footer class="footer flex  p-4 items-center bg-base-200 absolute bottom-0">
+    <nav>
+      <h6 class="footer-title mb-0">Github links</h6>
+      <a href="https://github.com/TheDrinix/snowrunner-merger-api" class="link link-hover">API Source code</a>
+      <a href="https://github.com/TheDrinix/snowrunner-merger-web" class="link link-hover">Website source code</a>
+    </nav>
+    <nav>
+      <h6 class="footer-title mb-0">Legal</h6>
+      <RouterLink class="link link-hover" to="/privacy">Privacy policy</RouterLink>
+      <RouterLink class="link link-hover" to="/terms-of-use">Terms of service</RouterLink>
+    </nav>
   </footer>
 </template>
 

@@ -8,7 +8,7 @@ import CookieConsent from "@/components/CookieConsent.vue";
 </script>
 
 <template>
-  <div class="relative min-h-screen pb-16">
+  <div class="relative min-h-screen pb-32">
     <Header />
     <div class="container mx-auto mt-4">
       <main class="pb-3">
