@@ -6,7 +6,7 @@ import {useForm} from "vee-validate";
 import axios, {type AxiosInstance} from "axios";
 import {computed, inject, ref, watch} from "vue";
 import {useUserStore} from "@/stores/userStore";
-import {type LoginResponse} from "@/types/auth";
+import type { LoginResponse } from "@/types/auth";
 import Icon from "@/components/icon.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useToaster} from "@/stores/toastStore";
@@ -43,8 +43,8 @@ const { errors, defineField } = useForm({
 const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
 
-const routeError = computed(() => {
-  return route.query.error?.toString ?? "";
+const routeError = computed<string>(() => {
+  return route.query.error?.toString() ?? "";
 })
 
 const error = ref({

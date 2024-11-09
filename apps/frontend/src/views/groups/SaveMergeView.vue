@@ -6,6 +6,7 @@ import JSZip from "jszip";
 import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
 import {useHttp} from "@/composables/useHttp";
 import {useToaster} from "@/stores/toastStore";
+import type { AxiosRequestConfig } from "axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -87,7 +88,7 @@ const handleSaveMerge = async () => {
   body.set('outputSaveNumber', formData.value.outputSaveNumber.toString());
   body.set('save', zipBlob);
 
-  const cfg = {
+  const cfg: AxiosRequestConfig = {
     headers: {
       'Content-Type': 'multipart/form-data'
     },

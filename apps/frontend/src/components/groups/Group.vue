@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Group } from "@/types/groups";
+import type { Group } from "@/types/groups";
 
 const props = defineProps<{
   group: Group,

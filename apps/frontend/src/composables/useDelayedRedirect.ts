@@ -6,7 +6,7 @@ export function useDelayedRedirect(pageName: string, delay: number) {
     const router = useRouter();
 
     const del = ref(delay);
-    let intervalId;
+    let intervalId: NodeJS.Timeout;
 
     function startRedirect() {
         intervalId = setInterval(() => {

@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
       <a href="https://github.com/TheDrinix/snowrunner-merger-web" class="link link-hover">Website source code</a>
     </nav>
     <nav>
-      <h6 class="footer-title mb-0">Legal</h6>
+      <h6 class="footer-title mb-0">Legal mumbo jumbo</h6>
       <RouterLink class="link link-hover" to="/privacy">Privacy policy</RouterLink>
       <RouterLink class="link link-hover" to="/terms-of-use">Terms of service</RouterLink>
     </nav>

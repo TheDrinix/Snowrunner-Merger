@@ -11,9 +11,9 @@ const router = useRouter();
 const http = useHttp();
 const { createToast } = useToaster();
 
-const email = ref(route.query.email ?? "");
-watch(() => route.query.email, (value: string) => {
-  email.value = value;
+const email = ref(route.query['email']?.toString() ?? "");
+watch(() => route.query.email, (value) => {
+  email.value = value?.toString() ?? "";
 });
 
 const isLoading = ref(false);

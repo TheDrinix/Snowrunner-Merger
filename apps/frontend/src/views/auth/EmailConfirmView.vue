@@ -13,11 +13,11 @@ const loading = ref(true);
 const err = ref(false);
 
 const userId = computed((): string => {
-  return route.query['user-id'] ?? '';
+  return route.query['user-id']?.toString() ?? '';
 })
 
 const token = computed((): string => {
-  return route.query['token'] ?? '';
+  return route.query['token']?.toString() ?? '';
 })
 
 if (!userId.value || !token.value) {
