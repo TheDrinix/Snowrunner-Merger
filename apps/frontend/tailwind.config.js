@@ -16,7 +16,8 @@ export default {
         themes: ["nord", "dracula", {
             dim: {
                 ...require("daisyui/src/theming/themes")["dim"],
-                primary: "rgb(72,218,230)"
+                primary: "rgb(72,218,230)",
+                secondary: "rgb(108,167,255)",
             }
         }]
     }

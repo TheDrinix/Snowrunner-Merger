@@ -2,31 +2,44 @@
 </script>
 
 <template>
-  <div class="max-w-screen-lg mx-auto flex flex-col gap-4 px-4">
-    <div>
-      <h1 class="text-2xl font-bold ">Welcome to Snowrunner merger</h1>
-      <p>Snowrunner Merger makes it easy to share your game progress with friends. Upload your save files to a shared group and let the Merger handle the rest.</p>
-    </div>
-    <div>
-      <h2 class="text-lg font-bold">What is snowrunner merger?</h2>
-      <p>Snowrunner merger is a tool for sharing Snowrunner save progression between players by taking progression data from host's save file and merging it into saves of other players.</p>
-      <p><span class="font-medium">But why you may ask.</span> When playing coop Snowrunner, the progression is not shared between individual players playing, only host gets the progression, that's why I created this tool for sharing this progression.</p>
-    </div>
-    <div>
-      <h2 class="text-lg font-bold">How it works?</h2>
-      <ol class="list-decimal ml-6">
-        <li class="list-item">
-          You and your friends create an account
-        </li>
-        <li>Hosting player creates a group and uploads a save file there</li>
-        <li>Others then join the group and can merge their save files with the ones stored in the group</li>
-        <li>After merging, the save file is downloaded and can be used in Snowrunner</li>
-      </ol>
-    </div>
-    <div class="flex flex-col items-center">
-      <h2 class="text-lg font-bold">Get started now!</h2>
-      <p class="text-center">Click the button below to create an account and start sharing your progression with friends.</p>
-      <RouterLink to="/register" class="btn btn-primary btn-outline mt-2">Create account</RouterLink>
-    </div>
+  <div>
+    <section class="py-20 h-56 box-content left-0 top-16 absolute w-full bg-gray-700">
+      <div class="container h-full flex justify-center flex-col mx-auto px-6 text-center">
+        <h2 class="text-4xl font-extrabold text-primary">Merge Your Snowrunner Game Saves Seamlessly</h2>
+        <p class="mt-4 text-gray-200 text-lg">Snowrunner Merger is a tool that allows you to combine your game progress with your friends.</p>
+        <p class="text-gray-200 text-lg">Now you can continue your adventure, wherever you left off whether you're hosting the game or not!</p>
+<!--        <div class="mt-8">
+          <a href="#merge" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            Start Merging Now
+          </a>
+        </div>-->
+      </div>
+    </section>
+
+    <main class="container mx-auto px-6 pb-10 mt-[26rem] relative top-0">
+      <section id="features" class="text-center">
+        <h3 class="text-3xl font-bold text-primary">Features</h3>
+        <div class="flex flex-wrap mt-4 justify-center md:space-x-4">
+          <div class="w-full md:w-5/12 lg:1/3 bg-gray-800 rounded-lg p-6 shadow-md mt-6">
+            <h4 class="text-xl font-semibold text-secondary">Easy Save Merging</h4>
+            <p class="text-gray-300 mt-2">Combine progress from multiple saves effortlessly. Bring your achievements together.</p>
+          </div>
+          <div class="w-full md:w-5/12 lg:1/3 bg-gray-800 rounded-lg p-6 shadow-md mt-6">
+            <h4 class="text-xl font-semibold text-secondary">Simple to use</h4>
+            <p class="text-gray-300 mt-2">All you have to do is to find your game saves folder and everything else is handled for you.</p>
+          </div>
+          <div class="w-full md:w-5/12 lg:1/3 bg-gray-800 rounded-lg p-6 shadow-md mt-6">
+            <h4 class="text-xl font-semibold text-secondary">Save history</h4>
+            <p class="text-gray-300 mt-2">You can store up to 3 saves in a single group, so older progression saves can be stored for a while.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="merge" class="mt-16 text-center">
+        <h3 class="text-3xl font-bold text-primary">Get Started with Snowrunner Merger</h3>
+        <p class="text-gray-200 mt-4">Upload your Snowrunner save files below to begin merging.</p>
+
+      </section>
+    </main>
   </div>
 </template>
