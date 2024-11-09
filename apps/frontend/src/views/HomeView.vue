@@ -8,11 +8,6 @@
         <h2 class="text-4xl font-extrabold text-primary">Merge Your Snowrunner Game Saves Seamlessly</h2>
         <p class="mt-4 text-gray-200 text-lg">Snowrunner Merger is a tool that allows you to combine your game progress with your friends.</p>
         <p class="text-gray-200 text-lg">Now you can continue your adventure, wherever you left off whether you're hosting the game or not!</p>
-<!--        <div class="mt-8">
-          <a href="#merge" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-            Start Merging Now
-          </a>
-        </div>-->
       </div>
     </section>
 
@@ -33,12 +28,6 @@
             <p class="text-gray-300 mt-2">You can store up to 3 saves in a single group, so older progression saves can be stored for a while.</p>
           </div>
         </div>
-      </section>
-
-      <section id="merge" class="mt-16 text-center">
-        <h3 class="text-3xl font-bold text-primary">Get Started with Snowrunner Merger</h3>
-        <p class="text-gray-200 mt-4">Upload your Snowrunner save files below to begin merging.</p>
-
       </section>
     </main>
   </div>

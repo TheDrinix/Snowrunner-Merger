@@ -53,6 +53,21 @@ const progressClass = computed(() => {
       return 'bg-primary';
   }
 });
+
+const icon = computed(() => {
+  switch (props.type) {
+    case "info":
+      return "info";
+    case "success":
+      return "task_alt";
+    case 'error':
+      return 'error';
+    case 'warning':
+      return 'warning';
+    default:
+      return 'info';
+  }
+});
 </script>
 
 <template>

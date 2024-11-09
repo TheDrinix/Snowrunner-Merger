@@ -9,12 +9,12 @@ export const useToaster = defineStore('toaster', {
         removeToast(id: number) {
             this.toasts = this.toasts.filter((toast) => toast.id !== id);
         },
-        createToast(message: string, type: ToastType = 'info', duration = 5000) {
+        createToast(message: string, type: ToastType = 'info', duration = 5000, icon = true) {
             const id = Date.now()
             const toast: Toast = {
                 id,
                 message,
-                icon: type,
+                icon,
                 type,
                 duration
             };
