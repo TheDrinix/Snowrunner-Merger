@@ -3,8 +3,11 @@ const year = new Date().getFullYear();
 </script>
 
 <template>
-  <footer class="footer flex  p-4 items-center bg-base-200 absolute bottom-0">
-    <nav>
+  <footer class="footer flex p-4 items-center bg-base-200 absolute bottom-0">
+    <div>
+      <p class="text font-medium">&copy; {{ year }} Snowrunner Merger</p>
+    </div>
+    <nav class="ml-auto">
       <h6 class="footer-title mb-0">Github links</h6>
       <a href="https://github.com/TheDrinix/snowrunner-merger-api" class="link link-hover">API Source code</a>
       <a href="https://github.com/TheDrinix/snowrunner-merger-web" class="link link-hover">Website source code</a>

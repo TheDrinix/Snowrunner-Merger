@@ -5,6 +5,7 @@ import RegisterView from "@/views/auth/RegisterView.vue";
 import {useUserStore} from "@/stores/userStore";
 import {useGroupsStore} from "@/stores/groupsStore";
 import GroupView from "@/views/groups/GroupView.vue";
+import NotFoundView from "@/views/NotFoundView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -145,6 +146,14 @@ const router = createRouter({
             meta: {
                 bypassAuth: true
             }
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: NotFoundView,
+            meta: {
+                bypassAuth: true
+            }
         }
     ]
 })
@@ -166,8 +175,6 @@ router.beforeEach(async (to, from, next) => {
     if (to.meta.validateGroupOwner) {
         const groupId = to.params.id as string;
         const groupsStore = useGroupsStore();
-
-        // TODO: Load user's groups if they haven't been loaded yet
 
         if (!groupsStore.isGroupOwner(groupId)) {
             next({ name: 'group', params: { id: groupId } });
