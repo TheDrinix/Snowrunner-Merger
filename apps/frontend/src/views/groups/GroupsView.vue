@@ -85,6 +85,7 @@ const handleJoinGroup = () => {
         <h2 class="card-title">Owned groups</h2>
       </div>
       <div class="card-body" v-if="!isLoading">
+        <p v-if="!ownedGroups.length" class="text-lg font-medium">You currently don't own any groups</p>
         <Group v-for="group in ownedGroups" :key="group.id" :group="group" isOwner />
       </div>
       <div class="card-body" v-else>
