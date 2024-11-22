@@ -23,7 +23,7 @@ export const validateSaveFiles = (fileNames: string[]): number[] => {
 export const generateSaveRegex = (saveNumber: number): RegExp => {
     const prefix = saveNumber ? saveNumber + '_' : '';
 
-    const regexString = `(CompleteSave${saveNumber}\\.dat)|(\\b${prefix}(fog|sts)_.*\\.dat\\b)`;
+    const regexString = `(CompleteSave${saveNumber || ''}\\.dat)|(\\b${prefix}(fog|sts)_.*\\.dat\\b)`;
 
     return new RegExp(regexString, 'm');
 }
