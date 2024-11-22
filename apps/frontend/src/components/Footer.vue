@@ -3,7 +3,7 @@ const year = new Date().getFullYear();
 </script>
 
 <template>
-  <footer class="footer flex p-4 items-center bg-base-200 absolute bottom-0">
+  <footer class="footer flex p-4 items-center bg-base-200 mt-auto">
     <div>
       <p class="text font-medium">&copy; {{ year }} Snowrunner Merger</p>
     </div>
