@@ -13,6 +13,7 @@ const {createToast} = useToaster();
 
 const isLoading = ref(true);
 const err = ref('');
+const sentLoading = ref(false);
 
 http.get<IGroup[]>("/groups")
   .then(res => {
@@ -29,6 +30,8 @@ const ownedGroups = computed(() => groupsStore.getOwnedGroups);
 const groupName = ref("");
 
 const handleCreateGroup = () => {
+  sentLoading.value = true;
+
   http.post("/groups", {name: groupName.value})
     .then(res => {
       groupsStore.storeGroup(res.data);
@@ -47,6 +50,9 @@ const handleCreateGroup = () => {
         }
       }
     })
+    .finally(() => {
+      sentLoading.value = false;
+    });
 }
 </script>
 
@@ -74,7 +80,9 @@ const handleCreateGroup = () => {
           <input v-model="groupName" type="text" class="input" placeholder="Enter a group name" />
         </div>
         <div class="flex justify-center mt-4">
-          <button :disabled="ownedGroups.length >= 4 || groupName.length < 3" type="submit" class="btn btn-primary btn-wide">Create</button>
+          <button :disabled="ownedGroups.length >= 4 || groupName.length < 3 || sentLoading" type="submit" class="btn btn-primary btn-wide">
+            Create <span v-if="sentLoading" class="loading loading-dots" />
+          </button>
         </div>
       </form>
     </div>

@@ -31,6 +31,7 @@ if (!group.value) {
   router.push({name: 'groups'});
 }
 
+const loading = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const formData = ref<{
@@ -69,6 +70,8 @@ const handleFolderChange = async (event: Event) => {
 
 const handleSaveUpload = async () => {
   if (!formData.value.files || formData.value.saveNumber === undefined || !formData.value.description) return;
+
+  loading.value = true;
 
   const regex = generateSaveRegex(formData.value.saveNumber);
 
@@ -110,6 +113,8 @@ const handleSaveUpload = async () => {
       createToast(e.response.data.title, 'error', 10000);
     }
   }
+
+  loading.value = false;
 }
 </script>
 
@@ -146,8 +151,8 @@ const handleSaveUpload = async () => {
               <textarea class="textarea textarea-bordered w-full min-h-8 resize-none" v-model="formData.description" />
             </div>
             <div class="flex justify-center">
-              <button :disabled="!canUpload" type="submit" class="btn btn-primary btn-wide transition-all">
-                Upload
+              <button :disabled="!canUpload || loading" type="submit" class="btn btn-primary btn-wide transition-all">
+                Upload <span v-if="loading" class="loading loading-dots" />
               </button>
             </div>
           </div>

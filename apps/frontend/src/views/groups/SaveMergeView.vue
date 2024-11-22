@@ -30,6 +30,8 @@ if (!group.value) {
   router.push({name: 'groups'});
 }
 
+const loading = ref(false);
+
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const formData = ref<{
@@ -68,6 +70,8 @@ const handleFolderChange = async (event: Event) => {
 
 const handleSaveMerge = async () => {
   if (!formData.value.files || formData.value.saveNumber === undefined || formData.value.outputSaveNumber === undefined) return;
+
+  loading.value = true;
 
   const regex = generateSaveRegex(formData.value.saveNumber)
 
@@ -113,9 +117,12 @@ const handleSaveMerge = async () => {
     window.URL.revokeObjectURL(url);
   } catch (e: any) {
     if (e.response.data.title) {
+
       createToast(e.response.data.title, 'error', 10000);
     }
   }
+
+  loading.value = false;
 }
 </script>
 
@@ -156,8 +163,9 @@ const handleSaveMerge = async () => {
               </div>
             </div>
             <div class="flex justify-center">
-              <button :disabled="!canMerge" type="submit" class="btn btn-primary btn-wide transition-all">
+              <button :disabled="!canMerge || loading" type="submit" class="btn btn-primary btn-wide transition-all">
                 Merge
+                <span v-if="loading" class="loading loading-dots" />
               </button>
             </div>
           </div>
