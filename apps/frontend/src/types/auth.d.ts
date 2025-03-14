@@ -15,3 +15,20 @@ export interface LoginResponse {
     expiresIn: number;
     user: User;
 }
+
+export interface GoogleLinkingTokenData {
+    token: string;
+    expiresAt: Date;
+    user: User;
+}
+
+export interface GoogleAccountCompletionTokenData {
+    token: string;
+    expiresAt: Date;
+    email: string;
+}
+
+export type GoogleLoginRes =
+    | { tokenType: 1; data: LoginResponse }
+    | { tokenType: 2; data: GoogleLinkingTokenData }
+    | { tokenType: 4; data: GoogleAccountCompletionTokenData };

@@ -2,7 +2,7 @@
 import {onBeforeMount} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useHttp} from "@/composables/useHttp";
-import type {LoginResponse} from "@/types/auth";
+import {type GoogleLoginRes} from "@/types/auth";
 import {useUserStore} from "@/stores/userStore";
 
 const route = useRoute();
@@ -21,7 +21,7 @@ onBeforeMount(async () => {
 
   // Exchange the Google code for an access token
   try {
-    const res = await http.get<LoginResponse>('/auth/google/signin/callback', {
+    const res = await http.get<GoogleLoginRes>('/auth/google/signin/callback', {
       params: {
         code,
         state
@@ -29,7 +29,20 @@ onBeforeMount(async () => {
       withCredentials: true
     });
 
-    userStore.signIn(res.data);
+    // TokenType = ACCESS_TOKEN
+    if (res.data.tokenType === 1) {
+      userStore.signIn(res.data.data);
+    }
+    // TokenType = LINKING_TOKEN
+    else if (res.data.tokenType === 2) {
+
+    }
+    // TokenType = COMPLETION_TOKEN
+    else if (res.data.tokenType === 4) {
+
+    }
+
+
   } catch (e) {
     console.error('Failed to exchange Google code for access token');
     await router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
