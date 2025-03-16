@@ -21,25 +21,46 @@ onBeforeMount(async () => {
 
   // Exchange the Google code for an access token
   try {
+    let redirectUrl = new URL('/auth/google/callback', window.location.origin);
+
     const res = await http.get<GoogleLoginRes>('/auth/google/signin/callback', {
       params: {
         code,
-        state
+        state,
+        callbackUrl: redirectUrl.toString(),
       },
       withCredentials: true
     });
 
+    console.log(res.data);
+
     // TokenType = ACCESS_TOKEN
     if (res.data.tokenType === 1) {
       userStore.signIn(res.data.data);
+
+      await router.push({ name: 'groups' });
     }
     // TokenType = LINKING_TOKEN
     else if (res.data.tokenType === 2) {
+      const linkingToken = res.data.data.token;
+      const email = res.data.data.user.email;
 
+      console.log("Linking token received, redirecting to link account view");
+
+      await router.push({ name: 'link-google-account', query: {
+        token: linkingToken,
+        email: email,
+      }});
     }
     // TokenType = COMPLETION_TOKEN
     else if (res.data.tokenType === 4) {
+      const completionToken = res.data.data.token;
+      const email = res.data.data.email;
 
+      await router.push({ name: 'complete-google-account', query: {
+        token: completionToken,
+        email: email,
+      }});
     }
 
 
@@ -47,8 +68,6 @@ onBeforeMount(async () => {
     console.error('Failed to exchange Google code for access token');
     await router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
   }
-
-  await router.push({ name: 'home' });
 });
 </script>
 

@@ -71,6 +71,22 @@ const router = createRouter({
             }
         },
         {
+            path: '/auth/link-google-account',
+            name: 'link-google-account',
+            component: () => import('../views/auth/LinkAccountView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
+            path: '/auth/complete-google-account',
+            name: 'complete-google-account',
+            component: () => import('../views/auth/FinishAccountSetupView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
             path: '/auth',
             name: 'auth',
             component: () => import('../views/AuthView.vue'),
@@ -162,11 +178,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
 
-    if (!userStore.accessTokenExpires) {
-        await userStore.refreshToken();
-    }
-
     if (!to.meta.bypassAuth) {
+        if (!userStore.accessTokenExpires) {
+            await userStore.refreshToken();
+        }
+
         if (!userStore.isAuthenticated) {
             next({ name: 'login' });
         }
