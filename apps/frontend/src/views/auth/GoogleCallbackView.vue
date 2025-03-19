@@ -2,7 +2,7 @@
 import {onBeforeMount} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useHttp} from "@/composables/useHttp";
-import {type GoogleLoginRes} from "@/types/auth";
+import type {GoogleLoginRes} from "@/types/auth";
 import {useUserStore} from "@/stores/userStore";
 
 const route = useRoute();
