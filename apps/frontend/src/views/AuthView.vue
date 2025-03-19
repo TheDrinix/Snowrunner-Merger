@@ -18,8 +18,13 @@ const title = computed(() => {
 
 const handleGoogleSignIn = async () => {
   try {
+    let redirectUrl = new URL('/auth/google/callback', window.location.origin);
+
     const googleSignInUrl = await http.get<string>('/auth/google/signin/', {
-      withCredentials: true
+      withCredentials: true,
+      params: {
+        callbackUrl: redirectUrl.toString(),
+      }
     });
 
     // Redirect the user to the Google sign-in page

@@ -58,6 +58,7 @@ const [confirmPassword, confirmPasswordAttrs] = passwordForm.defineField("confir
 const [username, usernameAttrs] = usernameForm.defineField("username");
 
 const isAccountDeleteModalOpen = ref(false);
+const isGoogleUnlinkModalOpen = ref(false);
 
 const user = computed(() => userStore.user);
 
@@ -130,6 +131,37 @@ const handleAccountDelete = async () => {
     isAccountDeleteModalOpen.value = false;
   }
 }
+
+const handleLinkGoogleAccount = async () => {
+  try {
+    const redirectUrl = new URL('/auth/google/link', window.location.origin);
+
+    const res = await http.get<string>('/auth/google/signin/', {
+      withCredentials: true,
+      params: {
+        callbackUrl: redirectUrl.toString()
+      }
+    });
+
+    // Redirect the user to the Google sign-in page
+    window.location.href = res.data;
+  } catch (e) {
+    createToast("There was an error trying to link your Google account, please try again later.", 'error', 10);
+  }
+}
+
+const handleUnlinkGoogleAccount = async () => {
+  try {
+    await http.post("/auth/google/unlink", {});
+
+    userStore.removeGoogleId();
+    createToast("Google account unlinked successfully", 'success');
+  } catch (e) {
+    createToast("There was an error trying to unlink your Google account, please try again later.", 'error', 10);
+  }
+
+  isGoogleUnlinkModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -139,7 +171,7 @@ const handleAccountDelete = async () => {
     </div>
     <div class="card-body pt-4">
       <div>
-        <h3>Account details</h3>
+        <h3 class="text-lg font-medium">Account details</h3>
         <div class="mt-2 flex flex-col gap-4 w-full">
           <p>Email: {{ user?.email }}</p>
           <div class="w-full flex justify-between" v-if="updating != 1">
@@ -164,6 +196,15 @@ const handleAccountDelete = async () => {
               </div>
             </form>
           </div>
+          <h3 class="text-lg font-medium mt-2">Linked accounts</h3>
+          <div class="w-full flex justify-between items-center">
+            <div>
+              <p>Google</p>
+              <span class="text-sm text-gray-400">Allows you to login using your Google account</span>
+            </div>
+            <button v-if="user?.googleId" class="btn btn-primary btn-sm" @click="() => isGoogleUnlinkModalOpen = true">Unlink</button>
+            <button v-else class="btn btn-primary btn-sm" @click="handleLinkGoogleAccount">Link</button>
+          </div>
           <hr class="divider border-none m-0" />
           <div class="flex gap-4 justify-end">
             <button class="btn btn-error btn-sm" @click="() => isAccountDeleteModalOpen = true">Delete account</button>
@@ -175,6 +216,15 @@ const handleAccountDelete = async () => {
               <div class="flex justify-end gap-4 mt-4">
                 <button @click="handleAccountDelete" class="btn btn-error btn-sm">Delete</button>
                 <button @click="() => isAccountDeleteModalOpen = false" class="btn btn-secondary btn-sm">Cancel</button>
+              </div>
+            </div>
+          </Modal>
+          <Modal v-model="isGoogleUnlinkModalOpen">
+            <div class="p-4">
+              <h3 class="text-lg font-bold">Are you sure you want to unlink your Google account?</h3>
+              <div class="flex justify-end gap-4 mt-4">
+                <button @click="handleUnlinkGoogleAccount" class="btn btn-error btn-sm">Unlink</button>
+                <button @click="() => isGoogleUnlinkModalOpen = false" class="btn btn-secondary btn-sm">Cancel</button>
               </div>
             </div>
           </Modal>

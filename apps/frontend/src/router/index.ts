@@ -27,6 +27,14 @@ const router = createRouter({
             }
         },
         {
+            path: '/auth/google/link',
+            name: 'google-link',
+            component: () => import('../views/auth/GoogleLinkCallbackView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
             path: '/auth/register-confirm',
             name: 'register-confirm',
             component: () => import('../views/auth/RegisterConfirmationView.vue'),
@@ -66,6 +74,22 @@ const router = createRouter({
                     component: () => import('../views/auth/RequestPasswordResetView.vue')
                 }
             ],
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
+            path: '/auth/link-google-account',
+            name: 'link-google-account',
+            component: () => import('../views/auth/LinkAccountView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
+            path: '/auth/complete-google-account',
+            name: 'complete-google-account',
+            component: () => import('../views/auth/FinishAccountSetupView.vue'),
             meta: {
                 bypassAuth: true
             }
@@ -162,11 +186,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
 
-    if (!userStore.accessTokenExpires) {
-        await userStore.refreshToken();
-    }
-
     if (!to.meta.bypassAuth) {
+        if (!userStore.accessTokenExpires || userStore.accessTokenExpires < new Date()) {
+            await userStore.refreshToken();
+        }
+
         if (!userStore.isAuthenticated) {
             next({ name: 'login' });
         }
