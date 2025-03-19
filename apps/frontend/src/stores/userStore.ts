@@ -50,6 +50,11 @@ export const useUserStore = defineStore('user', {
         },
         storeUser(user: User) {
             this.user = user;
+        },
+        removeGoogleId() {
+            if (this.user) {
+                this.user.googleId = undefined;
+            }
         }
     }
 });

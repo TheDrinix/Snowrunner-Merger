@@ -72,9 +72,9 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="flex items-center flex-col">
-    <h3 class="text-xl mb-4">Signing in</h3>
-    <progress class="progress w-4/5 sm:w-2/3 lg:w-1/2" />
+  <div class="flex items-center justify-center min-h-[calc(100vh-16rem)] flex-col">
+    <span class="loading loading-spinner w-72"></span>
+    <p class="text-xl font-bold mt-4">Signing you in...</p>
   </div>
 </template>
 

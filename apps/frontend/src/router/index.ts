@@ -27,6 +27,14 @@ const router = createRouter({
             }
         },
         {
+            path: '/auth/google/link',
+            name: 'google-link',
+            component: () => import('../views/auth/GoogleLinkCallbackView.vue'),
+            meta: {
+                bypassAuth: true
+            }
+        },
+        {
             path: '/auth/register-confirm',
             name: 'register-confirm',
             component: () => import('../views/auth/RegisterConfirmationView.vue'),
@@ -179,7 +187,7 @@ router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
 
     if (!to.meta.bypassAuth) {
-        if (!userStore.accessTokenExpires) {
+        if (!userStore.accessTokenExpires || userStore.accessTokenExpires < new Date()) {
             await userStore.refreshToken();
         }
 

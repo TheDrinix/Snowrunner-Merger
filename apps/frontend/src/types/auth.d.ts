@@ -2,6 +2,7 @@ export interface User {
     id: string;
     email: string;
     username: string;
+    googleId?: string;
 }
 
 export interface UserStore {
