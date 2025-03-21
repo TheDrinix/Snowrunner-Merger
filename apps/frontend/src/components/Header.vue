@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/userStore";
 import {computed} from "vue";
-import Icon from "@/components/icon.vue";
 import {breakpointsTailwind, useBreakpoints} from "@vueuse/core";
-import {useRouter} from "vue-router";
 import HeaderDropdown from "@/components/HeaderDropdown.vue";
 
 const userStore = useUserStore();
@@ -19,7 +17,7 @@ const isAuthenticated = computed(() => userStore.isAuthenticated);
     <nav class="navbar bg-base-200">
       <div class="container mx-auto">
         <div class="flex flex-1 items-center">
-          <RouterLink :to="{ name: 'home'}">Snowrunner merger</RouterLink>
+          <RouterLink class="text-primary text-lg font-medium" :to="{ name: 'home'}">Snowrunner merger</RouterLink>
           <div class="inline-flex items-center" v-if="isAuthenticated && !smAndSmaller">
             <div>
               <div class="h-8 divider divider-horizontal mr-1" />

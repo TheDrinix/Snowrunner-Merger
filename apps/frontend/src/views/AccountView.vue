@@ -187,9 +187,9 @@ const handleUnlinkGoogleAccount = async () => {
           </div>
           <div v-else>
             <form @submit.prevent="handlePasswordUpdate">
-              <TextInput v-model="currentPassword" name="current-password" placeholder="Current password" :error="passwordForm.errors.value.currentPassword" />
-              <TextInput v-model="newPassword" name="new-password" placeholder="New password" :error="passwordForm.errors.value.newPassword" />
-              <TextInput v-model="confirmPassword" name="confirm-password" placeholder="Confirm new password" :error="passwordForm.errors.value.confirmPassword" />
+              <TextInput type="password" autocomplete="current-password" v-model="currentPassword" name="current-password" placeholder="Current password" :error="passwordForm.errors.value.currentPassword" />
+              <TextInput type="password" autocomplete="new-password" v-model="newPassword" name="new-password" placeholder="New password" :error="passwordForm.errors.value.newPassword" />
+              <TextInput type="password" autocomplete="new-password" v-model="confirmPassword" name="confirm-password" placeholder="Confirm new password" :error="passwordForm.errors.value.confirmPassword" />
               <div class="flex justify-end gap-4 mt-4">
                 <button class="btn btn-primary btn-sm" :disabled="!isPasswordFormValid">Update</button>
                 <button @click="() => updating = 0" class="btn btn-secondary btn-sm">Cancel</button>
