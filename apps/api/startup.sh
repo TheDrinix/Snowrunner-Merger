@@ -8,4 +8,4 @@ else
 fi
 
 echo "Starting application"
-dotnet SnowrunnerMergerApi.dll
+dotnet SnowrunnerMerger.Api.dll

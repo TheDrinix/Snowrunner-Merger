@@ -9,11 +9,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["SnowrunnerMergerApi.csproj", "."]
-RUN dotnet restore "./SnowrunnerMergerApi.csproj"
+COPY ["SnowrunnerMerger.Api.csproj", "."]
+RUN dotnet restore "./SnowrunnerMerger.Api.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./SnowrunnerMergerApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./SnowrunnerMerger.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Install the EF core global tool
 RUN dotnet tool install --global dotnet-ef --version 8.0.6
@@ -25,7 +25,7 @@ RUN dotnet ef migrations bundle --self-contained -r linux-x64 -o /app/efbundle
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SnowrunnerMergerApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./SnowrunnerMerger.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
