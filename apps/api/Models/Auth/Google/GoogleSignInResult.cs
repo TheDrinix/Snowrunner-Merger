@@ -1,7 +1,7 @@
-using SnowrunnerMergerApi.Models.Auth.Dtos;
-using SnowrunnerMergerApi.Models.Auth.Tokens;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Models.Auth.Tokens;
 
-namespace SnowrunnerMergerApi.Models.Auth.Google;
+namespace SnowrunnerMerger.Api.Models.Auth.Google;
 
 public abstract record GoogleSignInResult
 {

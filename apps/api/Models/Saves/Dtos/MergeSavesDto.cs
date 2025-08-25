@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SnowrunnerMergerApi.Models.Saves.Dtos;
+namespace SnowrunnerMerger.Api.Models.Saves.Dtos;
 
 public record MergeSavesDto
 {

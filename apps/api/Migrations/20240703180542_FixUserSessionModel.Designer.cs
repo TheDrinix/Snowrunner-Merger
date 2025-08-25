@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SnowrunnerMergerApi.Data;
+using SnowrunnerMerger.Api.Data;
 
 #nullable disable
 
-namespace SnowrunnerMergerApi.Migrations
+namespace SnowrunnerMerger.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20240703180542_FixUserSessionModel")]
@@ -25,7 +25,7 @@ namespace SnowrunnerMergerApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.User", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +66,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserSession", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserSession", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,9 +94,9 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("UserSessions");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserSession", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserSession", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", "User")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "User")
                         .WithMany("UserSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -105,7 +105,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.User", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.User", b =>
                 {
                     b.Navigation("UserSessions");
                 });

@@ -1,4 +1,4 @@
-﻿namespace SnowrunnerMergerApi;
+﻿namespace SnowrunnerMerger.Api;
 
 public class Helpers
 {

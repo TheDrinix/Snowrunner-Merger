@@ -1,6 +1,6 @@
-﻿using SnowrunnerMergerApi.Models.Auth;
+﻿using SnowrunnerMerger.Api.Models.Auth;
 
-namespace SnowrunnerMergerApi.Models.Saves;
+namespace SnowrunnerMerger.Api.Models.Saves;
 
 public class SaveGroup
 {

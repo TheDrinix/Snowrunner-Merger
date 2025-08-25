@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Saves;
-using SnowrunnerMergerApi.Models.Saves.Dtos;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Api.Models.Saves.Dtos;
 
-namespace SnowrunnerMergerApi.Models;
+namespace SnowrunnerMerger.Api.Models;
 
 public class MapperProfile : Profile
 {

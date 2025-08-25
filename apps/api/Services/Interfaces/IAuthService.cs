@@ -1,9 +1,9 @@
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Auth.Dtos;
-using SnowrunnerMergerApi.Models.Auth.Google;
-using SnowrunnerMergerApi.Models.Auth.Tokens;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Models.Auth.Google;
+using SnowrunnerMerger.Api.Models.Auth.Tokens;
 
-namespace SnowrunnerMergerApi.Services.Interfaces;
+namespace SnowrunnerMerger.Api.Services.Interfaces;
 
 public interface IAuthService
 {

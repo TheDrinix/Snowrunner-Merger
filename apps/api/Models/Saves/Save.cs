@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace SnowrunnerMergerApi.Models.Saves;
+namespace SnowrunnerMerger.Api.Models.Saves;
 
 public class Save(
     Dictionary<string, dynamic> rawSaveData,

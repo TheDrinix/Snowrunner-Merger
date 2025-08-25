@@ -1,4 +1,4 @@
-namespace SnowrunnerMergerApi.Models.Auth.Tokens;
+namespace SnowrunnerMerger.Api.Models.Auth.Tokens;
 
 public class AccountConfirmationToken : UserToken
 {

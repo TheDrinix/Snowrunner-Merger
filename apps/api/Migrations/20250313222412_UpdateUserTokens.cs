@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace SnowrunnerMergerApi.Migrations
+namespace SnowrunnerMerger.Api.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateUserTokens : Migration

@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using SnowrunnerMergerApi.Models.Saves;
+using SnowrunnerMerger.Api.Models.Saves;
 
-namespace SnowrunnerMergerApi.Models.Auth;
+namespace SnowrunnerMerger.Api.Models.Auth;
 
 [Index(nameof(NormalizedEmail))]
 [Index(nameof(Email), IsUnique = true)]

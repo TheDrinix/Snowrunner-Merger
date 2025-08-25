@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SnowrunnerMergerApi.Data;
+using SnowrunnerMerger.Api.Data;
 
 #nullable disable
 
-namespace SnowrunnerMergerApi.Migrations
+namespace SnowrunnerMerger.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20241020091344_AddPasswordResetTokens")]
@@ -40,7 +40,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("SaveGroupUser");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.PasswordResetToken", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -57,7 +57,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("PasswordResetTokens");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.User", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -98,7 +98,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserConfirmationToken", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserConfirmationToken", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -115,7 +115,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("UserConfirmationTokens");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserSession", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserSession", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,7 +144,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("UserSessions");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Saves.SaveGroup", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Saves.SaveGroup", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,7 +164,7 @@ namespace SnowrunnerMergerApi.Migrations
                     b.ToTable("SaveGroups");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Saves.StoredSaveInfo", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Saves.StoredSaveInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,22 +192,22 @@ namespace SnowrunnerMergerApi.Migrations
 
             modelBuilder.Entity("SaveGroupUser", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Saves.SaveGroup", null)
+                    b.HasOne("SnowrunnerMerger.Api.Models.Saves.SaveGroup", null)
                         .WithMany()
                         .HasForeignKey("JoinedGroupsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", null)
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("MembersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.PasswordResetToken", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.PasswordResetToken", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", "User")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -216,9 +216,9 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserConfirmationToken", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserConfirmationToken", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", "User")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -227,9 +227,9 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.UserSession", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.UserSession", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", "User")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "User")
                         .WithMany("UserSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,9 +238,9 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Saves.SaveGroup", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Saves.SaveGroup", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Auth.User", "Owner")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "Owner")
                         .WithMany("OwnedGroups")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -249,9 +249,9 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Saves.StoredSaveInfo", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Saves.StoredSaveInfo", b =>
                 {
-                    b.HasOne("SnowrunnerMergerApi.Models.Saves.SaveGroup", "SaveGroup")
+                    b.HasOne("SnowrunnerMerger.Api.Models.Saves.SaveGroup", "SaveGroup")
                         .WithMany("StoredSaves")
                         .HasForeignKey("SaveGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -260,14 +260,14 @@ namespace SnowrunnerMergerApi.Migrations
                     b.Navigation("SaveGroup");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Auth.User", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.User", b =>
                 {
                     b.Navigation("OwnedGroups");
 
                     b.Navigation("UserSessions");
                 });
 
-            modelBuilder.Entity("SnowrunnerMergerApi.Models.Saves.SaveGroup", b =>
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Saves.SaveGroup", b =>
                 {
                     b.Navigation("StoredSaves");
                 });

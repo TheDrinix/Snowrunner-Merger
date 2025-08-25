@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SnowrunnerMergerApi.Models.Auth.Google;
+namespace SnowrunnerMerger.Api.Models.Auth.Google;
 
 public record GoogleTokenData
 {

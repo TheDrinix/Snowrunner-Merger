@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace SnowrunnerMergerApi.Migrations
+namespace SnowrunnerMerger.Api.Migrations
 {
     /// <inheritdoc />
     public partial class AddExtendedSessions : Migration

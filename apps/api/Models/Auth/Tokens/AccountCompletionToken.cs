@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SnowrunnerMergerApi.Models.Auth.Tokens;
+namespace SnowrunnerMerger.Api.Models.Auth.Tokens;
 
 public class AccountCompletionToken : UserToken
 {

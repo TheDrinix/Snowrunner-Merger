@@ -1,4 +1,4 @@
-﻿namespace SnowrunnerMergerApi.Models.Auth;
+﻿namespace SnowrunnerMerger.Api.Models.Auth;
 
 public record RefreshTokenData
 {

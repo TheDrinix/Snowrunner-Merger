@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace SnowrunnerMergerApi.Models.Auth.Tokens;
+namespace SnowrunnerMerger.Api.Models.Auth.Tokens;
 
 [Index(nameof(Token), IsUnique = true)]
 public class UserToken

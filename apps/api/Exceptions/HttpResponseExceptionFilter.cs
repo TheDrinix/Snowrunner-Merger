@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace SnowrunnerMergerApi.Exceptions;
+namespace SnowrunnerMerger.Api.Exceptions;
 
 public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
 {

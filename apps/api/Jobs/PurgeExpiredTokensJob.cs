@@ -1,7 +1,7 @@
 ﻿using Quartz;
-using SnowrunnerMergerApi.Data;
+using SnowrunnerMerger.Api.Data;
 
-namespace SnowrunnerMergerApi.Jobs;
+namespace SnowrunnerMerger.Api.Jobs;
 
 public class PurgeExpiredTokensJob(AppDbContext dbContext) : IJob
 {

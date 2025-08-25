@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using Microsoft.EntityFrameworkCore;
-using SnowrunnerMergerApi.Data;
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Saves;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Data;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Api.Services.Interfaces;
 
-namespace SnowrunnerMergerApi.Services;
+namespace SnowrunnerMerger.Api.Services;
 
 public class GroupsService(
     ILogger<GroupsService> logger, 

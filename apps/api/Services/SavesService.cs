@@ -3,13 +3,13 @@ using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using SnowrunnerMergerApi.Data;
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Models.Saves;
-using SnowrunnerMergerApi.Models.Saves.Dtos;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Data;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Api.Models.Saves.Dtos;
+using SnowrunnerMerger.Api.Services.Interfaces;
 
-namespace SnowrunnerMergerApi.Services;
+namespace SnowrunnerMerger.Api.Services;
 
 public class SavesService : ISavesService
 {

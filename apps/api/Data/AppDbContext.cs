@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Auth.Tokens;
-using SnowrunnerMergerApi.Models.Saves;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.Tokens;
+using SnowrunnerMerger.Api.Models.Saves;
 
-namespace SnowrunnerMergerApi.Data;
+namespace SnowrunnerMerger.Api.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
 {

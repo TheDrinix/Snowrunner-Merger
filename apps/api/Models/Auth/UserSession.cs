@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace SnowrunnerMergerApi.Models.Auth;
+namespace SnowrunnerMerger.Api.Models.Auth;
 
 [Index(nameof(RefreshToken), IsUnique = true)]
 [PrimaryKey(nameof(Id))]

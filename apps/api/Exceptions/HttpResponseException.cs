@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace SnowrunnerMergerApi.Exceptions;
+namespace SnowrunnerMerger.Api.Exceptions;
 
 public class HttpResponseException : Exception
 {

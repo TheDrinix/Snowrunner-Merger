@@ -7,16 +7,16 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol;
-using SnowrunnerMergerApi.Data;
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Auth.Dtos;
-using SnowrunnerMergerApi.Models.Auth.Google;
-using SnowrunnerMergerApi.Models.Auth.Tokens;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Data;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Models.Auth.Google;
+using SnowrunnerMerger.Api.Models.Auth.Tokens;
+using SnowrunnerMerger.Api.Services.Interfaces;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
-namespace SnowrunnerMergerApi.Services;
+namespace SnowrunnerMerger.Api.Services;
 
 public class AuthService : IAuthService
 {

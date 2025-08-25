@@ -1,4 +1,4 @@
-namespace SnowrunnerMergerApi.Models.Auth.Google;
+namespace SnowrunnerMerger.Api.Models.Auth.Google;
 
 public enum GoogleResTokenType
 {

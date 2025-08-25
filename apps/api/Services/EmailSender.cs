@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using SnowrunnerMergerApi.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth;
 
-namespace SnowrunnerMergerApi.Services;
+namespace SnowrunnerMerger.Api.Services;
 
 public interface IEmailSender
 {

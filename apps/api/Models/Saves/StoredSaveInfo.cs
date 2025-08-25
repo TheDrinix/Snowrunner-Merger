@@ -1,7 +1,7 @@
 ﻿
 using System.Text.Json.Serialization;
 
-namespace SnowrunnerMergerApi.Models.Saves;
+namespace SnowrunnerMerger.Api.Models.Saves;
 
 public class StoredSaveInfo
 {

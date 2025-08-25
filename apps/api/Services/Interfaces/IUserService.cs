@@ -1,8 +1,8 @@
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
 
-namespace SnowrunnerMergerApi.Services.Interfaces;
+namespace SnowrunnerMerger.Api.Services.Interfaces;
 
 public interface IUserService
 {

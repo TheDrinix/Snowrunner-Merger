@@ -1,4 +1,4 @@
-﻿namespace SnowrunnerMergerApi.Models.Auth.Dtos;
+﻿namespace SnowrunnerMerger.Api.Models.Auth.Dtos;
 
 /// <summary>
 /// DTO representing the response data for a login request.

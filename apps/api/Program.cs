@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Quartz;
-using SnowrunnerMergerApi.Data;
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Extensions;
-using SnowrunnerMergerApi.Jobs;
-using SnowrunnerMergerApi.Models;
-using SnowrunnerMergerApi.Services;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Data;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Extensions;
+using SnowrunnerMerger.Api.Jobs;
+using SnowrunnerMerger.Api.Models;
+using SnowrunnerMerger.Api.Services;
+using SnowrunnerMerger.Api.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

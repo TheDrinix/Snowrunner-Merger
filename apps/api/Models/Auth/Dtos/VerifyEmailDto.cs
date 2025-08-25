@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SnowrunnerMergerApi.Models.Auth.Dtos;
+namespace SnowrunnerMerger.Api.Models.Auth.Dtos;
 
 /// <summary>
 /// DTO for verifying email.

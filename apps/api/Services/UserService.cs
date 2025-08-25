@@ -1,13 +1,13 @@
 using System.Net;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using SnowrunnerMergerApi.Data;
-using SnowrunnerMergerApi.Exceptions;
-using SnowrunnerMergerApi.Models.Auth;
-using SnowrunnerMergerApi.Models.Auth.Dtos;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Data;
+using SnowrunnerMerger.Api.Exceptions;
+using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Services.Interfaces;
 
-namespace SnowrunnerMergerApi.Services;
+namespace SnowrunnerMerger.Api.Services;
 
 /// <summary>
 /// Service for managing user-related operations.

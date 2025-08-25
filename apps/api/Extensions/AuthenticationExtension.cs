@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using SnowrunnerMergerApi.Data;
+using SnowrunnerMerger.Api.Data;
 
-namespace SnowrunnerMergerApi.Extensions;
+namespace SnowrunnerMerger.Api.Extensions;
 
 public static class AuthenticationExtension
 {

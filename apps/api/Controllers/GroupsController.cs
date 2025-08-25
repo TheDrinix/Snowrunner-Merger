@@ -1,14 +1,14 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SnowrunnerMergerApi.Models.Auth.Dtos;
-using SnowrunnerMergerApi.Models.Saves;
-using SnowrunnerMergerApi.Models.Saves.Dtos;
-using SnowrunnerMergerApi.Services;
-using SnowrunnerMergerApi.Services.Interfaces;
+using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Api.Models.Saves.Dtos;
+using SnowrunnerMerger.Api.Services;
+using SnowrunnerMerger.Api.Services.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace SnowrunnerMergerApi.Controllers
+namespace SnowrunnerMerger.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

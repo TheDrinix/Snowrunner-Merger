@@ -1,6 +1,6 @@
-using SnowrunnerMergerApi.Models.Saves;
+using SnowrunnerMerger.Api.Models.Saves;
 
-namespace SnowrunnerMergerApi.Services.Interfaces;
+namespace SnowrunnerMerger.Api.Services.Interfaces;
 
 public interface IGroupsService
 {
