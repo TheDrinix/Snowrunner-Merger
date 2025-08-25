@@ -23,18 +23,17 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly AppDbContext _dbContext;
     private readonly IConfiguration _config;
+    private readonly ITokenService _tokenService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly HttpClient _httpClient;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly SameSiteMode _sameSiteMode = SameSiteMode.Lax;
-    private readonly int _maxRetries = 5;
-
-    private const int AccessTokenLifetime = 60 * 60 * 3; // 3 hours
 
     public AuthService(
         ILogger<AuthService> logger,
         AppDbContext dbContext,
         IConfiguration config,
+        ITokenService tokenService,
         IHttpContextAccessor httpContextAccessor,
         IWebHostEnvironment webHostEnvironment
     )
@@ -42,6 +41,7 @@ public class AuthService : IAuthService
         _logger = logger;
         _dbContext = dbContext;
         _config = config;
+        _tokenService = tokenService;
         _httpContextAccessor = httpContextAccessor;
         _webHostEnvironment = webHostEnvironment;
         _httpClient = new HttpClient
@@ -109,7 +109,7 @@ public class AuthService : IAuthService
         await _dbContext.Users.AddAsync(user);
         // await _dbContext.SaveChangesAsync();
 
-        var userConfirmationToken = await GenerateConfirmationToken(user);
+        var userConfirmationToken = await _tokenService.GenerateConfirmationToken(user);
 
         return userConfirmationToken;
     }
@@ -158,9 +158,9 @@ public class AuthService : IAuthService
             throw new HttpResponseException(HttpStatusCode.Forbidden, "Email not confirmed");
         }
 
-        var refreshTokenData = await GenerateRefreshToken(user);
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = GenerateJwt(new JwtData()
+        var token = _tokenService.GenerateJwt(new JwtData()
         {
             Id = user.Id, 
             Username = user.Username, 
@@ -171,7 +171,7 @@ public class AuthService : IAuthService
         return new LoginResponseDto
         {
             AccessToken = token,
-            ExpiresIn = AccessTokenLifetime,
+            ExpiresIn = ITokenService.AccessTokenLifetime,
             User = user
         };
     }
@@ -187,7 +187,7 @@ public class AuthService : IAuthService
     /// </exception>
     public async Task<RefreshResponseDto> RefreshToken(string refreshToken, bool isCookieToken = true)
     {
-        var refreshTokenData = await ValidateRefreshToken(refreshToken);
+        var refreshTokenData = await _tokenService.ValidateRefreshToken(refreshToken);
         
         if (refreshTokenData is null)
         {
@@ -210,7 +210,7 @@ public class AuthService : IAuthService
             _httpContextAccessor.HttpContext?.Response.Cookies.Append("refresh_token", refreshTokenData.Token, cookieOptions);
         }
         
-        var token = GenerateJwt(new JwtData()
+        var token = _tokenService.GenerateJwt(new JwtData()
         {
             Id = session.User.Id, 
             Username = session.User.Username, 
@@ -222,7 +222,7 @@ public class AuthService : IAuthService
         return new RefreshResponseDto()
         {
             AccessToken = token,
-            ExpiresIn = AccessTokenLifetime,
+            ExpiresIn = ITokenService.AccessTokenLifetime,
             User = session.User,
             RefreshToken = isCookieToken ? null : refreshTokenData.Token
         };
@@ -245,7 +245,7 @@ public class AuthService : IAuthService
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
-        var refreshTokenData = await GenerateRefreshToken(user, true, false);
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(user, true, false);
         
         return new RefreshTokenDto
         {
@@ -298,12 +298,12 @@ public class AuthService : IAuthService
                     throw new HttpResponseException(HttpStatusCode.Conflict, "There's a different google account linked to this email");
                 }
                 
-                var accountLinkingToken = await GenerateLinkingToken(user, userData.Id);
+                var accountLinkingToken = await _tokenService.GenerateLinkingToken(user, "google", userData.Id);
                 
                 return new GoogleSignInResult.GoogleSignInLinkRequired(accountLinkingToken);
             }
 
-            var accountCompletionToken = await GenerateCompletionToken(userData.Email, userData.Id);
+            var accountCompletionToken = await _tokenService.GenerateCompletionToken(userData.Email, "google", userData.Id);
             
             return new GoogleSignInResult.GoogleSignInAccountSetupRequired(accountCompletionToken);
         }
@@ -315,9 +315,9 @@ public class AuthService : IAuthService
             await _dbContext.SaveChangesAsync();
         }
 
-        var refreshTokenData = await GenerateRefreshToken(user);
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = GenerateJwt(new JwtData()
+        var token = _tokenService.GenerateJwt(new JwtData()
         {
             Id = user.Id, 
             Username = user.Username, 
@@ -328,7 +328,7 @@ public class AuthService : IAuthService
         return new GoogleSignInResult.GoogleSignInSuccess(new LoginResponseDto
         {
             AccessToken = token,
-            ExpiresIn = AccessTokenLifetime,
+            ExpiresIn = ITokenService.AccessTokenLifetime,
             User = user
         });
     }
@@ -360,17 +360,17 @@ public class AuthService : IAuthService
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Token == linkingToken);
 
-        if (linkingTokenEntry is null || linkingTokenEntry.ExpiresAt < DateTime.UtcNow)
+        if (linkingTokenEntry is null || linkingTokenEntry.ExpiresAt < DateTime.UtcNow || linkingTokenEntry.Provider != "google")
         {
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
         
         _dbContext.UserTokens.Remove(linkingTokenEntry);
-        var user = await LinkGoogleAccount(linkingTokenEntry.GoogleId, linkingTokenEntry.User);
+        var user = await LinkGoogleAccount(linkingTokenEntry.ProviderAccountId, linkingTokenEntry.User);
         
-        var refreshTokenData = await GenerateRefreshToken(user);
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = GenerateJwt(new JwtData()
+        var token = _tokenService.GenerateJwt(new JwtData()
         {
             Id = user.Id, 
             Username = user.Username, 
@@ -381,7 +381,7 @@ public class AuthService : IAuthService
         return new LoginResponseDto
         {
             AccessToken = token,
-            ExpiresIn = AccessTokenLifetime,
+            ExpiresIn = ITokenService.AccessTokenLifetime,
             User = user
         };
     }
@@ -441,7 +441,7 @@ public class AuthService : IAuthService
             .OfType<AccountCompletionToken>()
             .FirstOrDefaultAsync(t => t.Token == data.CompletionToken);
         
-        if (completionTokenEntry is null || completionTokenEntry.ExpiresAt < DateTime.UtcNow)
+        if (completionTokenEntry is null || completionTokenEntry.ExpiresAt < DateTime.UtcNow || completionTokenEntry.Provider != "google")
         {
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
@@ -462,7 +462,7 @@ public class AuthService : IAuthService
         var user = new User
         {
             Email = completionTokenEntry.Email,
-            GoogleId = completionTokenEntry.GoogleId,
+            GoogleId = completionTokenEntry.ProviderAccountId,
             Username = data.Username,
             NormalizedUsername = data.Username.ToUpper(),
             NormalizedEmail = completionTokenEntry.Email.ToUpper(),
@@ -477,9 +477,9 @@ public class AuthService : IAuthService
         
         await _dbContext.SaveChangesAsync();
         
-        var refreshTokenData = await GenerateRefreshToken(user);
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = GenerateJwt(new JwtData()
+        var token = _tokenService.GenerateJwt(new JwtData()
         {
             Id = user.Id, 
             Username = user.Username, 
@@ -490,7 +490,7 @@ public class AuthService : IAuthService
         return new LoginResponseDto()
         {
             AccessToken = token,
-            ExpiresIn = AccessTokenLifetime,
+            ExpiresIn = ITokenService.AccessTokenLifetime,
             User = user
         };
     }
@@ -677,7 +677,7 @@ public class AuthService : IAuthService
 
         if (user is null || user.EmailConfirmed) return null;
         
-        return await GenerateConfirmationToken(user);
+        return await _tokenService.GenerateConfirmationToken(user);
     }
 
     /// <summary>
@@ -691,43 +691,7 @@ public class AuthService : IAuthService
 
         if (user is null) return null;
         
-        using var rng = RandomNumberGenerator.Create();
-
-        for (var retry = 0; retry < _maxRetries; retry++)
-        {
-            var tokenBytes = new byte[256];
-            rng.GetBytes(tokenBytes);
-            var token = Convert.ToBase64String(tokenBytes);
-
-            var passwordResetToken = new PasswordResetToken
-            {
-                UserId = user.Id,
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
-                Token = token
-            };
-
-            try
-            {
-                _dbContext.UserTokens.Add(passwordResetToken);
-                await _dbContext.SaveChangesAsync();
-
-                return passwordResetToken;
-            }
-            catch (DbUpdateException e)
-            {
-                if(e.InnerException is Npgsql.PostgresException { SqlState: "23505" }) // Postgres unique constraint violation
-                {
-                    _logger.LogWarning("Token collision detected (retry {Retry}). Generating a new token.", retry + 1);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        _logger.LogError("Failed to generate password reset token after {MaxRetries} attempts", _maxRetries);
-        throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to generate password reset token");
+        return await _tokenService.GeneratePasswordResetToken(user);
     }
 
     /// <summary>
@@ -815,111 +779,6 @@ public class AuthService : IAuthService
     }
     
     /// <summary>
-    /// Generates a confirmation token for the specified user.
-    /// </summary>
-    /// <param name="user">The user for whom the confirmation token is generated.</param>
-    /// <returns>A <see cref="AccountConfirmationToken"/> object containing the generated token.</returns>
-    /// <remarks>
-    /// This method generates a unique confirmation token for the user and stores it in the database.
-    /// The token is valid for 1 hour from the time of generation.
-    /// </remarks>
-    private async Task<AccountConfirmationToken> GenerateConfirmationToken(User user)
-    {
-        using var rng = RandomNumberGenerator.Create();
-
-        for (var retry = 0; retry < _maxRetries; retry++)
-        {
-            var tokenBytes = new byte[256];
-            rng.GetBytes(tokenBytes);
-            var token = Convert.ToBase64String(tokenBytes);
-
-            var userConfirmationToken = new AccountConfirmationToken
-            {
-                UserId = user.Id,
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
-                Token = token
-            };
-
-            try
-            {
-                _dbContext.UserTokens.Add(userConfirmationToken);
-                await _dbContext.SaveChangesAsync();
-
-                return userConfirmationToken;
-            }
-            catch (DbUpdateException e)
-            {
-                if(e.InnerException is Npgsql.PostgresException { SqlState: "23505" }) // Postgres unique constraint violation
-                {
-                    _logger.LogWarning("Token collision detected (retry {Retry}). Generating a new token.", retry + 1);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        _logger.LogError("Failed to generate confirmation token after {MaxRetries} attempts", _maxRetries);
-        throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to generate confirmation token");
-    }
-
-    /// <summary>
-    ///     Generates an account completion token for the specified email and Google ID.
-    /// </summary>
-    /// <param name="email">
-    ///     The email of the user for whom the account completion token is generated.
-    /// </param>
-    /// <param name="googleId">
-    ///     The Google ID of the user for whom the account completion token is generated.
-    /// </param>
-    /// <returns>A <see cref="AccountCompletionToken"/> object containing the generated token.</returns>
-    /// <exception cref="HttpResponseException">
-    ///     Thrown with an HTTP status code of HttpStatusCode.InternalServerError (500) if the token cannot be generated.
-    /// </exception>
-    private async Task<AccountCompletionToken> GenerateCompletionToken(string email, string googleId)
-    {
-        using var rng = RandomNumberGenerator.Create();
-
-        for (var retry = 0; retry < _maxRetries; retry++)
-        {
-            var tokenBytes = new byte[256 / 8];
-            rng.GetBytes(tokenBytes);
-            var token = Convert.ToBase64String(tokenBytes);
-
-            var accountCompletionToken = new AccountCompletionToken
-            {
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
-                Token = token,
-                Email = email,
-                GoogleId = googleId
-            };
-
-            try
-            {
-                _dbContext.UserTokens.Add(accountCompletionToken);
-                await _dbContext.SaveChangesAsync();
-
-                return accountCompletionToken;
-            }
-            catch (DbUpdateException e)
-            {
-                if(e.InnerException is Npgsql.PostgresException { SqlState: "23505" }) // Postgres unique constraint violation
-                {
-                    _logger.LogWarning("Token collision detected (retry {Retry}). Generating a new token.", retry + 1);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        _logger.LogError("Failed to generate account completion token after {MaxRetries} attempts", _maxRetries);
-        throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to generate account completion token");
-    }
-    
-    /// <summary>
     ///     Links the Google account to the user.
     /// </summary>
     /// <param name="googleId">The Google ID of the user to link the account to.</param>
@@ -992,169 +851,6 @@ public class AuthService : IAuthService
 
         return userData;
     }
-    
-    /// <summary>
-    ///     Generates an account linking token for the specified user and Google ID.
-    /// </summary>
-    /// <param name="user">The user for whom the account linking token is generated.</param>
-    /// <param name="googleId">The Google ID to link to the user.</param>
-    /// <returns>A <see cref="AccountLinkingToken"/> object containing the generated token.</returns>
-    /// <exception cref="HttpResponseException">
-    ///     Thrown with an HTTP status code of HttpStatusCode.InternalServerError (500) if the token cannot be generated.
-    /// </exception>
-    private async Task<AccountLinkingToken> GenerateLinkingToken(User user, string googleId)
-    {
-        using var rng = RandomNumberGenerator.Create();
-
-        for (var retry = 0; retry < _maxRetries; retry++)
-        {
-            var tokenBytes = new byte[256 / 8];
-            rng.GetBytes(tokenBytes);
-            var token = Convert.ToBase64String(tokenBytes);
-
-            var accountLinkingToken = new AccountLinkingToken()
-            {
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
-                Token = token,
-                GoogleId = googleId,
-                User = user
-            };
-
-            try
-            {
-                _dbContext.UserTokens.Add(accountLinkingToken);
-                await _dbContext.SaveChangesAsync();
-
-                return accountLinkingToken;
-            }
-            catch (DbUpdateException e)
-            {
-                if(e.InnerException is Npgsql.PostgresException { SqlState: "23505" }) // Postgres unique constraint violation
-                {
-                    _logger.LogWarning("Token collision detected (retry {Retry}). Generating a new token.", retry + 1);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        _logger.LogError("Failed to generate account linking token after {MaxRetries} attempts", _maxRetries);
-        throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to generate account linking token");
-    }
-
-    /// <summary>
-    ///     Generates a refresh token for the specified user.
-    /// </summary>
-    /// <param name="user">The user for whom the refresh token is generated.</param>
-    /// <param name="extendedLifespan">A boolean indicating whether the refresh token should have an extended lifespan.</param>
-    /// <param name="storeInCookie">A boolean indicating whether the refresh token should be stored in a cookie.</param>
-    /// <returns>A <see cref="RefreshTokenData"/> object containing the generated refresh token.</returns>
-    private async Task<RefreshTokenData> GenerateRefreshToken(User user, bool extendedLifespan = false, bool storeInCookie = true)
-    {
-        string token;
-        byte[] encryptedToken;
-        do
-        {
-           token = Guid.NewGuid().ToString();
-        
-           encryptedToken = EncryptRefreshToken(token);
-        } while (_dbContext.UserSessions.Any(s => s.RefreshToken == encryptedToken));
-
-        var session = new UserSession
-        {
-            User = user,
-            RefreshToken = encryptedToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(extendedLifespan ? 90 : 7),
-            HasLongLivedRefreshToken = extendedLifespan
-        };
-        
-        await _dbContext.UserSessions.AddAsync(session);
-        await _dbContext.SaveChangesAsync();
-
-        if (storeInCookie)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = _sameSiteMode,
-                Expires = session.ExpiresAt,
-                Path = "/api/auth/refresh"
-            };
-
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append("refresh_token", token, cookieOptions);
-        }
-        
-        return new RefreshTokenData
-        {
-            Session = session,
-            Token = token
-        };
-    }
-
-    /// <summary>
-    ///     Validates the refresh token and generates a new one if it is valid.
-    /// </summary>
-    /// <param name="token">The refresh token to validate.</param>
-    /// <returns>A <see cref="RefreshTokenData"/> object containing the user session data if the token is valid, null otherwise.</returns>
-    private async Task<RefreshTokenData?> ValidateRefreshToken(string token)
-    {
-        var encryptedToken = EncryptRefreshToken(token);
-
-        var session = await _dbContext.UserSessions
-            .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.RefreshToken == encryptedToken);
-        
-        if (session is null || session.ExpiresAt < DateTime.UtcNow)
-        {
-            return null;
-        }
-        
-        string newRefreshToken;
-        byte[] newEncryptedToken;
-        do
-        {
-            newRefreshToken = Guid.NewGuid().ToString();
-        
-            newEncryptedToken = EncryptRefreshToken(newRefreshToken);
-        } while (_dbContext.UserSessions.FirstOrDefault(s => s.RefreshToken == newEncryptedToken) is not null);
-        
-        session.ExpiresAt = DateTime.UtcNow.AddDays(session.HasLongLivedRefreshToken ? 90 : 7);
-        session.RefreshToken = newEncryptedToken;
-        await _dbContext.SaveChangesAsync();
-
-        return new RefreshTokenData()
-        {
-            Session = session,
-            Token = newRefreshToken
-        };
-    }
-    
-    private byte[] EncryptRefreshToken(string token)
-    {
-        var encryptionKey = _config.GetSection("Authentication:RefreshSecret").Value;
-        
-        if (encryptionKey is null)
-        {
-            throw new ArgumentNullException(nameof(encryptionKey));
-        }
-        
-        byte[] encryptedToken;
-        using (var aes = Aes.Create())
-        {
-            var key = Convert.FromBase64String(encryptionKey);
-            aes.Key = key;
-            aes.IV = new byte[16];
-
-            var encryptor = aes.CreateEncryptor();
-            var tokenBytes = Encoding.UTF8.GetBytes(token);
-            encryptedToken = encryptor.TransformFinalBlock(tokenBytes, 0, tokenBytes.Length);
-        }
-        
-        return encryptedToken;
-    }
 
     /// <summary>
     ///     Hashes the provided password using the provided salt.
@@ -1171,43 +867,6 @@ public class AuthService : IAuthService
             iterationCount: 10000,
             numBytesRequested: 256 / 8
         );
-    }
-
-    /// <summary>
-    ///     Generates a JWT token using the provided data.
-    /// </summary>
-    /// <param name="data">A <see cref="JwtData"/> object containing data to include in the JWT token.</param>
-    /// <returns>The generated JWT token.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if the JWT secret is not found in the configuration.</exception>
-    private string GenerateJwt(JwtData data)
-    {
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.NameIdentifier, data.Id.ToString()),
-            new Claim(ClaimTypes.Name, data.Username),
-            new Claim(ClaimTypes.Email, data.Email),
-            new Claim(ClaimTypes.PrimarySid, data.SessionId.ToString())
-        };
-
-        var secret = _config.GetSection("Authentication:JwtSecret").Value;
-
-        if (secret is null)
-        {
-            throw new ArgumentNullException(nameof(secret));
-        }
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),
-            signingCredentials: creds
-        );
-
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return tokenString;
     }
     
     /// <summary>
