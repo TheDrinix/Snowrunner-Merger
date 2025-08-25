@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using SnowrunnerMerger.Api.Models.Auth;
+using SnowrunnerMerger.Api.Models.Auth.OAuth;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
 using SnowrunnerMerger.Api.Models.Saves;
 
@@ -10,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
 {
     public DbSet<User> Users { get; set; }
     public DbSet<UserSession> UserSessions { get; set; }
+    public DbSet<OAuthConnection> OAuthConnections { get; set; }
     public DbSet<StoredSaveInfo> StoredSaves { get; set; }
     public DbSet<SaveGroup> SaveGroups { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
@@ -27,6 +29,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
             .Entity<UserSession>()
             .Property(s => s.Id)
             .HasValueGenerator<GuidValueGenerator>();
+        
+        modelBuilder
+            .Entity<OAuthConnection>()
+            .HasKey(c => new { c.Provider, c.ProviderAccountId });
+        
+        // Unique constraint to ensure a user can only have one connection per provider
+        modelBuilder
+            .Entity<OAuthConnection>()
+            .HasIndex(c => new { c.UserId, c.Provider })
+            .IsUnique();
         
         modelBuilder
             .Entity<UserSession>()
