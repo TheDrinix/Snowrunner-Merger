@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowrunnerMergerApi", "SnowrunnerMergerApi.csproj", "{207DDC09-E1CA-427A-9823-A80ADE82A3C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowrunnerMerger.Api", "apps/api/SnowrunnerMerger.Api.csproj", "{207DDC09-E1CA-427A-9823-A80ADE82A3C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
