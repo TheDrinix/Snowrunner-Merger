@@ -33,3 +33,20 @@ export type GoogleLoginRes =
     | { tokenType: 1; data: LoginResponse }
     | { tokenType: 2; data: GoogleLinkingTokenData }
     | { tokenType: 4; data: GoogleAccountCompletionTokenData };
+
+export interface OAuthLinkingTokenData {
+    token: string;
+    expiresAt: Date;
+    user: User;
+}
+
+export interface OAuthAccountCompletionTokenData {
+    token: string;
+    expiresAt: Date;
+    email: string;
+}
+
+export type OAuthLoginRes =
+    | { tokenType: 1; data: LoginResponse }
+    | { tokenType: 2; data: OAuthLinkingTokenData }
+    | { tokenType: 4; data: OAuthAccountCompletionTokenData };

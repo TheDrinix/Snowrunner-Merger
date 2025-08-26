@@ -18,6 +18,10 @@ const { createToast } = useToaster();
 const http = useHttp();
 const userStore = useUserStore();
 
+const provider = computed(() => {
+  return route.params.provider as string;
+});
+
 if (!route.query.token || !route.query.email) {
   createToast('Invalid linking token', 'error');
   router.push({ name: 'login' });
@@ -79,7 +83,7 @@ const handleAccountCompletion = async () => {
   loading.value = true;
 
   try {
-    const res = await http.post<LoginResponse>('/auth/google/finish-account-setup', {
+    const res = await http.post<LoginResponse>(`/auth/${provider.value}/finish-account-setup`, {
       completionToken: completionToken.value,
       username: username.value,
       password: password.value
@@ -95,7 +99,7 @@ const handleAccountCompletion = async () => {
       return await router.push({ name: 'login' });
     }
 
-    createToast('Failed to link account, please try again later', 'error');
+    createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
     await router.push({ name: 'login' });
   }
 }

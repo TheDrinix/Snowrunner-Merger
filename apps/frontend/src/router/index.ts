@@ -19,9 +19,9 @@ const router = createRouter({
             }
         },
         {
-            path: '/auth/google/callback',
-            name: 'google-callback',
-            component: () => import('../views/auth/GoogleCallbackView.vue'),
+            path: '/auth/:provider/callback',
+            name: 'oauth-callback',
+            component: () => import('../views/auth/OAuthCallbackView.vue'),
             meta: {
                 bypassAuth: true
             }
@@ -79,16 +79,16 @@ const router = createRouter({
             }
         },
         {
-            path: '/auth/link-google-account',
-            name: 'link-google-account',
+            path: '/auth/:provider/link-account',
+            name: 'link-oauth-account',
             component: () => import('../views/auth/LinkAccountView.vue'),
             meta: {
                 bypassAuth: true
             }
         },
         {
-            path: '/auth/complete-google-account',
-            name: 'complete-google-account',
+            path: '/auth/:provider/complete-account',
+            name: 'complete-account',
             component: () => import('../views/auth/FinishAccountSetupView.vue'),
             meta: {
                 bypassAuth: true
