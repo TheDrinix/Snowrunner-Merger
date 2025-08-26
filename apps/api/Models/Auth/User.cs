@@ -6,7 +6,6 @@ namespace SnowrunnerMerger.Api.Models.Auth;
 
 [Index(nameof(NormalizedEmail))]
 [Index(nameof(Email), IsUnique = true)]
-[Index(nameof(GoogleId), IsUnique = true)]
 public class User
 {
     public Guid Id { get; set; }
@@ -22,7 +21,6 @@ public class User
     public byte[] PasswordSalt { get; set; }
     [JsonIgnore]
     public bool EmailConfirmed { get; set; }
-    public string? GoogleId { get; set; }
     public DateTime CreatedAt { get; set; }
     [JsonIgnore]
     public List<UserSession> UserSessions { get; set; }
