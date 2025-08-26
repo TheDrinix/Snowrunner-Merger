@@ -66,6 +66,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
 
 builder.Services.AddScoped<GoogleOAuthService>();
+builder.Services.AddScoped<DiscordOAuthService>();
 builder.Services.AddScoped<IOAuthServiceFactory, OAuthServiceFactory>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
