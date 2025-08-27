@@ -22,17 +22,14 @@ public class AuthService : IAuthService
 {
     private readonly ILogger<AuthService> _logger;
     private readonly AppDbContext _dbContext;
-    private readonly IConfiguration _config;
     private readonly ITokenService _tokenService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly HttpClient _httpClient;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly SameSiteMode _sameSiteMode = SameSiteMode.Lax;
 
     public AuthService(
         ILogger<AuthService> logger,
         AppDbContext dbContext,
-        IConfiguration config,
         ITokenService tokenService,
         IHttpContextAccessor httpContextAccessor,
         IWebHostEnvironment webHostEnvironment
@@ -40,14 +37,9 @@ public class AuthService : IAuthService
     {
         _logger = logger;
         _dbContext = dbContext;
-        _config = config;
         _tokenService = tokenService;
         _httpContextAccessor = httpContextAccessor;
         _webHostEnvironment = webHostEnvironment;
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://www.googleapis.com")
-        };
 
         if (_webHostEnvironment.IsDevelopment())
         {
@@ -160,13 +152,7 @@ public class AuthService : IAuthService
 
         var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = _tokenService.GenerateJwt(new JwtData()
-        {
-            Id = user.Id, 
-            Username = user.Username, 
-            Email = user.Email,
-            SessionId = refreshTokenData.Session.Id
-        });
+        var token = _tokenService.GenerateJwt(user.Id);
         
         return new LoginResponseDto
         {
@@ -210,13 +196,7 @@ public class AuthService : IAuthService
             _httpContextAccessor.HttpContext?.Response.Cookies.Append("refresh_token", refreshTokenData.Token, cookieOptions);
         }
         
-        var token = _tokenService.GenerateJwt(new JwtData()
-        {
-            Id = session.User.Id, 
-            Username = session.User.Username, 
-            Email = session.User.Email,
-            SessionId = session.Id
-        });
+        var token = _tokenService.GenerateJwt(session.User.Id);
 
 
         return new RefreshResponseDto()
@@ -321,13 +301,7 @@ public class AuthService : IAuthService
         
         var refreshTokenData = await _tokenService.GenerateRefreshToken(user);
         
-        var token = _tokenService.GenerateJwt(new JwtData()
-        {
-            Id = user.Id, 
-            Username = user.Username, 
-            Email = user.Email,
-            SessionId = refreshTokenData.Session.Id
-        });
+        var token = _tokenService.GenerateJwt(user.Id);
 
         return new LoginResponseDto()
         {

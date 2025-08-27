@@ -369,17 +369,16 @@ public class TokenService : ITokenService
     /// <summary>
     ///     Generates a JWT token using the provided data.
     /// </summary>
-    /// <param name="data">A <see cref="JwtData"/> object containing data to include in the JWT token.</param>
+    /// <param name="userId">The unique identifier of the user for whom the JWT token is generated.</param>
+    /// <param name="role">The role of the user (default is "User").</param>
     /// <returns>The generated JWT token.</returns>
     /// <exception cref="ArgumentNullException">Thrown if the JWT secret is not found in the configuration.</exception>
-    public string GenerateJwt(JwtData data)
+    public string GenerateJwt(Guid userId, string role = "User")
     {
         var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.NameIdentifier, data.Id.ToString()),
-            new Claim(ClaimTypes.Name, data.Username),
-            new Claim(ClaimTypes.Email, data.Email),
-            new Claim(ClaimTypes.PrimarySid, data.SessionId.ToString())
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Role, role)
         };
 
         var secret = _config.GetSection("Authentication:JwtSecret").Value;

@@ -73,13 +73,7 @@ public abstract class OAuthService(
 
         var refreshTokenData = await tokenService.GenerateRefreshToken(existingUser);
         
-        var jwt = tokenService.GenerateJwt(new JwtData()
-        {
-            Id = existingUser.Id,
-            Email = existingUser.Email,
-            Username = existingUser.Username,
-            SessionId = refreshTokenData.Session.Id
-        });
+        var jwt = tokenService.GenerateJwt(existingUser.Id);
         
         return new OAuthSignInResult.OAuthSignInSuccess(new LoginResponseDto()
         {
@@ -131,13 +125,7 @@ public abstract class OAuthService(
         
         var refreshTokenData = await tokenService.GenerateRefreshToken(user);
         
-        var jwt = tokenService.GenerateJwt(new JwtData()
-        {
-            Id = user.Id,
-            Email = user.Email,
-            Username = user.Username,
-            SessionId = refreshTokenData.Session.Id
-        });
+        var jwt = tokenService.GenerateJwt(user.Id);
 
         return new LoginResponseDto()
         {
