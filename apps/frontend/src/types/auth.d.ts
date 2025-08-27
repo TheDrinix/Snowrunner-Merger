@@ -9,6 +9,8 @@ export interface UserStore {
     user?: User;
     accessToken?: string;
     accessTokenExpires?: Date;
+    oauthProviders?: string[];
+    linkedProviders?: string[];
 }
 
 export interface LoginResponse {

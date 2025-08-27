@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useUserStore} from "@/stores/userStore";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import TextInput from "@/components/forms/TextInput.vue";
 import UpdateInput from "@/components/forms/UpdateInput.vue";
 import {toTypedSchema} from "@vee-validate/yup";
@@ -12,6 +12,7 @@ import {useHttp} from "@/composables/useHttp";
 import {useToaster} from "@/stores/toastStore";
 import type {User} from "@/types/auth";
 import router from "@/router";
+import { link } from "fs";
 
 const userStore = useUserStore();
 const logout = useLogout();
@@ -58,7 +59,15 @@ const [confirmPassword, confirmPasswordAttrs] = passwordForm.defineField("confir
 const [username, usernameAttrs] = usernameForm.defineField("username");
 
 const isAccountDeleteModalOpen = ref(false);
-const isGoogleUnlinkModalOpen = ref(false);
+const OAuthUnlinkModalState = ref<string | null>(null);
+const isOAuthUnlinkModalOpen = computed({
+  get: () => OAuthUnlinkModalState.value !== null,
+  set: (val: boolean) => {
+    if (!val) {
+      OAuthUnlinkModalState.value = null;
+    }
+  }
+});
 
 const user = computed(() => userStore.user);
 
@@ -132,6 +141,10 @@ const handleAccountDelete = async () => {
   }
 }
 
+const oauthLoading = ref(false);
+const oauthProviders = computed(() => userStore.oauthProviders);
+const linkedProviders = ref({} as Record<string, boolean>);
+
 const handleLinkGoogleAccount = async () => {
   try {
     const redirectUrl = new URL('/auth/google/link', window.location.origin);
@@ -150,18 +163,60 @@ const handleLinkGoogleAccount = async () => {
   }
 }
 
-const handleUnlinkGoogleAccount = async () => {
+const handleLinkOAuthAccount = async (provider: string) => {
   try {
-    await http.post("/auth/google/unlink", {});
+    const redirectUrl = new URL(`/auth/${provider}/link`, window.location.origin);
 
-    userStore.removeGoogleId();
-    createToast("Google account unlinked successfully", 'success');
+    const res = await http.get<string>(`/auth/${provider}/signin/`, {
+      withCredentials: true,
+      params: {
+        callbackUrl: redirectUrl.toString()
+      }
+    });
+
+    // Redirect the user to the OAuth provider's sign-in page
+    window.location.href = res.data;
   } catch (e) {
-    createToast("There was an error trying to unlink your Google account, please try again later.", 'error', 10);
+    createToast(`There was an error trying to link your ${provider} account, please try again later.`, 'error', 10);
+  }
+}
+
+const handleOAuthUnlink = async () => {
+  const provider = OAuthUnlinkModalState.value;
+
+  if (!provider) return;
+
+  try {
+    await http.post(`/auth/${provider}/unlink`, {});
+
+    linkedProviders.value[provider] = false;
+    createToast(`${provider.charAt(0).toUpperCase() + provider.slice(1)} account unlinked successfully`, 'success');
+  } catch (e) {
+    createToast(`There was an error trying to unlink your ${provider} account, please try again later.`, 'error', 10);
+  }
+  
+  OAuthUnlinkModalState.value = provider;
+}
+
+onMounted(async () => {
+  oauthLoading.value = true;
+
+  if (!oauthProviders.value) {
+    await userStore.fetchOAuthProviders();
+
+    for (const provider of oauthProviders.value || []) {
+      linkedProviders.value[provider] = false;
+    }
   }
 
-  isGoogleUnlinkModalOpen.value = false;
-}
+  const res = await http.get<string[]>('/user/oauth/providers');
+
+  for (const provider of res.data) {
+    linkedProviders.value[provider] = true;
+  }
+
+  oauthLoading.value = false;
+})
 </script>
 
 <template>
@@ -197,13 +252,13 @@ const handleUnlinkGoogleAccount = async () => {
             </form>
           </div>
           <h3 class="text-lg font-medium mt-2">Linked accounts</h3>
-          <div class="w-full flex justify-between items-center">
+          <div class="w-full flex justify-between items-center" v-for="provider in oauthProviders" :key="provider">
             <div>
-              <p>Google</p>
-              <span class="text-sm text-gray-400">Allows you to login using your Google account</span>
+              <p class="capitalize">{{ provider }}</p>
+              <span class="text-sm text-gray-400">Allows you to login using your {{ provider }} account</span>
             </div>
-            <button v-if="user?.googleId" class="btn btn-primary btn-sm" @click="() => isGoogleUnlinkModalOpen = true">Unlink</button>
-            <button v-else class="btn btn-primary btn-sm" @click="handleLinkGoogleAccount">Link</button>
+            <button v-if="linkedProviders[provider]" class="btn btn-primary btn-sm" @click="() => OAuthUnlinkModalState = provider">Unlink</button>
+            <button v-else class="btn btn-primary btn-sm" @click="() => handleLinkOAuthAccount(provider)">Link</button>
           </div>
           <hr class="divider border-none m-0" />
           <div class="flex gap-4 justify-end">
@@ -219,12 +274,12 @@ const handleUnlinkGoogleAccount = async () => {
               </div>
             </div>
           </Modal>
-          <Modal v-model="isGoogleUnlinkModalOpen">
+          <Modal v-model="isOAuthUnlinkModalOpen">
             <div class="p-4">
-              <h3 class="text-lg font-bold">Are you sure you want to unlink your Google account?</h3>
+              <h3 class="text-lg font-bold">Are you sure you want to unlink your {{ OAuthUnlinkModalState }} account?</h3>
               <div class="flex justify-end gap-4 mt-4">
-                <button @click="handleUnlinkGoogleAccount" class="btn btn-error btn-sm">Unlink</button>
-                <button @click="() => isGoogleUnlinkModalOpen = false" class="btn btn-secondary btn-sm">Cancel</button>
+                <button @click="handleOAuthUnlink" class="btn btn-error btn-sm">Unlink</button>
+                <button @click="() => OAuthUnlinkModalState = null" class="btn btn-secondary btn-sm">Cancel</button>
               </div>
             </div>
           </Modal>

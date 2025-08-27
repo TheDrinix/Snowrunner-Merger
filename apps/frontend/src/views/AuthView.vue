@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
-import {computed} from "vue";
+import {computed, onMounted} from "vue";
 import {useHttp} from "@/composables/useHttp";
 import { useToaster } from "@/stores/toastStore";
+import { useUserStore } from "@/stores/userStore";
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToaster();
+const userStore = useUserStore();
 
 const http = useHttp();
 
@@ -18,7 +20,7 @@ const title = computed(() => {
   return route.name == 'login' ? 'Sign in to existing account' : 'Create a new account'
 })
 
-const availableProviders = ['google', 'discord']
+const oauthProviders = computed(() => userStore.oauthProviders);
 
 const handleOauthSignIn = async (provider: string) => {
   try {
@@ -38,6 +40,12 @@ const handleOauthSignIn = async (provider: string) => {
     toast.createToast(`Failed to get ${provider} sign-in URL`, 'error');
   }
 }
+
+onMounted(() => {
+  if (!oauthProviders.value) {
+    userStore.fetchOAuthProviders();
+  }
+})
 </script>
 
 <template>
@@ -52,7 +60,7 @@ const handleOauthSignIn = async (provider: string) => {
         <h3>Sign-in using an external service:</h3>
         <div class="mt-2 flex flex-wrap gap-1">
           <button 
-            v-for="provider in availableProviders" 
+            v-for="provider in oauthProviders" 
             :key="provider"
             class="btn btn-ghost gap-0"
             @click="() => handleOauthSignIn(provider)"
