@@ -368,5 +368,15 @@ namespace SnowrunnerMerger.Api.Controllers
             
             return Ok();
         }
+        
+        [HttpGet("oauth/providers")]
+        [SwaggerOperation(Summary = "Gets available OAuth providers", Description = "Gets a list of available OAuth providers")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of available OAuth providers", typeof(IEnumerable<string>))]
+        public IActionResult GetAvailableOAuthProviders()
+        {
+            var providers = oauthServiceFactory.ProviderNames;
+            
+            return Ok(providers);
+        }
     }
 }

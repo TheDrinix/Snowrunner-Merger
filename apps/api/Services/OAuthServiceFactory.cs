@@ -4,6 +4,7 @@ namespace SnowrunnerMerger.Api.Services;
 
 public class OAuthServiceFactory(IServiceProvider provider) : IOAuthServiceFactory
 {
+    public string[] ProviderNames => ["google", "discord"];
     public OAuthService GetService(string providerName)
     {
         return providerName.ToLower() switch
