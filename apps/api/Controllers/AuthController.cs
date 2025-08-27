@@ -194,7 +194,7 @@ namespace SnowrunnerMerger.Api.Controllers
                 return BadRequest();
             }
             
-            if (!authService.ValidateOauthStateToken(state))
+            if (!authService.ValidateOauthStateToken(WebUtility.UrlDecode(state)))
             {
                 return BadRequest();
             }
