@@ -24,6 +24,16 @@ namespace SnowrunnerMerger.Api.Controllers
 
             return Ok(user);
         }
+        
+        [HttpGet("oauth/providers")]
+        [SwaggerOperation(Summary = "Get OAuth providers", Description = "Get a list of OAuth providers linked to the currently authenticated user")]
+        [SwaggerResponse(StatusCodes.Status200OK, "List of OAuth providers", typeof(List<string>))]
+        public async Task<ActionResult<List<string>>> GetUserOAuthProviders()
+        {
+            var providers = await userService.GetUserOAuthProviders();
+
+            return Ok(providers);
+        }
 
         [HttpPatch("password")]
         [SwaggerOperation(Summary = "Update password", Description = "Update the password of the currently authenticated user")]

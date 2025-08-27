@@ -33,4 +33,6 @@ public interface IUserService
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task DeleteUser();
+
+    Task<List<string>> GetUserOAuthProviders();
 };

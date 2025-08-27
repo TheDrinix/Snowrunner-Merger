@@ -107,4 +107,16 @@ public class UserService(
         
         await dbContext.SaveChangesAsync();
     }
+    
+    public async Task<List<string>> GetUserOAuthProviders()
+    {
+        var userData = GetUserSessionData();
+        
+        var providers = await dbContext.OAuthConnections
+            .Where(o => o.UserId == userData.Id)
+            .Select(o => o.Provider)
+            .ToListAsync();
+
+        return providers;
+    }
 }
