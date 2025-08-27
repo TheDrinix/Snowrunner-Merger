@@ -5,7 +5,8 @@ import {useGroupsStore} from "@/stores/groupsStore";
 const defaultState = {
     user: undefined,
     accessToken: undefined,
-    accessTokenExpires: undefined
+    accessTokenExpires: undefined,
+    oauthProviders: undefined,
 }
 
 export const useUserStore = defineStore('user', {
@@ -54,6 +55,15 @@ export const useUserStore = defineStore('user', {
         removeGoogleId() {
             if (this.user) {
                 this.user.googleId = undefined;
+            }
+        },
+        async fetchOAuthProviders() {
+            try {
+                const res = await this.axios.get<string[]>('/auth/oauth/providers');
+
+                this.oauthProviders = res.data;
+            } catch (e) {
+                console.error(e);
             }
         }
     }

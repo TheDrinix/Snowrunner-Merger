@@ -29,23 +29,15 @@ public class UserService(
         var principal = httpContextAccessor.HttpContext?.User;
         
         var id = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-        var username = principal?.FindFirstValue(ClaimTypes.Name);
-        var email = principal?.FindFirstValue(ClaimTypes.Email);
-        var sessionId = principal?.FindFirstValue(ClaimTypes.PrimarySid);
+        var role = principal?.FindFirstValue(ClaimTypes.Role);
 
-        if (id is null || username is null || email is null || sessionId is null)
+        if (id is null || role is null)
         {
             logger.LogError("User session data not found");
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
         
-        return new JwtData
-        {
-            Id = Guid.Parse(id),
-            Username = username,
-            Email = email,
-            SessionId = Guid.Parse(sessionId)
-        };
+        return new JwtData(Guid.Parse(id), role);
     }
 
     /// <summary>
@@ -114,5 +106,17 @@ public class UserService(
         dbContext.Users.Remove(user);
         
         await dbContext.SaveChangesAsync();
+    }
+    
+    public async Task<List<string>> GetUserOAuthProviders()
+    {
+        var userData = GetUserSessionData();
+        
+        var providers = await dbContext.OAuthConnections
+            .Where(o => o.UserId == userData.Id)
+            .Select(o => o.Provider)
+            .ToListAsync();
+
+        return providers;
     }
 }

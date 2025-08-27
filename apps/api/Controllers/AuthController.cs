@@ -8,12 +8,18 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.Google;
+using SnowrunnerMerger.Api.Models.Auth.OAuth;
 
 namespace SnowrunnerMerger.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService, IUserService userService, IEmailSender emailSender) : ControllerBase
+    public class AuthController(
+        IAuthService authService, 
+        IUserService userService, 
+        IEmailSender emailSender,
+        IOAuthServiceFactory oauthServiceFactory
+    ) : ControllerBase
     {
         [HttpPost("login")]
         [SwaggerOperation(Summary = "Logs in a user", Description = "Logs in a user with provided credentials and returns a JWT token")]
@@ -98,124 +104,176 @@ namespace SnowrunnerMerger.Api.Controllers
             return verified ? Ok() : BadRequest();
         }
 
-        [HttpGet("google/signin")]
-        [SwaggerOperation(Summary = "Initiates Google sign-in", Description = "Initiates Google sign-in flow")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Returns google signin url", typeof(string))]
-        public IActionResult GoogleSignin([FromQuery] string? callbackUrl)
+        [HttpGet("{provider}/signin")]
+        [SwaggerOperation(Summary = "Initiates OAuth sign-in", Description = "Initiates OAuth sign-in flow for the specified provider and returns the sign-in URL")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns OAuth provider signin url", typeof(string))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Unsupported OAuth provider")]
+        public IActionResult OAuthSignIn([FromQuery] string? callbackUrl, [FromRoute] string provider)
         {
-            var credentials = authService.GetGoogleCredentials();
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
+            }
             
             var hashedState = authService.GenerateOauthStateToken();
 
-            var redirectUrl = callbackUrl ?? authService.GetGoogleCallbackUrl();
+            var currentUrl = $"{Request.Scheme}://{Request.Host}";
             
-            const string scopes = "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
-            
-            var url = new UriBuilder("https://accounts.google.com/o/oauth2/v2/auth")
-            {
-                Query = $"client_id={credentials.ClientId}&response_type=code&redirect_uri={redirectUrl}&scope={scopes}&include_granted_scopes=true&prompt=consent&state={WebUtility.UrlEncode(hashedState)}"
-            }.ToString();
+            var url = oauthService.GetSignInUrl(currentUrl, hashedState, callbackUrl);
             
             return Ok(url);
         }
         
-        [HttpGet("google/signin/callback")]
-        [SwaggerOperation(Summary = "Handles Google sign-in callback", Description = "Handles Google sign-in callback and returns JWT token")]
+        [HttpGet("{provider}/callback")]
+        [SwaggerOperation(Summary = "Handles OAuth sign-in callback", Description = "Handles OAuth sign-in callback and signs in the user")]
         [SwaggerResponse(StatusCodes.Status200OK, "Sign-in successful", typeof(LoginResponseDto))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid state token or error during google sign-in")]
-        public async Task<IActionResult> GoogleSigninCallback(string? code, string state, string? error, string? callbackUrl)
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid state token or error during OAuth sign-in")]
+        public async Task<IActionResult> OAuthSignInCallback(string? code, string state, string? error, string? callbackUrl, [FromRoute] string provider)
         {
-            if (!authService.ValidateOauthStateToken(state))
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
+            }
+            
+            if (!authService.ValidateOauthStateToken(WebUtility.UrlDecode(state)))
             {
                 return BadRequest();
             }            
             
             if (!string.IsNullOrEmpty(error))
             {
-                return BadRequest();
+                return BadRequest(error);
             }
-
-            var redirectUrl = callbackUrl ?? authService.GetGoogleCallbackUrl();
-
-            var res = await authService.GoogleSignIn(code!, redirectUrl);
+            
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            
+            var redirectUrl = callbackUrl ?? oauthService.GetCallbackUrl(baseUrl);
+            
+            var res = await oauthService.OAuthSignIn(code!, redirectUrl);
 
             return res switch
             {
-                GoogleSignInResult.GoogleSignInAccountSetupRequired googleSignInAccountSetupRequired => Ok(new
+                OAuthSignInResult.OAuthSignInAccountSetupRequired oAuthSignInAccountSetupRequired => Ok(new
                 {
-                    tokenType = GoogleResTokenType.CompletionToken,
-                    data = googleSignInAccountSetupRequired.completionToken
+                    tokenType = OAuthResultTokenType.CompletionToken,
+                    data = oAuthSignInAccountSetupRequired.completionToken
                 }),
-                GoogleSignInResult.GoogleSignInLinkRequired googleSignInLinkRequired => Ok(new
+                OAuthSignInResult.OAuthSignInLinkRequired oAuthSignInLinkRequired => Ok(new
                 {
-                    tokenType = GoogleResTokenType.LinkingToken,
-                    data = googleSignInLinkRequired.linkingToken,  
+                    tokenType = OAuthResultTokenType.LinkingToken,
+                    data = oAuthSignInLinkRequired.linkingToken,
                 }),
-                GoogleSignInResult.GoogleSignInSuccess googleSignInSuccess => Ok(new
+                OAuthSignInResult.OAuthSignInSuccess oAuthSignInSuccess => Ok(new
                 {
-                    tokenType = GoogleResTokenType.AccessToken,
-                    data = googleSignInSuccess.data
+                    tokenType = OAuthResultTokenType.AccessToken,
+                    data = oAuthSignInSuccess.data
                 }),
                 _ => StatusCode(500)
             };
         }
 
-        [HttpGet("google/link/callback")]
+        [HttpGet("{provider}/link/callback")]
         [Authorize]
-        [SwaggerOperation(Summary = "Handles Google account linking callback", Description = "Handles Google account linking callback and links Google account to the current user")]
+        [SwaggerOperation(Summary = "Handles OAuth account linking callback", Description = "Handles OAuth provider account linking callback and links the OAuth provider account to the current user")]
         [SwaggerResponse(StatusCodes.Status200OK, "Account linked successfully", typeof(User))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid state token or error during google account linking")]
-        [SwaggerResponse(StatusCodes.Status409Conflict, "There is already a user with the Google account linked")]
-        public async Task<IActionResult> LinkGoogleAccountCallback(string? code, string state, string? error,
-            string callbackUrl)
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid state token or error during OAuth account linking")]
+        [SwaggerResponse(StatusCodes.Status409Conflict, "There is already a user with the OAuth provider account linked")]
+        public async Task<IActionResult> LinkOAuthAccountCallback(string? code, string state, string? error,
+            string callbackUrl, [FromRoute] string provider)
         {
             if (!string.IsNullOrEmpty(error))
             {
                 return BadRequest();
             }
             
-            if (!authService.ValidateOauthStateToken(state))
+            if (!authService.ValidateOauthStateToken(WebUtility.UrlDecode(state)))
             {
                 return BadRequest();
+            }
+            
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
             }
 
             var user = await userService.GetCurrentUser();
 
-            var updatedUser = await authService.LinkGoogleAccount(user, code!, callbackUrl);
+            var updatedUser = await oauthService.LinkOAuthProvider(user, code!, callbackUrl);
 
             return Ok(updatedUser);
         }
 
-        [HttpPost("google/link-account")]
-        [SwaggerOperation(Summary = "Links Google account", Description = "Links Google account to an existing user account")]
+        [HttpPost("{provider}/link-account")]
+        [SwaggerOperation(Summary = "Links OAuth provider account", Description = "Links OAuth provider account to an existing user account")]
         [SwaggerResponse(StatusCodes.Status200OK, "Account linked successfully and logs user in", typeof(LoginResponseDto))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized, "Invalid or expired linking token")]
-        public async Task<IActionResult> LinkAccount([FromBody] LinkAccountDto data)
+        public async Task<IActionResult> LinkAccount([FromBody] LinkAccountDto data, [FromRoute] string provider)
         {
-            var accessTokenData = await authService.LinkGoogleAccount(data.LinkingToken);
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
+            }
+
+            var accessTokenData = await oauthService.LinkOAuthProvider(data.LinkingToken);
             
             return Ok(accessTokenData);
         }
         
-        [HttpPost("google/finish-account-setup")]
-        [SwaggerOperation(Summary = "Finishes Google account setup", Description = "Finishes Google account setup for a new user")]
+        [HttpPost("{provider}/finish-account-setup")]
+        [SwaggerOperation(Summary = "Finishes account setup", Description = "Finishes account setup for a new user created via OAuth sign-in")]
         [SwaggerResponse(StatusCodes.Status200OK, "Account setup finished successfully and logs user in", typeof(LoginResponseDto))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid account data or password requirements not met")]
         [SwaggerResponse(StatusCodes.Status401Unauthorized, "Invalid or expired account completion token")]
-        public async Task<IActionResult> FinishAccountSetup([FromBody] FinishAccountSetupDto data)
+        public async Task<IActionResult> FinishAccountSetup([FromBody] FinishAccountSetupDto data, [FromRoute] string provider)
         {
-            var accessTokenData = await authService.FinishAccountSetup(data);
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
+            }
+            
+            var accessTokenData = await authService.FinishAccountSetup(data, oauthService);
             
             return Ok(accessTokenData);
         }
         
-        [HttpPost("google/unlink")]
+        [HttpPost("{provider}/unlink")]
         [Authorize]
-        [SwaggerOperation(Summary = "Unlinks Google account", Description = "Unlinks Google account from the current user")]
+        [SwaggerOperation(Summary = "Unlinks OAuth provider account", Description = "Unlinks OAuth provider account from the current user")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Account unlinked successfully")]
-        public async Task<IActionResult> UnlinkGoogleAccount()
+        public async Task<IActionResult> UnlinkGoogleAccount([FromRoute] string provider)
         {
-            await authService.UnlinkGoogleAccount();
+            OAuthService oauthService;
+            try
+            {
+                oauthService = oauthServiceFactory.GetService(provider);
+            } catch (NotSupportedException)
+            {
+                return BadRequest("Unsupported OAuth provider");
+            }
+            
+            var user = await userService.GetCurrentUser();
+            
+            await oauthService.UnlinkOAuthProvider(user);
             
             return NoContent();
         }
@@ -309,6 +367,16 @@ namespace SnowrunnerMerger.Api.Controllers
             await authService.ResetPassword(body);
             
             return Ok();
+        }
+        
+        [HttpGet("oauth/providers")]
+        [SwaggerOperation(Summary = "Gets available OAuth providers", Description = "Gets a list of available OAuth providers")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of available OAuth providers", typeof(IEnumerable<string>))]
+        public IActionResult GetAvailableOAuthProviders()
+        {
+            var providers = oauthServiceFactory.ProviderNames;
+            
+            return Ok(providers);
         }
     }
 }

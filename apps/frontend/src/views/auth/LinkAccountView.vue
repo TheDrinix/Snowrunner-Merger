@@ -13,7 +13,9 @@ const { createToast } = useToaster();
 const http = useHttp();
 const userStore = useUserStore();
 
-console.log("Hello from LinkAccountView");
+const provider = computed(() => {
+  return route.params.provider as string;
+});
 
 if (!route.query.token || !route.query.email) {
   createToast('Invalid linking token', 'error');
@@ -37,11 +39,9 @@ watch([linkingToken, email], () => {
   }
 })
 
-console.log("Linking token received 2");
-
 const handleLinkAccount = async () => {
   try {
-    const res = await http.post<LoginResponse>('/auth/google/link-account', {
+    const res = await http.post<LoginResponse>(`/auth/${provider.value}/link-account`, {
       linkingToken: linkingToken.value,
     }, {
       withCredentials: true
@@ -59,7 +59,7 @@ const handleLinkAccount = async () => {
       }
     }
 
-    createToast('Failed to link account, please try again later', 'error');
+    createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
     await router.push({ name: 'login' });
   }
 }

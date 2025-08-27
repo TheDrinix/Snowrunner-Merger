@@ -8,6 +8,7 @@ using SnowrunnerMerger.Api.Jobs;
 using SnowrunnerMerger.Api.Models;
 using SnowrunnerMerger.Api.Services;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Api.Services.OAuthProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +64,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+
+builder.Services.AddScoped<GoogleOAuthService>();
+builder.Services.AddScoped<DiscordOAuthService>();
+builder.Services.AddScoped<IOAuthServiceFactory, OAuthServiceFactory>();
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupsService, GroupsService>();

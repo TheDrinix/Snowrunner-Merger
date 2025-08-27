@@ -34,11 +34,6 @@ public interface IAuthService
     /// <returns>A <see cref="RefreshTokenDto"/> object containing the long-lived refresh token and expiration time on success.</returns>
     Task<RefreshTokenDto> GetLongLivedRefreshToken(Guid userId);
     /// <summary>
-    ///     Retrieves the Google OAuth2 credentials from the configuration.
-    /// </summary>
-    /// <returns>A <see cref="GoogleCredentials"/> object containing the Google OAuth2 client ID and secret.</returns>
-    GoogleCredentials GetGoogleCredentials();
-    /// <summary>
     ///     Generates a new OAuth2 state token and stores it in a cookie.
     /// </summary>
     /// <returns>The hashed OAuth2 state token.</returns>
@@ -50,46 +45,15 @@ public interface IAuthService
     /// <returns>True if the token is valid, false otherwise.</returns>
     bool ValidateOauthStateToken(string state);
     /// <summary>
-    ///     Attempts to sign in a user using the provided Google OAuth2 code.
-    ///     If the user does not exist, a new user is created.
-    /// </summary>
-    /// <param name="code">The Google OAuth2 code used to exchange for an access token.</param>
-    /// <param name="redirectUri">The redirect URI used to exchange the code.</param>
-    /// <returns>A <see cref="LoginResponseDto"/> object containing the access token, expiration time, and user information on success.</returns>
-    Task<GoogleSignInResult> GoogleSignIn(string code, string redirectUri);
-    /// <summary>
-    ///     Attempts to link a Google account to an existing account using a linking token.
-    ///     User gets signed in if the linking is successful.
-    /// </summary>
-    /// <param name="linkingToken">The linking token used to link the Google account.</param>
-    /// <returns>A <see cref="LoginResponseDto"/> object containing the access token, expiration time, and user information on success.</returns>
-    Task<LoginResponseDto> LinkGoogleAccount(string linkingToken);
-    /// <summary>
-    ///     Attempts to link a Google account to an existing account using the provided Google OAuth2 code.
-    /// </summary>
-    /// <param name="user">The user to link the Google account to.</param>
-    /// <param name="code">The Google OAuth2 code used to exchange for an access token.</param>
-    /// <param name="redirectUri">The OAuth redirect url.</param>
-    /// <returns>The updated user.</returns>
-    Task<User> LinkGoogleAccount(User user, string code, string redirectUri);
-    /// <summary>
     ///     Attempts to finish the account for a user using the provided data.
     ///     User gets signed in if the account setup is successful.
     /// </summary>
     /// <param name="data">A <see cref="FinishAccountSetupDto"/> object containing the user's account details.</param>
+    /// <param name="oauthService">
+    ///     The OAuth service used to handle the OAuth2 flow (e.g., Google, Facebook).
+    /// </param>
     /// <returns>A <see cref="LoginResponseDto"/> object containing the access token, expiration time, and user information on success.</returns>
-    Task<LoginResponseDto> FinishAccountSetup(FinishAccountSetupDto data);
-
-    /// <summary>
-    ///     Attempts to unlink the Google account from the current user.
-    /// </summary>
-    Task UnlinkGoogleAccount();
-
-    /// <summary>
-    ///     Retrieves the Google OAuth2 callback URL from the configuration.
-    /// </summary>
-    /// <returns>The Google OAuth2 callback URL.</returns>
-    public string GetGoogleCallbackUrl();
+    Task<LoginResponseDto> FinishAccountSetup(FinishAccountSetupDto data, OAuthService oauthService);
     /// <summary>
     ///     Verifies the email of a user using the provided confirmation token.
     /// </summary>
