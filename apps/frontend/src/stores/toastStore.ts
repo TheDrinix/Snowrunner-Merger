@@ -1,31 +1,42 @@
 import {defineStore} from "pinia";
 import type {Toast, ToastType} from "@/types/toast";
+import {ref} from "vue";
 
-export const useToaster = defineStore('toaster', {
-    state: () => ({
-        toasts: [] as Toast[]
-    }),
-    actions: {
-        removeToast(id: number) {
-            this.toasts = this.toasts.filter((toast) => toast.id !== id);
-        },
-        createToast(message: string, type: ToastType = 'info', duration = 5000, icon = true) {
-            const id = Date.now()
-            const toast: Toast = {
-                id,
-                message,
-                icon,
-                type,
-                duration
-            };
+export const useToaster = defineStore('toaster', () => {
+    const toasts = ref<Toast[]>([]);
 
-            console.log('Creating toast:', toast.id);
+    const removeToast = (id: number) => {
+        toasts.value = toasts.value.filter((toast) => toast.id !== id);
+    }
 
-            this.toasts = [...this.toasts, toast];
+    const createToast = (
+        title: string,
+        message: string = '',
+        type: ToastType = 'info',
+        duration = 5000,
+        icon = true
+    ) => {
+        const id = Date.now();
 
-            setTimeout(() => {
-                this.removeToast(id);
-            }, duration);
+        const toast: Toast = {
+            id,
+            title,
+            message,
+            icon,
+            type,
+            duration
         }
+
+        toasts.value = [...toasts.value, toast];
+
+        setTimeout(() => {
+            removeToast(id);
+        }, duration);
+    }
+
+    return {
+        toasts,
+        removeToast,
+        createToast
     }
 })

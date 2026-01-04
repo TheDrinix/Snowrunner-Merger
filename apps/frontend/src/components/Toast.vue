@@ -71,11 +71,15 @@ const icon = computed(() => {
 </script>
 
 <template>
-  <div class="relative bg-base-200 shadow-lg p-4 mb-4 border-l-4" :class="[borderClass]">
-    <div class="flex items-center justify-between">
-      <Icon v-if="icon" :name="icon" class="mr-2" />
+  <div class="relative bg-base-200 shadow-lg p-4 mt-4 border-l-4 w-[90vw] md:w-[30vw] lg:w-[20vw]" :class="[borderClass]">
+    <div class="flex flex-col">
+      <div class="flex items-center">
+        <Icon v-if="icon" :name="icon" class="mr-2" />
+        <h3 class="font-medium text-lg">{{ title }}</h3>
+        <button @click="emit('close', id)" class="btn btn-xs btn-square btn-ghost ml-auto">×</button>
+      </div>
       <p>{{ message }}</p>
-      <button @click="emit('close', id)" class="btn btn-xs btn-square btn-ghost ml-2">×</button>
+
     </div>
 
     <div class="absolute bottom-0 left-0 right-0 h-1 bg-base-300">

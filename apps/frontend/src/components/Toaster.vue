@@ -9,8 +9,8 @@ const toasts = computed(() => toaster.toasts);
 </script>
 
 <template>
-  <div class="fixed bottom-6 right-6 p-8 z-50">
-    <div class="flex flex-col items-end">
+  <div class="fixed top-4 left-0 md:top-auto md:left-auto md:bottom-4 md:right-4 px-[5vw] md:px-0 z-50">
+    <div class="flex flex-col md:flex-col-reverse items-end">
       <TransitionGroup enter-active-class="transform ease-out duration-300 transition"
                        enter-from-class="opacity-0 translate-x-2"
                        enter-to-class="opacity-100 translate-x-0"
