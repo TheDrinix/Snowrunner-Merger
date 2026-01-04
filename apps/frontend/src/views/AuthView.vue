@@ -4,11 +4,12 @@ import {computed, onMounted} from "vue";
 import {useHttp} from "@/composables/useHttp";
 import { useToaster } from "@/stores/toastStore";
 import { useUserStore } from "@/stores/userStore";
+import {useOAuthStore} from "@/stores/oauthStore";
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToaster();
-const userStore = useUserStore();
+const oauthStore = useOAuthStore();
 
 const http = useHttp();
 
@@ -20,7 +21,7 @@ const title = computed(() => {
   return route.name == 'login' ? 'Sign in to existing account' : 'Create a new account'
 })
 
-const oauthProviders = computed(() => userStore.oauthProviders);
+const oauthProviders = computed(() => oauthStore.oauthProviders);
 
 const handleOauthSignIn = async (provider: string) => {
   try {
@@ -42,8 +43,8 @@ const handleOauthSignIn = async (provider: string) => {
 }
 
 onMounted(() => {
-  if (!oauthProviders.value) {
-    userStore.fetchOAuthProviders();
+  if (!oauthProviders.value.length) {
+    oauthStore.fetchOAuthProviders();
   }
 })
 </script>
