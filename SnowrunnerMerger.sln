@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowrunnerMerger.Api", "apps/api/SnowrunnerMerger.Api.csproj", "{207DDC09-E1CA-427A-9823-A80ADE82A3C1}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SnowrunnerMerger.Frontend", "apps\frontend\SnowrunnerMerger.Frontend.esproj", "{EAD1AB80-A5D1-4682-9AC5-3922982A0ECB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{207DDC09-E1CA-427A-9823-A80ADE82A3C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{207DDC09-E1CA-427A-9823-A80ADE82A3C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{207DDC09-E1CA-427A-9823-A80ADE82A3C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD1AB80-A5D1-4682-9AC5-3922982A0ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD1AB80-A5D1-4682-9AC5-3922982A0ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD1AB80-A5D1-4682-9AC5-3922982A0ECB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD1AB80-A5D1-4682-9AC5-3922982A0ECB}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -6,12 +6,25 @@
     <projectFile profileName="http">apps/api/SnowrunnerMerger.Api.csproj</projectFile>
     <projectFile profileName="https">apps/api/SnowrunnerMerger.Api.csproj</projectFile>
     <projectFile pubXmlPath="apps/api/Properties/PublishProfiles/docker.drinix.xyz.pubxml">apps/api/SnowrunnerMerger.Api.csproj</projectFile>
+    <projectFile kind="EcmaScript">apps/frontend/SnowrunnerMerger.Frontend.esproj</projectFile>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3365c7ba-69be-48c8-817e-e2c647131b33" name="Changes" comment="" />
+    <list default="true" id="3365c7ba-69be-48c8-817e-e2c647131b33" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/apps/frontend/src/stores/oauthStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SnowrunnerMerger.sln" beforeDir="false" afterPath="$PROJECT_DIR$/SnowrunnerMerger.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Properties/launchSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/components/Toast.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/components/Toast.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/components/Toaster.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/components/Toaster.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/stores/toastStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/stores/toastStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/stores/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/stores/userStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/types/toast.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/types/toast.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/frontend/src/views/AuthView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/frontend/src/views/AuthView.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,31 +70,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;SolutionBuilderGeneralOptionsPage&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor": "Run",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe",
+    "git-widget-placeholder": "feature/frontend-refactor",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.SnowrunnerMerger.Frontend: run.executor": "Run",
+    "settings.editor.selected.configurable": "settings.javascript.runtime",
+    "ts.external.directory.path": "F:\\Dev\\Shenanigens\\SnowrunnerMergerMonorepo\\apps\\frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;,
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql",
+      "mysql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express">
     <configuration name="SnowrunnerMerger.Api: docker.drinix.xyz" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="docker.drinix.xyz.pubxml" pubxml_path="$PROJECT_DIR$/apps/api/Properties/PublishProfiles/docker.drinix.xyz.pubxml" user_name="drinix" uuid_high="2341269316303471226" uuid_low="-7483953391123389503" />
@@ -91,7 +109,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="IIS Express" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
@@ -99,6 +116,7 @@
       <option name="SEND_DEBUG_REQUEST" value="1" />
       <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
       <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2">
         <option name="Build" />
       </method>
@@ -107,7 +125,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="http" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
@@ -115,6 +132,7 @@
       <option name="SEND_DEBUG_REQUEST" value="1" />
       <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
       <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2">
         <option name="Build" />
       </method>
@@ -123,7 +141,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="https" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
@@ -131,6 +148,7 @@
       <option name="SEND_DEBUG_REQUEST" value="1" />
       <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
       <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2">
         <option name="Build" />
       </method>
@@ -154,6 +172,16 @@
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="true" />
       <method v="2" />
     </configuration>
+    <configuration name="SnowrunnerMerger.Frontend: run" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/apps/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -169,6 +197,13 @@
       <workItem from="1756241790029" duration="3677000" />
       <workItem from="1756286903931" duration="6692000" />
       <workItem from="1756298545581" duration="71000" />
+      <workItem from="1756298636337" duration="428000" />
+      <workItem from="1756309504716" duration="616000" />
+      <workItem from="1762371585561" duration="30000" />
+      <workItem from="1762378884775" duration="44000" />
+      <workItem from="1764634058224" duration="39000" />
+      <workItem from="1767434691507" duration="624000" />
+      <workItem from="1767530201361" duration="1953000" />
     </task>
     <task id="LOCAL-00001" summary="[Api] Update namespaces accordingly to project name update">
       <option name="closed" value="true" />
@@ -290,7 +325,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756291095585</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Add initial project configuration files for version control and IDE settings">
+      <option name="closed" value="true" />
+      <created>1756298712221</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1756298712221</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -324,7 +367,8 @@
     <MESSAGE value="[Api] Refactor JWT Bearer authentication events to simplify token validation logic" />
     <MESSAGE value="[Api] Refactor JWT generation to simplify token creation and remove unnecessary data" />
     <MESSAGE value="[Api] Add endpoint to retrieve available OAuth providers" />
-    <option name="LAST_COMMIT_MESSAGE" value="[Api] Add endpoint to retrieve available OAuth providers" />
+    <MESSAGE value="Add initial project configuration files for version control and IDE settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add initial project configuration files for version control and IDE settings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -343,5 +387,9 @@
         </breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
