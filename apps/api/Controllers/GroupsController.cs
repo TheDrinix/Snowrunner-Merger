@@ -114,7 +114,7 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
         public async Task<IActionResult> UploadSave([FromRoute] Guid groupId, [FromForm] UploadSaveDto data, [FromQuery] int saveSlot = -1)
         {
-            if (data.Save.Length > SavesService.MaxSaveSize) return BadRequest();
+            if (data.Save.Length > IStorageService.MaxSaveSize) return BadRequest();
             
             var save = await savesService.StoreSave(groupId, data, saveSlot);
             
@@ -129,12 +129,9 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
         public async Task<IActionResult> MergeSaves([FromRoute] Guid groupId, [FromForm] MergeSavesDto data, [FromQuery] int storedSaveNumber = 0)
         {
-            var saveZipPath = await savesService.MergeSaves(groupId, data, storedSaveNumber);
+            var zip = await savesService.MergeSaves(groupId, data, storedSaveNumber);
 
-            var fs = new FileStream(saveZipPath, FileMode.Open, FileAccess.Read, FileShare.None, 4096,
-                FileOptions.DeleteOnClose);
-
-            return File(fs, contentType: "application/zip", fileDownloadName: "output.zip");
+            return File(zip, contentType: "application/zip", fileDownloadName: "output.zip");
         }
 
         [HttpDelete("{groupId:guid}/saves/{saveId:guid}")]

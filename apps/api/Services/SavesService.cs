@@ -13,25 +13,22 @@ namespace SnowrunnerMerger.Api.Services;
 
 public class SavesService : ISavesService
 {
-    private static readonly string StorageDir = Path.Join("storage", "saves");
-    private static readonly string TmpStorageDir = Path.Join(StorageDir, "tmp");
-    public static readonly int MaxSaveSize = 50 * 1024 * 1024;
-
     private readonly ILogger<SavesService> _logger;
     private readonly AppDbContext _dbContext;
     private readonly IUserService _userService;
+    private readonly IStorageService _storageService;
     
     public SavesService(
         ILogger<SavesService> logger,
         AppDbContext dbContext,
-        IUserService userService
+        IUserService userService,
+        IStorageService storageService
     )
     {
         _logger = logger;
         _dbContext = dbContext;
         _userService = userService;
-        
-        if (!Directory.Exists(StorageDir)) Directory.CreateDirectory(StorageDir);
+        _storageService = storageService;
     }
     
     /// <summary>
@@ -92,39 +89,12 @@ public class SavesService : ISavesService
         
         _dbContext.StoredSaves.Add(saveInfo);
 
-        var saveId = saveInfo.Id.ToString();
-        var saveDirectory = Path.Join(StorageDir, saveId);
-
-        if (!Directory.Exists(saveDirectory)) Directory.CreateDirectory(saveDirectory);
-
-        var zipFilePath = Path.Join(saveDirectory, "tmp.zip");
-
-        await using var stream = new FileStream(zipFilePath, FileMode.Create);
-        
-        await data.Save.CopyToAsync(stream);
-        
-        stream.Close();
-
-        var zipfile = ZipFile.OpenRead(zipFilePath);
-        
-        var declaredSize = zipfile.Entries.Sum(e => e.Length);
-
-        if (declaredSize > MaxSaveSize)
+        try
         {
-            Directory.Delete(saveDirectory, true);
-            throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is too big");
-        }
-        
-        ZipFile.ExtractToDirectory(zipFilePath, saveDirectory);
-        
-        zipfile.Dispose();
-        
-        File.Delete(zipFilePath);
-        
-        if (!ValidateSaveFiles(saveDirectory, data.SaveNumber))
+            await _storageService.StoreGroupSave(saveInfo.Id, data.Save, data.SaveNumber);
+        } catch (InvalidDataException ex)
         {
-            Directory.Delete(saveDirectory, true);
-            throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is invalid");
+            throw new HttpResponseException(HttpStatusCode.BadRequest, ex.Message);
         }
 
         await _dbContext.SaveChangesAsync();
@@ -143,7 +113,7 @@ public class SavesService : ISavesService
     /// <param name="groupId">The ID of the group to merge the save files for.</param>
     /// <param name="data">A <see cref="MergeSavesDto"/> object containing the save file to merge and its metadata.</param>
     /// <param name="storedSaveNumber">The slot number of the stored save file to merge with.</param>
-    /// <returns>The path to the merged save file.</returns>
+    /// <returns>A MemoryStream containing the merged save file.</returns>
     /// <exception cref="HttpResponseException">
     ///     Thrown with different HTTP status codes depending on the validation failure:
     ///     <list type="bullet">
@@ -158,7 +128,7 @@ public class SavesService : ISavesService
     ///         </item>
     ///     </list>
     /// </exception>
-    public async Task<string> MergeSaves(Guid groupId, MergeSavesDto data, int storedSaveNumber)
+    public async Task<MemoryStream> MergeSaves(Guid groupId, MergeSavesDto data, int storedSaveNumber)
     {
         if (data.Save.ContentType != "application/zip") throw new HttpResponseException(HttpStatusCode.BadRequest, "Invalid file type");
         
@@ -182,86 +152,27 @@ public class SavesService : ISavesService
         if (saves.Count < storedSaveNumber) storedSaveNumber = saves.Count - 1;
         
         if (storedSaveNumber < 0) throw new HttpResponseException(HttpStatusCode.BadRequest, "Invalid save number");
-        
-        if (!Directory.Exists(TmpStorageDir)) Directory.CreateDirectory(TmpStorageDir);
-        
-        var tmpStorage = Path.Join(TmpStorageDir, sessionData.Id.ToString());
-        var tmpSaveStorage = Path.Join(tmpStorage, "save");
-        var outputDirectory = Path.Join(tmpStorage, "output");
-        
-        if (Directory.Exists(tmpStorage)) Directory.Delete(tmpStorage, true);
 
-        Directory.CreateDirectory(tmpStorage);
-        Directory.CreateDirectory(tmpSaveStorage);
-        Directory.CreateDirectory(outputDirectory);
-
-        var zippedSavePath = Path.Join(tmpSaveStorage, "tmp.zip");
-        await using var stream = new FileStream(zippedSavePath, FileMode.Create);
-
-        await data.Save.CopyToAsync(stream);
-        
-        stream.Close();
-
-        var zippedSave = ZipFile.OpenRead(zippedSavePath);
-
-        var declaredSize = zippedSave.Entries.Sum(e => e.Length);
-        if (declaredSize > MaxSaveSize)
+        try
         {
-            Directory.Delete(tmpSaveStorage, true);
-            throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is too big");
-        }
-        
-        zippedSave.Dispose();
-        
-        ZipFile.ExtractToDirectory(zippedSavePath, tmpSaveStorage, overwriteFiles: true);
-        
-        File.Delete(zippedSavePath);
-        
-        if (!ValidateSaveFiles(tmpSaveStorage, data.SaveNumber))
+            await _storageService.StoreTmpSave(sessionData.Id, data.Save, storedSaveNumber);   
+        } 
+        catch (InvalidDataException ex)
         {
-            Directory.Delete(tmpSaveStorage, true);
-            throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is invalid");
+            throw new HttpResponseException(HttpStatusCode.BadRequest, ex.Message);
         }
 
         var storedSaveData = saves[storedSaveNumber];
-        
-        var storedSaveDirectory = Path.Join(StorageDir, storedSaveData.Id.ToString());
-        
-        var mapDataFilesRegex = new Regex($@"\b({(storedSaveData.SaveNumber > 0 ? storedSaveData.SaveNumber.ToString() + '_' : "")}(fog|sts)_.*\.dat)\b", RegexOptions.Multiline);
 
-        var mapDataFiles = Directory
-            .GetFiles(storedSaveDirectory)
-            .Where(f => mapDataFilesRegex.IsMatch(Path.GetFileName(f)));
+        _storageService.CopyTmpSaveMapDataToOutput(sessionData.Id, data.SaveNumber, data.OutputSaveNumber);
         
-        // Copy map data files to output from stored save
-        foreach (var file in mapDataFiles)
-        {
-            var currentFileName = Path.GetFileName(file);
-            if (storedSaveData.SaveNumber > 0)
-            {
-                currentFileName = currentFileName[2..];
-            }
-            
-            var filePrefix = data.OutputSaveNumber > 0 ? data.OutputSaveNumber.ToString() + '_' : "";
-            
-            var outputFileName = filePrefix + currentFileName;
-            var outputFilePath = Path.Join(outputDirectory, outputFileName);
-            
-            File.Copy(file, outputFilePath, overwrite: true);
-        }
-
-        var uploadedSave = LoadSave(tmpSaveStorage, data.SaveNumber);
-        var uploadedSaveFilePath = Path.Join(tmpSaveStorage, $"CompleteSave{(data.SaveNumber > 0 ? data.SaveNumber.ToString() : "")}.dat");
-        if (File.Exists(uploadedSaveFilePath))
-        {
-            File.Delete(uploadedSaveFilePath);
-        }
-        
-        var storedSave = LoadSave(storedSaveDirectory, storedSaveData.SaveNumber);
+;
+        var uploadedSave = _storageService.ReadTmpSave(sessionData.Id, data.SaveNumber);
+        var storedSave = _storageService.ReadGroupSave(storedSaveData.Id, storedSaveData.SaveNumber);
         
         if (uploadedSave is null || storedSave is null)
         {
-            Directory.Delete(tmpStorage, true);
+            _storageService.RemoveTmpStorage(sessionData.Id);
             throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is invalid");
         }
         
@@ -269,7 +180,7 @@ public class SavesService : ISavesService
         
         if (outputSaveData is null)
         {
-            Directory.Delete(tmpStorage, true);
+            _storageService.RemoveTmpStorage(sessionData.Id);
             throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is invalid");
         }
 
@@ -279,22 +190,9 @@ public class SavesService : ISavesService
             { "cfg_version", uploadedSave.RawSaveData["cfg_version"] }
         };
         
-        var outputSaveJson = JsonSerializer.Serialize(outputSave);
-        var outputSavePath = Path.Join(outputDirectory,
-            $"CompleteSave{(data.OutputSaveNumber > 0 ? data.OutputSaveNumber.ToString() : "")}.dat");
-        
-        await File.WriteAllTextAsync(outputSavePath, outputSaveJson);
-        
-        var outputZipPath = Path.Join(tmpStorage, "output.zip");
-        
-        if (File.Exists(outputZipPath)) File.Delete(outputZipPath);
-        
-        ZipFile.CreateFromDirectory(outputDirectory, outputZipPath);
-        
-        Directory.Delete(tmpSaveStorage, true);
-        Directory.Delete(outputDirectory, true);
+        _storageService.StoreOutputSaveData(sessionData.Id, outputSave, data.OutputSaveNumber);
 
-        return outputZipPath;
+        return _storageService.ZipOutputSaveDataStream(sessionData.Id);
     }
 
     /// <summary>
@@ -333,12 +231,7 @@ public class SavesService : ISavesService
     /// <param name="save">The <see cref="StoredSaveInfo"/> object to remove.</param>
     public Task RemoveSave(StoredSaveInfo save)
     {
-        var saveDirectory = Path.Join(StorageDir, save.Id.ToString());
-        
-        if (Directory.Exists(saveDirectory))
-        {
-            Directory.Delete(saveDirectory, true);
-        }
+        _storageService.RemoveGroupSave(save);
         
         _dbContext.StoredSaves.Remove(save);
         
@@ -384,52 +277,5 @@ public class SavesService : ISavesService
         outputSaveData.SslValue.saveId = outputSaveNumber;
         
         return outputSaveData;
-    }
-    
-    /// <summary>
-    ///     Validates the save files in a directory.
-    /// </summary>
-    /// <param name="path">The path to the directory containing the save files.</param>
-    /// <param name="saveNumber">The save number to validate.</param>
-    /// <returns>True if the save files are valid, false otherwise.</returns>
-    private bool ValidateSaveFiles(string path, int saveNumber)
-    {
-        var saveFileName = $"CompleteSave{(saveNumber > 0 ? saveNumber : "")}.dat";
-        var files = Directory
-            .GetFiles(path)
-            .Select(Path.GetFileName)
-            .ToList();
-
-        if (!files.Contains(saveFileName)) return false;
-        
-        var mapDataRegex = new Regex($@"\b({(saveNumber > 0 ? saveNumber.ToString() + '_' : "")}(fog|sts)_.*\.dat)\b", RegexOptions.Multiline);
-        
-        // Count the number of files matching the regex
-        var count = files.Count(file => mapDataRegex.IsMatch(Path.GetFileName(file)));
-
-        return count >= 2;
-    }
-    
-    /// <summary>
-    ///     Loads a save from a directory.
-    /// </summary>
-    /// <param name="saveFileDirectory">The directory containing the save file.</param>
-    /// <param name="saveFileNumber">The save file number.</param>
-    /// <returns>A <see cref="Save"/> object containing the save data.</returns>
-    private Save? LoadSave(string saveFileDirectory, int saveFileNumber)
-    {
-        var saveFilePath = Path.Join(saveFileDirectory, $"CompleteSave{(saveFileNumber > 0 ? saveFileNumber.ToString() : "")}.dat");
-
-        if (!File.Exists(saveFilePath)) return null;
-
-        var saveFileJson = File.ReadAllText(saveFilePath);
-        if (saveFileJson[^1] != '}')
-        {
-            saveFileJson = saveFileJson.Remove(saveFileJson.Length - 1, 1);
-        }
-
-        var saveFileData = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(saveFileJson);
-        
-        return saveFileData is null ? null : new Save(saveFileData, saveFileNumber);
     }
 }

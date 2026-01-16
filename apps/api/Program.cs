@@ -69,6 +69,8 @@ builder.Services.AddScoped<GoogleOAuthService>();
 builder.Services.AddScoped<DiscordOAuthService>();
 builder.Services.AddScoped<IOAuthServiceFactory, OAuthServiceFactory>();
 
+builder.Services.AddSingleton<IStorageService, FileStorageService>();
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();

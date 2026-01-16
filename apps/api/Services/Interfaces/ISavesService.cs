@@ -19,8 +19,8 @@ public interface ISavesService
     /// <param name="groupId">The ID of the group to merge the save files for.</param>
     /// <param name="data">A <see cref="MergeSavesDto"/> object containing the save file to merge and its metadata.</param>
     /// <param name="storedSaveNumber">The slot number of the stored save file to merge with.</param>
-    /// <returns>The path to the merged save file.</returns>
-    Task<string> MergeSaves(Guid groupId, MergeSavesDto data, int storedSaveNumber);
+    /// <returns>A MemoryStream containing the merged save file.</returns>
+    Task<MemoryStream> MergeSaves(Guid groupId, MergeSavesDto data, int storedSaveNumber);
     /// <summary>
     ///     Removes a save file from a group.
     /// </summary>
