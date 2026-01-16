@@ -12,4 +12,8 @@ public record MergeSavesDto
     [Range(0, 3)]
     [Required]
     public int OutputSaveNumber { get; init; }
+    [Required]
+    public MergeOptions Options { get; init; }
+    [Required]
+    public string[] MergedMaps { get; init; }
 };
