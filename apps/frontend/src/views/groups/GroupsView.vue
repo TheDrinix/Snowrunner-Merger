@@ -11,7 +11,8 @@ import {useToaster} from "@/stores/toastStore";
 const http = useHttp();
 const groupsStore = useGroupsStore();
 const router = useRouter();
-const isLoading = ref(true);
+
+const isLoading = ref(!groupsStore.groups.size);
 const {createToast} = useToaster();
 
 http.get<IGroup[]>("/groups")

@@ -186,6 +186,10 @@ router.beforeEach(async (to, from, next) => {
         if (!userStore.isAuthenticated) {
             next({ name: 'login' });
         }
+    } else {
+        if (!userStore.accessTokenExpires) {
+            userStore.refreshToken();
+        }
     }
 
     if (to.meta.validateGroupOwner) {
