@@ -116,6 +116,13 @@ const handleSaveMerge = async () => {
 
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    
+    router.push({
+      name: 'group-save-merge-success', 
+      params: {
+        id: groupId.value
+      }
+    });
   } catch (e: any) {
     if (e.response.data.title) {
 

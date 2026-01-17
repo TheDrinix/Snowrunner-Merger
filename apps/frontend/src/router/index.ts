@@ -136,6 +136,11 @@ const router = createRouter({
                     meta: {
                         validateGroupOwner: true
                     }
+                },
+                {
+                    path: 'merge/success',
+                    name: 'group-save-merge-success',
+                    component: () => import('../views/groups/PostMergeView.vue'),
                 }
             ],
         },
