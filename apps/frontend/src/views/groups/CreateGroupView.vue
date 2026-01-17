@@ -25,7 +25,7 @@ http.get<IGroup[]>("/groups")
     router.push({name: "login"});
   });
 
-const ownedGroups = computed(() => groupsStore.getOwnedGroups);
+const ownedGroups = computed(() => groupsStore.getOwnedGroups());
 
 const groupName = ref("");
 

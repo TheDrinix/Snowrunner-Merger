@@ -25,8 +25,8 @@ http.get<IGroup[]>("/groups")
     router.push({name: "login"});
   });
 
-const joinedGroups = computed(() => groupsStore.getJoinedGroups);
-const ownedGroups = computed(() => groupsStore.getOwnedGroups);
+const joinedGroups = computed(() => groupsStore.getJoinedGroups());
+const ownedGroups = computed(() => groupsStore.getOwnedGroups());
 
 const groupJoinCode = ref("");
 
