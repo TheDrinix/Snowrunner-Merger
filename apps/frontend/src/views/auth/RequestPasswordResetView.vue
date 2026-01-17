@@ -30,7 +30,7 @@ const handlePasswordReset = async () => {
     await router.push({name: "reset-password-confirm"});
   } catch (e: any) {
     if (e.response.data.title) {
-      createToast(e.response.data.title, 'error');
+      createToast(e.response.data.title, '', 'error');
     }
   }
 

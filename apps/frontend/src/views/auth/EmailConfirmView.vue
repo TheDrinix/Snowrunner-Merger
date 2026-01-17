@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
       </template>
       <template v-else-if="err">
         <div class="alert alert-error flex flex-col items-center gap-0">
-            <p class="text-lg">The confirmation link is either invalid or expired</p>
+            <p class="text-lg font-bold">The confirmation link is either invalid or expired</p>
             <p>Request a new link by trying to log in</p>
             <p>You'll be redirected to login page in {{timer}} seconds</p>
         </div>

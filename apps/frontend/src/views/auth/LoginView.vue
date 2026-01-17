@@ -90,8 +90,6 @@ const handleLogin = async () => {
 
     router.push({name: 'groups'})
   } catch (e: any) {
-    console.error("Failed to log in user");
-
     if (e.response.status === 401) {
       error.value = {
         msg: "Invalid email or password",
@@ -121,7 +119,7 @@ const handleConfirmationResend = async () => {
     await http.post('/auth/resend-confirmation', { email: email.value });
   } catch (e: any) {
     if (e.response.data.title) {
-      createToast(e.response.data.title, 'error');
+      createToast(e.response.data.title, e.response.data.message || '', 'error');
     }
   }
 }

@@ -23,7 +23,7 @@ const provider = computed(() => {
 });
 
 if (!route.query.token || !route.query.email) {
-  createToast('Invalid linking token', 'error');
+  createToast('Invalid completion token', 'Your completion token is missing', 'error');
   router.push({ name: 'login' });
 }
 
@@ -37,7 +37,7 @@ const email = computed(() => {
 
 watch([completionToken, email], () => {
   if (!route.query.token || !route.query.email) {
-    createToast('Invalid linking token', 'error');
+    createToast('Invalid completion token', 'Your completion token is missing', 'error');
     router.push({ name: 'login' });
   }
 })
@@ -75,8 +75,7 @@ const handleAccountCompletion = async () => {
   }
 
   if (!yup.string().email().validateSync(email.value)) {
-    createToast('Invalid email address', 'error');
-    await router.push({ name: 'login' });
+    createToast('Invalid email address', '', 'error');
     return;
   }
 
@@ -89,18 +88,21 @@ const handleAccountCompletion = async () => {
       password: password.value
     });
 
-    createToast('Account setup complete', 'success');
+    createToast('Account setup complete', 'Your account has been finished', 'success');
 
     userStore.signIn(res.data);
-    await router.push({ name: 'groups' });
+    router.push({ name: 'groups' });
   } catch (e) {
     if (e instanceof AxiosError && e.response?.status === 401) {
-      createToast('Invalid or expired completion token', 'error');
-      return await router.push({ name: 'login' });
+      createToast('Invalid or expired completion token', '', 'error');
+      return router.push({ name: 'login' });
+    } else if (e instanceof AxiosError && e.response?.status === 400) {
+      createToast('Account setup failed', e.response.data.message || 'Failed to finish account setup, please try again later', 'error');
+      return router.push({ name: 'login' });
     }
 
-    createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
-    await router.push({ name: 'login' });
+    createToast('Account setup failed', `Failed to finish ${provider.value} account setup, please try again later`, 'error');
+    router.push({ name: 'login' });
   }
 }
 </script>

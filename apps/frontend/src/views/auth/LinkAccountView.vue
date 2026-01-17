@@ -66,7 +66,7 @@ const handleLinkAccount = async () => {
       }
     }
 
-    createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
+    createToast('Account linking failed', `Failed to link ${provider.value} account, please try again later`, 'error');
     router.push({ name: 'login' });
   }
 } 

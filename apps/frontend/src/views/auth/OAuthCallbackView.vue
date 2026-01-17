@@ -18,7 +18,7 @@ onBeforeMount(async () => {
   const { code, state } = route.query;
 
   if (!code || !state) {
-    await router.push({ name: 'login' });
+    router.push({ name: 'login' });
   }
 
   // Exchange the OAuth provider code for an access token
@@ -34,8 +34,6 @@ onBeforeMount(async () => {
       withCredentials: true
     });
 
-    console.log(res.data);
-
     // TokenType = ACCESS_TOKEN
     if (res.data.tokenType === 1) {
       userStore.signIn(res.data.data);
@@ -47,9 +45,7 @@ onBeforeMount(async () => {
       const linkingToken = res.data.data.token;
       const email = res.data.data.user.email;
 
-      console.log("Linking token received, redirecting to link account view");
-
-      await router.push({ 
+      router.push({ 
         name: 'link-oauth-account', 
         query: {
           token: linkingToken,
@@ -65,7 +61,7 @@ onBeforeMount(async () => {
       const completionToken = res.data.data.token;
       const email = res.data.data.email;
 
-      await router.push({ 
+      router.push({ 
         name: 'complete-account', 
         query: {
           token: completionToken,
@@ -80,7 +76,7 @@ onBeforeMount(async () => {
 
   } catch (e) {
     console.error('Failed to exchange Google code for access token');
-    await router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
+    router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
   }
 });
 </script>
