@@ -27,14 +27,6 @@ const router = createRouter({
             }
         },
         {
-            path: '/auth/google/link',
-            name: 'google-link',
-            component: () => import('../views/auth/GoogleLinkCallbackView.vue'),
-            meta: {
-                bypassAuth: true
-            }
-        },
-        {
             path: '/auth/register-confirm',
             name: 'register-confirm',
             component: () => import('../views/auth/RegisterConfirmationView.vue'),

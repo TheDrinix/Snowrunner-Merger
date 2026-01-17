@@ -74,7 +74,7 @@ console.log("End of LinkAccountView");
 <template>
   <div class="card w-5/6 md:w-2/3 lg:w-1/2 mx-auto bg-base-200 shadow-xl">
     <div class="card-header">
-      <h3 class="text-lg font-medium">Link your google account</h3>
+      <h3 class="text-lg font-medium">Link your {{provider}} account</h3>
     </div>
     <div class="card-body pt-4">
       <div class="flex flex-col gap-2">

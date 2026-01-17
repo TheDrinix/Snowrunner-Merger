@@ -59,7 +59,7 @@ onBeforeMount(async () => {
           provider: provider.value,
         }
       });
-    }
+    }  
     // TokenType = COMPLETION_TOKEN
     else if (res.data.tokenType === 4) {
       const completionToken = res.data.data.token;
