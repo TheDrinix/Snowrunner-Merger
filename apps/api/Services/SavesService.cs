@@ -11,7 +11,7 @@ using SnowrunnerMerger.Api.Services.Interfaces;
 
 namespace SnowrunnerMerger.Api.Services;
 
-public class SavesService : ISavesService
+public partial class SavesService : ISavesService
 {
     private readonly ILogger<SavesService> _logger;
     private readonly AppDbContext _dbContext;
@@ -95,6 +95,28 @@ public class SavesService : ISavesService
         } catch (InvalidDataException ex)
         {
             throw new HttpResponseException(HttpStatusCode.BadRequest, ex.Message);
+        }
+
+        var storedSave = _storageService.ReadGroupSave(saveInfo.Id, data.SaveNumber);
+        if (storedSave is not null && storedSave.SaveData is not null)
+        {
+            var knownMapsIds = new HashSet<string>();
+            foreach (var visitedLevel in storedSave.SaveData.SslValue.visitedLevels)
+            {
+                // Known region format is "level_<region_tag (ru/us)>_<map_id>_<region_number>" e.g. "region_us_01_01"
+                // We need to extract the <region_tag>_<map_id> part
+                var match = KnownRegionRegex().Match(visitedLevel);
+                if (!match.Success) continue;
+                
+                var mapId = $"{match.Groups[1].Value}_{match.Groups[2].Value}";
+                knownMapsIds.Add(mapId);
+            }
+            
+            var discoveredMaps = _dbContext.Maps
+                .Where(m => knownMapsIds.Contains(m.Id))
+                .ToList();
+
+            saveInfo.DiscoveredMaps = discoveredMaps;
         }
 
         await _dbContext.SaveChangesAsync();
@@ -278,4 +300,7 @@ public class SavesService : ISavesService
         
         return outputSaveData;
     }
+
+    [GeneratedRegex(@"level_(\w+?)_(\d+?)_\d+")]
+    private static partial Regex KnownRegionRegex();
 }
