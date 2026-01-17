@@ -18,6 +18,13 @@ public interface IGroupsService
     /// <returns>The SaveGroup if found and the user is a member; otherwise, null.</returns>
     Task<SaveGroup?> GetGroupData(Guid groupId, Guid userId);
     /// <summary>
+    ///    Retrieves all stored saves for the specified group if the user is a member of the
+    /// </summary>
+    /// <param name="groupId">The unique identifier of the group.</param>
+    /// <param name="userId">The unique identifier of the user.</param>
+    /// <returns>A collection of StoredSaveInfo objects.</returns>
+    Task<ICollection<StoredSaveInfo>> GetGroupSaves(Guid groupId, Guid userId);
+    /// <summary>
     ///     Retrieves all groups the user is a member of.
     /// </summary>
     /// <param name="userId">The unique identifier of the user.</param>

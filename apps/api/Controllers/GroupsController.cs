@@ -52,18 +52,16 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerOperation(Summary = "Get group saves", Description = "Get list of saves uploaded to the group")]
         [SwaggerResponse(StatusCodes.Status200OK, "Saves list", typeof(ICollection<StoredSaveInfo>))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "User is not a member of this group")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
         public async Task<ActionResult<ICollection<StoredSaveInfo>>> GetGroupSaves(Guid groupId)
         {
             var sessionData = userService.GetUserSessionData();
             
-            var group = await groupsService.GetGroupData(groupId, sessionData.Id);
+            var saves = await groupsService.GetGroupSaves(groupId, sessionData.Id);
+            var sortedSaves = saves.OrderByDescending(s => s.UploadedAt);
             
-            if (group is null) return NotFound();
-
-            var saves = group.StoredSaves.OrderByDescending(s => s.UploadedAt);
-            
-            return Ok(saves);
+            return Ok(sortedSaves);
         }
         
         [HttpPost]

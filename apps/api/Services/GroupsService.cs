@@ -44,6 +44,44 @@ public class GroupsService(
     }
     
     /// <summary>
+    ///    Retrieves all stored saves for the specified group if the user is a member of the
+    /// </summary>
+    /// <param name="groupId">The unique identifier of the group.</param>
+    /// <param name="userId">The unique identifier of the user.</param>
+    /// <returns>A collection of StoredSaveInfo objects.</returns>
+    /// <exception cref="HttpResponseException">
+    ///     Thrown with different HTTP status codes depending on the validation failure:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             HttpStatusCode.NotFound (404): The group is not found.
+    ///         </item>
+    ///         <item>
+    ///             HttpStatusCode.Forbidden (403): The user is not a member of this group.
+    ///         </item>
+    ///     </list>
+    /// </exception>
+    public async Task<ICollection<StoredSaveInfo>> GetGroupSaves(Guid groupId, Guid userId)
+    {
+        var group = await dbContext.SaveGroups
+            .Include(g => g.Members)
+            .Include(g => g.StoredSaves)
+            .ThenInclude(s => s.DiscoveredMaps)
+            .FirstOrDefaultAsync(g => g.Id == groupId);
+
+        if (group is null)
+        {
+            throw new HttpResponseException(HttpStatusCode.NotFound, "Group not found");
+        }
+        
+        if (group.Members.All(m => m.Id != userId))
+        {
+            throw new HttpResponseException(HttpStatusCode.Forbidden, "You are not a member of this group");
+        }
+        
+        return group.StoredSaves;
+    }
+    
+    /// <summary>
     ///     Retrieves all groups the user is a member of.
     /// </summary>
     /// <param name="userId">The unique identifier of the user.</param>
