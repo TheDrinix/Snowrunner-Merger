@@ -19,8 +19,10 @@ const timeAgo = useTimeAgo(props.save.uploadedAt);
         <p class="break-words">{{save.description}}</p>
         <p class="text-sm text-neutral-content mt-2">Uploaded {{timeAgo}}</p>
       </div>
-      <div class="flex flex-col justify-around items-center gap-4">
-        <slot name="actions" />
+      <div>
+        <div class="flex lg:items-center h-full">
+          <slot name="actions" />
+        </div>
       </div>
     </div>
   </div>

@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import type { Group } from "@/types/groups";
+import { ref } from "vue";
 
 const props = defineProps<{
   group: Group,
   isOwner?: boolean
 }>();
 
+const tooltipText = ref("Click to copy")
+
 const handleCopy = () => {
+  tooltipText.value = "Copied!";
+  
+  console.log(tooltipText.value);
+  setTimeout(() => {
+    tooltipText.value = "Click to copy"
+  }, 2000);
+  
   navigator.clipboard.writeText(props.group.id);
 }
 </script>
@@ -18,14 +28,15 @@ const handleCopy = () => {
         <h3 class="card-title">{{ group.name }}</h3>
         <div class="text-sm text-neutral-content" v-if="isOwner">
           <span>Invite code: </span>
-          <div class="tooltip tooltip-bottom" data-tip="Click to copy">
+          <div class="tooltip tooltip-bottom" :data-tip="tooltipText">
             <a class="cursor-pointer hover:underline" @click.prevent="handleCopy">{{group.id}}</a>
           </div>
         </div>
       </div>
       <div class="card-actions items-center">
-        <RouterLink :to="{ name: 'group', params: { id: group.id } }" class="btn btn-sm">View</RouterLink>
-        <RouterLink v-if="isOwner" :to="{ name: 'group-manage', params: { id: group.id } }" class="btn btn-sm">Manage</RouterLink>
+        <div class="join join-vertical md:join-horizontal">
+          <RouterLink :to="{ name: 'group', params: { id: group.id } }" class="btn btn-sm join-item">{{ isOwner ? "Manage" : "View" }}</RouterLink>
+        </div>
       </div>
     </div>
   </div>

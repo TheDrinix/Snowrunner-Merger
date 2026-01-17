@@ -1,12 +1,15 @@
 import {defineStore} from "pinia";
-import type {Group, GroupData, GroupsStore} from "@/types/groups";
+import type {Group, GroupData} from "@/types/groups";
 import {useUserStore} from "@/stores/userStore";
 import type {StoredSave} from "@/types/saves";
-import { ref } from "vue";
+import {ref} from "vue";
+import { useHttp } from "@/composables/useHttp";
 
 export const useGroupsStore = defineStore("groups", () => {
     const groups = ref<Map<string, Group>>(new Map());
+    const isLoading = ref<boolean>(false);
     const userStore = useUserStore();
+    const http = useHttp();
 
     // Getters (as functions)
     const getGroup = (id: string) => {
@@ -14,14 +17,9 @@ export const useGroupsStore = defineStore("groups", () => {
     };
 
     const getOwnedGroups = () => {
-        const ownedGroups= Array.from(groups.value.values()).filter(
+        return Array.from(groups.value.values()).filter(
             (group) => group.owner.id === userStore.user?.id
         );
-        
-        console.log(ownedGroups);
-        console.log(groups.value)
-        
-        return ownedGroups;
     };
 
     const getJoinedGroups = () => {
@@ -84,9 +82,29 @@ export const useGroupsStore = defineStore("groups", () => {
     function clearStore() {
         groups.value = new Map();
     }
+    
+    async function fetchGroupSaves(groupId: string) {
+        const group = groups.value.get(groupId);
+        
+        if (!group || (group.lastLoadedSavesAt && group.lastLoadedSavesAt.getTime() < Date.now() - 1000 * 60 * 5)) return;
+
+        isLoading.value = true;
+        try {
+            const res = await http.get<StoredSave[]>(`/groups/${groupId}/saves`);
+            if (res) {
+                storeGroupSaves(groupId, res.data);
+            }
+
+            isLoading.value = false;
+        } catch (e) {
+            isLoading.value = false;
+            throw e;
+        }
+    }
 
     return {
         groups,
+        isLoading,
         getGroup,
         getOwnedGroups,
         getJoinedGroups,
@@ -98,84 +116,6 @@ export const useGroupsStore = defineStore("groups", () => {
         removeGroup,
         clearSaves,
         clearStore,
+        fetchGroupSaves
     };
 });
-
-/*
-export const useGroupsStore = defineStore('groups', {
-    state: (): GroupsStore => ({...defaultState}),
-    getters: {
-        getGroup: (state) => (id: string) => {
-            return state.groups.get(id);
-        },
-        getOwnedGroups: (state) => {
-            const userStore = useUserStore();
-
-            return Array.from(state.groups.values())
-                .filter(group => group.owner.id === userStore.user?.id);
-        },
-        getJoinedGroups: (state) => {
-            const userStore = useUserStore();
-
-            return Array.from(state.groups.values())
-                .filter(group => group.owner.id !== userStore.user?.id);
-        },
-        isGroupOwner: (state) => (id: string) => {
-            const userStore = useUserStore();
-
-            const group = state.groups.get(id);
-
-            return group?.owner.id === userStore.user?.id;
-        }
-    },
-    actions: {
-        storeGroups(groups: GroupData[]) {
-            groups.forEach(data => {
-                const group = {
-                    ...data,
-                    saves: []
-                };
-
-                this.groups.set(group.id, group);
-            });
-        },
-        storeGroup(group: GroupData) {
-            this.groups.set(group.id, {...group, saves: []});
-        },
-        storeGroupSaves(groupId: string, saves: StoredSave[]) {
-            const group = this.groups.get(groupId);
-
-            if (group) {
-                group.saves = saves;
-                group.lastLoadedSavesAt = new Date();
-
-                this.groups.set(groupId, group);
-            }
-        },
-        deleteGroupSave(groupId: string, saveIdx: number) {
-            const group = this.groups.get(groupId);
-
-            if (group) {
-                group.saves.splice(saveIdx, 1);
-
-                this.groups.set(groupId, group);
-            }
-        },
-        removeGroup(groupId: string) {
-          this.groups.delete(groupId);
-        },
-        clearSaves(groupId: string) {
-            const group = this.groups.get(groupId);
-
-            if (group) {
-                group.saves = [];
-                group.lastLoadedSavesAt = new Date(0);
-
-                this.groups.set(groupId, group);
-            }
-        },
-        clearStore() {
-            this.$state = {...defaultState};
-        }
-    }
-});*/

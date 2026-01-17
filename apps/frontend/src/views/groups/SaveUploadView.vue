@@ -107,10 +107,10 @@ const handleSaveUpload = async () => {
 
     groupsStore.clearSaves(groupId.value);
 
-    await router.push({name: "group-manage", params: {id: groupId.value}});
+    router.push({name: "group", params: {id: groupId.value}});
   } catch (e: any) {
     if (e.response.data.title) {
-      createToast(e.response.data.title, 'error', 10000);
+      createToast(e.response.data.title, '', 'error', 10000);
     }
   }
 

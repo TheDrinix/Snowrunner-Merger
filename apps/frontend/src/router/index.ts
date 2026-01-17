@@ -125,14 +125,6 @@ const router = createRouter({
                     component: GroupView
                 },
                 {
-                    path: 'manage',
-                    name: 'group-manage',
-                   component: () => import('../views/groups/GroupManageView.vue'),
-                    meta: {
-                        validateGroupOwner: true
-                    }
-                },
-                {
                     path: 'merge',
                     name: 'group-save-merge',
                     component: () => import('../views/groups/SaveMergeView.vue'),
@@ -185,6 +177,7 @@ router.beforeEach(async (to, from, next) => {
 
         if (!userStore.isAuthenticated) {
             next({ name: 'login' });
+            return;
         }
     } else {
         if (!userStore.accessTokenExpires) {
@@ -198,6 +191,7 @@ router.beforeEach(async (to, from, next) => {
 
         if (!groupsStore.isGroupOwner(groupId)) {
             next({ name: 'group', params: { id: groupId } });
+            return;
         }
     }
 
