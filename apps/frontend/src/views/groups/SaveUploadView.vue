@@ -6,6 +6,7 @@ import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
 import JSZip from "jszip";
 import {useHttp} from "@/composables/useHttp";
 import {useToaster} from "@/stores/toastStore";
+import SaveUploadInstructions from "@/components/groups/SaveUploadInstructions.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -105,8 +106,9 @@ const handleSaveUpload = async () => {
       params,
     });
 
-    groupsStore.clearSaves(groupId.value);
-
+    await groupsStore.fetchGroupSaves(groupId.value);
+    
+    createToast('Save uploaded successfully', `The save has been successfully uploaded to ${group.value!.name}`, 'success', 5000);
     router.push({name: "group", params: {id: groupId.value}});
   } catch (e: any) {
     if (e.response.data.title) {
@@ -119,53 +121,55 @@ const handleSaveUpload = async () => {
 </script>
 
 <template>
-  <div class="card mx-auto w-11/12 md:w-5/6 lg:w-full bg-base-200 shadow-xl">
-    <div class="card-header">
-      <h2 class="card-title">Merge save</h2>
-    </div>
-    <div class="card-body flex-col-reverse lg:gap-4 lg:flex-row">
-      <div class="w-full lg:w-1/2 xl:w-3/5">
-        <form @submit.prevent="handleSaveUpload">
-          <div class="flex flex-col gap-4">
-            <div class="alert alert-error" v-if="error">
-              {{error}}
+  <div class="card mx-auto w-11/12 md:w-5/6 lg:w-full bg-base-200 shadow-xl border border-base-300">
+    <div class="card-body">
+      <h2 class="card-title text-2xl font-bold mb-6 border-b border-base-300 pb-2">Upload save</h2>
+      <div class="flex flex-col-reverse lg:flex-row gap-8">
+        <div class="w-full lg:w-3/5">
+          <form @submit.prevent="handleSaveUpload">
+            <div class="flex flex-col gap-4">
+              <div class="alert alert-error" v-if="error">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>{{error}}</span>
+              </div>
             </div>
+
             <div class="form-control w-full">
-              <div class="label">
-                <span class="label-text">Select a snowrunner save folder</span>
+              <div class="label pt-0">
+                <span class="label-text font-semibold">1. Select a snowrunner save folder</span>
               </div>
-              <input class="file-input file-input-bordered w-full" ref="fileInput" type="file" webkitdirectory directory @change="handleFolderChange" />
+              <input class="file-input file-input-bordered file-input-primary w-full" ref="fileInput" type="file" webkitdirectory directory @change="handleFolderChange" />
             </div>
-            <div class="form-control w-full" v-if="availableSaves.length">
-              <div class="label">
-                <span class="label-text">Select which save you want to merge</span>
+
+            <div class="transition-all duration-500 ease-in-out overflow-hidden" :class="{'max-h-64 opacity-100': availableSaves.length, 'max-h-0 opacity-0': !availableSaves.length}">
+              <div class="form-control w-full" v-if="availableSaves.length">
+                <div class="label">
+                  <span class="label-text font-semibold">2. Select which save you want to upload</span>
+                </div>
+                <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber">
+                  <option v-for="save in availableSaves" :key="save" :value="save">Save {{save + 1}}</option>
+                </select>
               </div>
-              <select name="saveNumber" class="select select-bordered" v-model="formData.saveNumber">
-                <option v-for="save in availableSaves" :key="save" :value="save">Save {{save + 1}}</option>
-              </select>
-            </div>
-            <div class="form-control w-full" v-if="availableSaves.length">
-              <div class="label">
-                <span class="label-text">Enter a save description</span>
+              <div class="form-control w-full" v-if="availableSaves.length">
+                <div class="label">
+                  <span class="label-text font-semibold">3. Enter a save description</span>
+                </div>
+                <textarea class="textarea textarea-bordered w-full min-h-8 resize-none" v-model="formData.description" />
               </div>
-              <textarea class="textarea textarea-bordered w-full min-h-8 resize-none" v-model="formData.description" />
             </div>
-            <div class="flex justify-center">
-              <button :disabled="!canUpload || loading" type="submit" class="btn btn-primary btn-wide transition-all">
-                Upload <span v-if="loading" class="loading loading-dots" />
+
+            <div class="pt-4">
+              <button :disabled="!canUpload || loading" type="submit" class="btn btn-primary btn-block lg:btn-wide transition-all shadow-lg">
+                <span v-if="loading" class="loading loading-dots" />
+                <span v-else>Upload</span>
               </button>
             </div>
-          </div>
-        </form>
-      </div>
-      <div class="w-full lg:w-1/2 xl:w-2/5">
-        <h3 class="text-lg font-medium">Instructions</h3>
-        <ol class="list-decimal ml-6">
-          <li class="my-1"><p>Select your save by going to:</p><p>Documents -> My games -> Snowrunner -> base -> storage</p><p>There you'll see a folder named using bunch of random alphanumeric character, that's your save folder</p></li>
-          <li class="my-1">After selecting the folder, select save number which you want to upload</li>
-          <li class="my-1">Select the output save number</li>
-          <li class="my-1">Click upload</li>
-        </ol>
+          </form>
+        </div>
+
+        <div class="divider lg:divider-horizontal mx-0"></div>
+        
+        <SaveUploadInstructions />
       </div>
     </div>
   </div>
