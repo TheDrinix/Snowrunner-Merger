@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
     public DbSet<StoredSaveInfo> StoredSaves { get; set; }
     public DbSet<SaveGroup> SaveGroups { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
+    public DbSet<Map> Maps { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,5 +107,39 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
             .Entity<UserSession>()
             .Property(s => s.HasLongLivedRefreshToken)
             .HasDefaultValue(false);
+
+        modelBuilder
+            .Entity<Map>()
+            .HasKey(m => m.Id);
+
+        modelBuilder
+            .Entity<Map>()
+            .HasData(new List<Map>()
+            {
+                new Map("US_01", "Michigan"),
+                new Map("US_02", "Alaska"),
+                new Map("US_03", "Wisconsin"),
+                new Map("US_04", "Yukon"),
+                new Map("US_06", "Maine"),
+                new Map("US_07", "Tennessee"),
+                new Map("US_09", "Ontario"),
+                new Map("US_10", "British Columbia"),
+                new Map("US_11", "Scandinavia"),
+                new Map("US_12", "North Carolina"),
+                new Map("US_14", "Austria"),
+                new Map("US_15", "Quebec"),
+                new Map("US_16", "Washington"),
+                new Map("RU_02", "Taymyr"),
+                new Map("RU_03", "Kola Peninsula"),
+                new Map("RU_04", "Amur"),
+                new Map("RU_05", "Don"),
+                new Map("RU_08", "Belozersk Glades"),
+                new Map("RU_13", "Almaty Region"),
+            });
+        
+        modelBuilder
+            .Entity<StoredSaveInfo>()
+            .HasMany(s => s.DiscoveredMaps)
+            .WithMany();
     }
 }

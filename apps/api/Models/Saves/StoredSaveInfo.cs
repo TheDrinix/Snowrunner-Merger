@@ -9,6 +9,7 @@ public class StoredSaveInfo
     public string Description { get; set; }
     public int SaveNumber { get; set; }
     public DateTime UploadedAt { get; set; }
+    public List<Map> DiscoveredMaps { get; set; } = [];
     public Guid SaveGroupId { get; set; }
     [JsonIgnore]
     public SaveGroup SaveGroup { get; set; }
