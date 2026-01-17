@@ -18,7 +18,7 @@ if (route.name == 'auth') {
 }
 
 const title = computed(() => {
-  return route.name == 'login' ? 'Sign in to existing account' : 'Create a new account'
+  return route.name == 'login' ? 'Sign in to an existing account' : 'Create a new account'
 })
 
 const oauthProviders = computed(() => oauthStore.oauthProviders);
@@ -52,7 +52,7 @@ onMounted(() => {
 <template>
   <div class="card w-5/6 md:w-2/3 lg:w-1/2 mx-auto bg-base-200 shadow-xl">
     <div class="card-header">
-      {{ title }}
+      <p class="font-medium">{{ title }}</p>
     </div>
     <div class="card-body pt-4">
       <RouterView />

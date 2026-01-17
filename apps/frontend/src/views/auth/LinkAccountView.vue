@@ -18,7 +18,7 @@ const provider = computed(() => {
 });
 
 if (!route.query.token || !route.query.email) {
-  createToast('Invalid linking token', 'error');
+  createToast('Invalid linking token', 'Your linking token is missing', 'error');
   router.push({ name: 'login' });
 }
 
@@ -34,7 +34,7 @@ const email = computed(() => {
 
 watch([linkingToken, email], () => {
   if (!route.query.token || !route.query.email) {
-    createToast('Invalid linking token', 'error');
+    createToast('Invalid linking token', 'Your linking token is missing', 'error');
     router.push({ name: 'login' });
   }
 })
@@ -47,28 +47,33 @@ const handleLinkAccount = async () => {
       withCredentials: true
     });
 
-    createToast('Account linked successfully', 'success');
+    createToast('Account linked successfully', `Your ${provider} account has been linked to your account.`, 'success');
 
     userStore.signIn(res.data);
-    await router.push({ name: 'groups' });
+    router.push({ name: 'groups' });
+    
   } catch (e) {
     if (e instanceof AxiosError) {
       if (e.response?.status === 401) {
-        createToast('Invalid or expired linking token', 'error');
-        return await router.push({ name: 'login' });
+        createToast('Invalid or expired linking token', '', 'error');
+        return router.push({ name: 'login' });
+      } else if (e.response?.status === 409) {
+        createToast('Accounts already linked', `Your ${provider.value} account is already linked to another account. Please login using that account.`, 'error');
+        return router.push({ name: 'login' });
+      } else if (e.response?.status === 400) {
+        createToast('Linking failed', e.response.data.message || 'Failed to link accounts, please try again later', 'error');
+        return router.push({ name: 'login' });
       }
     }
 
     createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
-    await router.push({ name: 'login' });
+    router.push({ name: 'login' });
   }
-}
+} 
 
 const handleCancel = () => {
   router.push({ name: 'login' });
 }
-
-console.log("End of LinkAccountView");
 </script>
 
 <template>
@@ -78,8 +83,8 @@ console.log("End of LinkAccountView");
     </div>
     <div class="card-body pt-4">
       <div class="flex flex-col gap-2">
-        <p>There's already an account created using the same email <span>({{email}})</span> as your google account.</p>
-        <p>Do you want to link your google account to this account?</p>
+        <p>There's already an account created using the same email <span>({{email}})</span> as your {{ provider }} account.</p>
+        <p>Do you want to link your {{ provider }} account to this account?</p>
       </div>
     </div>
     <div class="card-actions p-4">
