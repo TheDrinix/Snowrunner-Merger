@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
 import {computed, ref} from "vue";
-import {useHttp} from "@/composables/useHttp";
 import {useGroupsStore} from "@/stores/groupsStore";
 import GroupSave from "@/components/groups/GroupSave.vue";
 import GroupSaveLoading from "@/components/groups/GroupSaveLoading.vue";
 import {useUserStore} from "@/stores/userStore";
-import {useToaster} from "@/stores/toastStore";
 import GroupLeaveModal from "@/components/groups/GroupLeaveModal.vue";
 import GroupDeleteModal from "@/components/groups/GroupDeleteModal.vue";
 
@@ -14,8 +12,7 @@ const route = useRoute();
 const router = useRouter();
 const groupsStore = useGroupsStore();
 const userStore = useUserStore();
-const { createToast } = useToaster();
-const http = useHttp();
+
 
 const groupId = computed(() => {
   return route.params.id as string;
@@ -41,57 +38,65 @@ const isOwner = computed(() => {
 const loading = groupsStore.isLoading;
 
 groupsStore.fetchGroupSaves(groupId.value);
-
-const handleSaveDelete = async (saveIdx: number) => {
-  const saveId = group.value?.saves[saveIdx].id;
-
-  try {
-    await http.delete(`/groups/${groupId.value}/saves/${saveId}`);
-
-    groupsStore.deleteGroupSave(groupId.value, saveIdx);
-  } catch (e: any) {
-    if (e.response.data.title) {
-      createToast(e.response.data.title, 'error');
-    }
-  }
-}
 </script>
 
 <template>
-  <div class="card mx-auto w-11/12 md:w-5/6 lg:2/3 xl:w-1/2 bg-base-200 shadow-xl">
-    <div class="card-header flex" v-if="!loading">
-      <h2 class="card-title">Save group {{group?.name}}</h2>
-      <div class="ml-auto">
-        <div class="flex flex-col md:flex-row gap-2 md:gap-4" v-if="isOwner">
-          <RouterLink :to="{ name: 'group-save-upload' }" class="btn btn-outline btn-secondary btn-sm w-full md:w-fit">Upload save</RouterLink>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <div class="text-sm breadcrumbs mb-1 opacity-60">
+          <ul>
+            <li><RouterLink to="/groups">Groups</RouterLink></li>
+            <li>Save Group</li>
+          </ul>
+        </div>
+        <h2 class="text-3xl font-black flex items-center gap-3">
+          <div class="w-3 h-8 bg-secondary rounded-full"></div>
+          {{ loading ? 'Loading...' : group?.name }}
+        </h2>
+      </div>
+
+      <div v-if="!loading" class="flex gap-2">
+        <template v-if="isOwner">
+          <RouterLink
+              v-if="saves.length < 3"
+              :to="{ name: 'group-save-upload' }"
+              class="btn btn-secondary btn-sm shadow-lg"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
+            Upload New Save
+          </RouterLink>
           <GroupDeleteModal :group="group!" />
-        </div>
-        <div v-else>
-          <GroupLeaveModal :group="group!" />
-        </div>
-      </div>
-    </div>
-    <div class="card-header" v-else>
-      <div class="skeleton h-8 w-36" />
-    </div>
-    <div class="card-body" v-if="!loading">
-      <GroupSave v-for="(save, idx) in saves" :key="save.id" :save="save" :idx="idx" :groupId="groupId">
-        <template #actions>
-          <div class="join join-vertical lg:join-horizontal">
-            <RouterLink :to="{name: 'group-save-merge', query: { saveNumber: idx }, params: { id: groupId }}" class="btn btn-outline btn-secondary join-item">Merge</RouterLink>
-            <template v-if="isOwner">
-              <RouterLink v-if="group!.saves.length >= 3" :to="{name: 'group-save-upload', query: { saveNumber: idx }, params: { id: groupId }}" class="btn btn-outline btn-secondary join-item">Replace</RouterLink>
-              <button class="btn btn-outline btn-secondary join-item" @click="() => handleSaveDelete(idx)">Delete</button>
-            </template>
-          </div>
         </template>
-      </GroupSave>
-      <div v-if="!saves.length">
-        <p class="text-lg font-medium">There are currently no saves shared in this group.</p>
+        <GroupLeaveModal v-else :group="group!" />
       </div>
     </div>
-    <div class="card-body" v-else>
-      <GroupSaveLoading v-for="i in 3" :key="i" />
+
+    <div class="grid grid-cols-1 gap-6">
+      <div v-if="!loading" class="space-y-6">
+        <GroupSave
+            v-for="(save, idx) in saves"
+            :key="save.id"
+            :save="save"
+            :idx="idx"
+            :groupId="groupId"
+            :isOwner="isOwner"
+            :totalSaves="saves.length"
+        />
+
+        <div
+            v-for="i in (3 - saves.length)"
+            :key="'empty-' + i"
+            class="border-2 border-dashed border-base-300 rounded-2xl p-8 flex flex-col items-center justify-center bg-base-200/50 opacity-50"
+        >
+          <span class="text-sm font-bold uppercase tracking-widest opacity-40">Empty Slot {{ saves.length + i }}</span>
+          <p v-if="isOwner" class="text-xs mt-1">Owner can upload a save to this slot</p>
+        </div>
+      </div>
+
+      <div v-else class="space-y-6">
+        <GroupSaveLoading v-for="i in 3" :key="i" />
+      </div>
     </div>
   </div>
 </template>
