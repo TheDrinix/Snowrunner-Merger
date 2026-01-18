@@ -7,7 +7,7 @@
     <div class="bg-base-100 p-6 rounded-2xl border border-base-300 h-full">
       <h3 class="text-sm font-black uppercase tracking-widest text-primary mb-4">Quick Guide</h3>
 
-      <ul class="steps steps-vertical space-y-4">
+      <ul class="steps steps-vertical">
         <li class="step step-primary">
           <div class="text-left ml-4">
             <p class="font-bold text-sm">Find your folder</p>
