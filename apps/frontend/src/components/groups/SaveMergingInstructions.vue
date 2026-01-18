@@ -37,6 +37,12 @@
             <p class="text-xs opacity-70">Which slot should the new save live in?</p>
           </div>
         </li>
+        <li class="step">
+          <div class="text-left ml-4">
+            <p class="font-bold text-sm">Adjust merging options</p>
+            <p class="text-xs opacity-70">Select what you want to merge between the saves and from what maps to share progress. (If no maps are selected, progress of all maps will be merged)</p>
+          </div>
+        </li>
       </ul>
     </div>
   </div>

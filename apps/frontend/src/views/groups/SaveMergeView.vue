@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useGroupsStore} from "@/stores/groupsStore";
 import JSZip from "jszip";
-import {generateSaveRegex, validateSaveFiles} from "@/helpers/saves";
+import {generateSaveRegex, SaveMergingOptions as TSaveMergingOptions, validateSaveFiles} from "@/helpers/saves";
 import {useHttp} from "@/composables/useHttp";
 import {useToaster} from "@/stores/toastStore";
 import type { AxiosRequestConfig } from "axios";
 import SaveMergingInstructions from "@/components/groups/SaveMergingInstructions.vue";
+import SaveMergingOptions from "@/components/groups/SaveMergingOptions.vue";
+import type {SaveMergingConfig} from "@/types/saves";
+
 
 const route = useRoute();
 const router = useRouter();
@@ -27,9 +30,15 @@ const group = computed(() => {
   return groupsStore.getGroup(groupId.value);
 });
 
-if (!group.value) {
+const save = computed(() => {
+  return group.value?.saves[saveNumber.value];
+});
+
+if (!group.value || !save.value) {
   router.push({name: 'groups'});
 }
+
+
 
 const loading = ref(false);
 
@@ -38,8 +47,14 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const formData = ref<{
   files?: FileList,
   saveNumber?: number,
-  outputSaveNumber?: number
-}>({});
+  outputSaveNumber?: number,
+  mergeConfig: SaveMergingConfig
+}>({
+  mergeConfig: {
+    maps: [],
+    options: TSaveMergingOptions.All
+  }
+});
 const canMerge = computed(() => {
   return !!formData.value.files && formData.value.saveNumber != undefined && formData.value.outputSaveNumber != undefined;
 });
@@ -92,6 +107,8 @@ const handleSaveMerge = async () => {
   body.set('saveNumber', formData.value.saveNumber.toString());
   body.set('outputSaveNumber', formData.value.outputSaveNumber.toString());
   body.set('save', zipBlob);
+  body.set('options', formData.value.mergeConfig.options.toString());
+  body.set('maps', JSON.stringify(formData.value.mergeConfig.maps));
 
   const cfg: AxiosRequestConfig = {
     headers: {
@@ -117,6 +134,8 @@ const handleSaveMerge = async () => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
     
+    localStorage.setItem('merge-options', formData.value.mergeConfig.options.toString());
+    
     router.push({
       name: 'group-save-merge-success', 
       params: {
@@ -132,6 +151,13 @@ const handleSaveMerge = async () => {
 
   loading.value = false;
 }
+
+onMounted(() => {
+  const savedOptions = localStorage.getItem('merge-options');
+  if (savedOptions) {
+    formData.value.mergeConfig.options = parseInt(savedOptions);
+  }
+})
 </script>
 
 <template>
@@ -155,7 +181,7 @@ const handleSaveMerge = async () => {
                 <input class="file-input file-input-bordered file-input-primary w-full" ref="fileInput" type="file" webkitdirectory directory @change="handleFolderChange" />
               </div>
 
-              <div class="transition-all duration-500 ease-in-out overflow-hidden" :class="{'max-h-64 opacity-100': availableSaves.length, 'max-h-0 opacity-0': !availableSaves.length}">
+              <div class="transition-all duration-500 ease-in-out" :class="{'opacity-100 max-h-screen': !availableSaves.length, 'opacity-0 max-h-0': !availableSaves.length}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="form-control w-full">
                     <div class="label">
@@ -175,8 +201,12 @@ const handleSaveMerge = async () => {
                     </select>
                   </div>
                 </div>
+
+                <SaveMergingOptions :available-maps="save!.discoveredMaps" v-model="formData.mergeConfig" />
               </div>
 
+              
+              
               <div class="pt-4">
                 <button :disabled="!canMerge || loading" type="submit" class="btn btn-primary btn-block lg:btn-wide transition-all shadow-lg">
                   <span v-if="loading" class="loading loading-dots"></span>
