@@ -82,9 +82,21 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-[calc(100vh-16rem)] flex-col">
-    <span class="loading loading-spinner w-72"></span>
-    <p class="text-xl font-bold mt-4">Signing you in...</p>
+  <div class="flex items-center justify-center min-h-[60vh] px-6">
+    <div class="text-center">
+      <div class="relative flex items-center justify-center mb-8">
+        <span class="loading loading-ring w-32 h-32 text-primary opacity-20"></span>
+        <span class="loading loading-ring w-24 h-24 text-primary absolute opacity-40"></span>
+        <span class="loading loading-ring w-16 h-16 text-primary absolute"></span>
+      </div>
+
+      <h2 class="text-2xl font-black uppercase tracking-widest animate-pulse">
+        Authenticating<span class="text-primary">...</span>
+      </h2>
+      <p class="text-xs font-mono opacity-50 mt-2 uppercase tracking-[0.2em]">
+        Securing Handshake with {{ provider || 'Service' }}
+      </p>
+    </div>
   </div>
 </template>
 

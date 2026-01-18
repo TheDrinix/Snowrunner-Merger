@@ -173,6 +173,7 @@ const handleOAuthUnlink = async () => {
 
     linkedProviders.value[provider] = false;
     createToast('Unlink success', `${provider.charAt(0).toUpperCase() + provider.slice(1)} account unlinked successfully`, 'success');
+    isOAuthUnlinkModalOpen.value = false;
   } catch (e) {
     createToast('Unlink failed', `There was an error trying to unlink your ${provider} account, please try again later.`, 'error', 10);
   }
