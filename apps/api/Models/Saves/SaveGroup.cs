@@ -8,6 +8,7 @@ public class SaveGroup
     public string Name { get; set; }
     public ICollection<StoredSaveInfo> StoredSaves { get; set; }
     public ICollection<User> Members { get; set; }
+    public string InviteCode { get; set; }
     public Guid OwnerId { get; set; }
     public User Owner { get; set; }
 }

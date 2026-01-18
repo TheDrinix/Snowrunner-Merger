@@ -11,6 +11,7 @@ export interface GroupData {
 export interface Group {
     id: stirng;
     name: string;
+    inviteCode: string;
     members: GroupMember[];
     owner: GroupMember;
     ownerId: string;

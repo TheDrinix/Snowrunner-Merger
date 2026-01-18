@@ -17,7 +17,7 @@ const handleCopy = () => {
     tooltipText.value = "Click to copy"
   }, 2000);
   
-  navigator.clipboard.writeText(props.group.id);
+  navigator.clipboard.writeText(props.group.inviteCode);
 }
 </script>
 
@@ -31,7 +31,7 @@ const handleCopy = () => {
         <div class="tooltip tooltip-right" :data-tip="tooltipText">
           <code @click.prevent="handleCopy"
                 class="bg-base-200 px-2 py-0.5 rounded text-xs font-mono cursor-pointer hover:bg-primary hover:text-primary-content transition-colors">
-            {{ group.id }}
+            {{ group.inviteCode }}
           </code>
         </div>
       </div>

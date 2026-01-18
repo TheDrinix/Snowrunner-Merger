@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using SnowrunnerMerger.Api.Data;
 using SnowrunnerMerger.Api.Exceptions;
@@ -14,6 +15,10 @@ public class GroupsService(
     IUserService userService,
     ISavesService savesService) : IGroupsService
 {
+    private readonly int MaxRetries = 10;
+    private readonly string InviteCodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private readonly int InviteCodeLength = 12;
+    
     /// <summary>
     /// Retrieves a SaveGroup by its unique identifier with stored saves included.
     /// </summary>
@@ -125,34 +130,62 @@ public class GroupsService(
         if (user is null) throw new HttpResponseException(HttpStatusCode.Unauthorized);
         
         if (user.OwnedGroups.Count >= 4) throw new HttpResponseException(HttpStatusCode.Forbidden, "User already owns 4 groups");
-        
-        var group = new SaveGroup()
+
+        using var rng = RandomNumberGenerator.Create();
+
+        for (var retry = 0; retry < MaxRetries; retry++)
         {
-            Name = name,
-            Owner = user,
-            Members = new List<User>() { user }
-        };
-        
-        await dbContext.SaveGroups.AddAsync(group);
-        await dbContext.SaveChangesAsync();
-        
-        return group;
+            var inviteCodeChars = new char[InviteCodeLength];
+            var randomBytes = new byte[InviteCodeLength];
+            
+            rng.GetBytes(randomBytes);
+            
+            for (var i = 0; i < InviteCodeLength; i++)
+            {
+                var charIndex = randomBytes[i] % InviteCodeChars.Length;
+                inviteCodeChars[i] = InviteCodeChars[charIndex];
+            }
+            
+            var inviteCode = new string(inviteCodeChars);
+            
+            var group = new SaveGroup()
+            {
+                Name = name,
+                Owner = user,
+                Members = new List<User>() { user },
+                InviteCode = inviteCode,
+            };
+
+            try
+            {
+                await dbContext.SaveGroups.AddAsync(group);
+                await dbContext.SaveChangesAsync();
+
+                return group;
+            } catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("UNIQUE constraint failed: SaveGroups.InviteCode") == true)
+            {
+                logger.LogWarning("Invite code collision detected when creating group. Retrying ({Retry}/{MaxRetries})...", retry + 1, MaxRetries);
+            }
+        }
+
+        logger.LogError("Failed to generate unique invite code after {MaxRetries} attempts", MaxRetries);
+        throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to create group due to invite code generation error");
     }
     
     /// <summary>
     /// Adds the current user to the specified group.
     /// </summary>
-    /// <param name="groupId">The unique identifier of the group.</param>
+    /// <param name="inviteCode">A unique invite code for a group.</param>
     /// <param name="userId">The unique identifier of the user.</param>
     /// <returns>The updated SaveGroup object.</returns>
     /// <exception cref="HttpResponseException">
     /// Thrown with different an HttpStatusCode.NotFound (404) when the group is not found.
     /// </exception>
-    public async Task<SaveGroup> JoinGroup(Guid groupId, Guid userId)
+    public async Task<SaveGroup> JoinGroup(string inviteCode, Guid userId)
     {
         var group = await dbContext.SaveGroups
             .Include(g => g.Members)
-            .FirstOrDefaultAsync(g => g.Id == groupId);
+            .FirstOrDefaultAsync(g => g.InviteCode == inviteCode);
         
         if (group is null) throw new HttpResponseException(HttpStatusCode.NotFound, "Group not found");
 

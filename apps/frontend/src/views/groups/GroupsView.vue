@@ -31,13 +31,17 @@ const ownedGroups = computed(() => groupsStore.getOwnedGroups());
 const groupJoinCode = ref("");
 
 const isValidCode = computed(() => {
-  const regex = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/mi
+  const regex = /^[0-9A-Z]{10,}$/mi
 
   return regex.test(groupJoinCode.value);
 })
 
 const handleJoinGroup = () => {
-  http.post(`/groups/${groupJoinCode.value}/join`)
+  const body = {
+    inviteCode: groupJoinCode.value,
+  }
+  
+  http.post(`/groups/join`, body)
     .then(res => {
       groupsStore.storeGroup(res.data);
       groupJoinCode.value = "";

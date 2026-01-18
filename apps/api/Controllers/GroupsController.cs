@@ -78,16 +78,16 @@ namespace SnowrunnerMerger.Api.Controllers
             return Ok(group);
         }
         
-        [HttpPost("{groupId:guid}/join")]
+        [HttpPost("join")]
         [SwaggerOperation(Summary = "Join group", Description = "Join an existing group")]
         [SwaggerResponse(StatusCodes.Status200OK, "Group data", typeof(GroupDto))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized)]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
-        public async Task<ActionResult<GroupDto>> JoinGroup(Guid groupId)
+        public async Task<ActionResult<GroupDto>> JoinGroup(GroupJoinDto data)
         {
             var sessionData = userService.GetUserSessionData();
             
-            var group = await groupsService.JoinGroup(groupId, sessionData.Id);
+            var group = await groupsService.JoinGroup(data.InviteCode, sessionData.Id);
             
             return Ok(mapper.Map<GroupDto>(group));
         }

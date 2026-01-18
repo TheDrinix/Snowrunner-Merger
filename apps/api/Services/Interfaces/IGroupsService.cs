@@ -40,10 +40,10 @@ public interface IGroupsService
     /// <summary>
     /// Adds the current user to the specified group.
     /// </summary>
-    /// <param name="groupId">The unique identifier of the group.</param>
+    /// <param name="inviteCode">A unique invite code for a group.</param>
     /// <param name="userId">The unique identifier of the user.</param>
     /// <returns>The updated SaveGroup object.</returns>
-    Task<SaveGroup> JoinGroup(Guid groupId, Guid userId);
+    Task<SaveGroup> JoinGroup(string inviteCode, Guid userId);
     /// <summary>
     ///     Removes the current user from the specified group.
     /// </summary>

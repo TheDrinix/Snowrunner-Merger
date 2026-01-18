@@ -55,6 +55,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
             .HasValueGenerator<GuidValueGenerator>();
         
         modelBuilder
+            .Entity<SaveGroup>()
+            .HasIndex(g => g.InviteCode)
+            .IsUnique();
+            
+        
+        modelBuilder
             .Entity<StoredSaveInfo>()
             .Property(s => s.Id)
             .HasValueGenerator<GuidValueGenerator>();
