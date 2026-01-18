@@ -4,10 +4,11 @@
 public enum MergeOptions
 {
     MissionProgress = 1 << 0,
-    MapProgress = 1 << 1,
-    DiscoveredVehicles = 1 << 2,
-    UnlockedUpgrades = 1 << 3,
-    GarageContents = 1 << 4,
-    VehiclesInWorld = 1 << 5,
-    All = MissionProgress | MapProgress | DiscoveredVehicles | UnlockedUpgrades | GarageContents | VehiclesInWorld
+    ContestTimes = 1 << 1,
+    MapProgress = 1 << 2,
+    DiscoveredVehicles = 1 << 3,
+    UnlockedUpgrades = 1 << 4,
+    GarageContents = 1 << 5,
+    VehiclesInWorld = 1 << 6,
+    All = MissionProgress | ContestTimes | MapProgress | DiscoveredVehicles | UnlockedUpgrades | GarageContents | VehiclesInWorld
 }
