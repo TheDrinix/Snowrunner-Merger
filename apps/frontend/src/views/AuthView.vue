@@ -50,26 +50,39 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="card w-5/6 md:w-2/3 lg:w-1/2 mx-auto bg-base-200 shadow-xl">
-    <div class="card-header">
-      <p class="font-medium">{{ title }}</p>
-    </div>
-    <div class="card-body pt-4">
-      <RouterView />
-      <hr class="divider border-none my-2" />
-      <div>
-        <h3>Sign-in using an external service:</h3>
-        <div class="mt-2 flex flex-wrap gap-1">
-          <button 
-            v-for="provider in oauthProviders" 
-            :key="provider"
-            class="btn btn-ghost gap-0"
-            @click="() => handleOauthSignIn(provider)"
+  <div class="max-w-md mx-auto my-12 px-4">
+    <div class="card bg-base-200 shadow-2xl border border-base-300 overflow-hidden">
+      <div class="bg-base-300/50 p-6 pb-0">
+        <h2 class="text-xs font-black uppercase tracking-[0.2em] text-primary mb-4 text-center">{{ title }}</h2>
+
+        <div class="tabs tabs-boxed bg-base-300 p-1 mb-4">
+          <RouterLink
+              :to="{ name: 'login' }"
+              class="tab flex-1 font-bold transition-all"
+              active-class="tab-active !bg-primary !text-primary-content"
+          >Login</RouterLink>
+          <RouterLink
+              :to="{ name: 'register' }"
+              class="tab flex-1 font-bold transition-all"
+              active-class="tab-active !bg-primary !text-primary-content"
+          >Register</RouterLink>
+        </div>
+      </div>
+
+      <div class="card-body pt-4">
+        <RouterView />
+
+        <div class="divider text-xs uppercase opacity-40 font-bold my-6">Or continue with</div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button
+              v-for="provider in oauthProviders"
+              :key="provider"
+              class="btn btn-outline border-base-300 hover:bg-base-300 gap-2 font-bold capitalize"
+              @click="() => handleOauthSignIn(provider)"
           >
-            <div class="md:p-1">
-              <img class="w-8 h-8 md:w-6 md:h-6" :src="`/${provider}.svg`" :alt="`${provider} icon`" />
-            </div>
-            <span class="hidden md:inline-block capitalize">{{ provider }}</span>
+            <img class="w-5 h-5" :src="`/${provider}.svg`" :alt="`${provider} icon`" />
+            {{ provider }}
           </button>
         </div>
       </div>

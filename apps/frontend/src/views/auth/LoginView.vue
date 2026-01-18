@@ -126,41 +126,41 @@ const handleConfirmationResend = async () => {
 </script>
 
 <template>
-  <div>
-    <div class="text-center">
-      <p class="text">New to snowrunner merger? <RouterLink class="btn btn-link btn-sm px-0" :to="{ name: 'register' }">Register here</RouterLink></p>
-    </div>
-    <form @submit.prevent="handleLogin">
-      <div class="flex flex-col gap-4">
-        <div class="alert alert-error font-bold" v-if="error.msg">
-          <div>
-            <p>{{error.msg}}</p>
-            <p v-if="error.type === LoginErrorType.EMAIL_NOT_CONFIRMED">Click <a @click="handleConfirmationResend" class="link text-blue-700">here</a> to resend confirmation email to the entered email address</p>
-          </div>
-        </div>
-        <div class="alert alert-success" v-if="msg && !error">
-          <span>{{msg}}</span>
-        </div>
-        <TextInput v-model="email" name="email" placeholder="Email" type="email" autocomplete="email" :error="errors.email">
-          <template #icon-prepend>
-            <Icon name="mail" />
-          </template>
-        </TextInput>
-        <div>
-          <div class="label">
-            <span class="label-text text-error">{{errors.password}}</span>
-            <span class="ml-auto label-text"><RouterLink :to="{name: 'reset-password-request'}" class="link text-blue-400 transition-colors">Forgot password</RouterLink></span>
-          </div>
-          <label class="transition-all input input-bordered flex items-center gap-2" :class="{ 'input-error': !!errors.password }">
-            <Icon name="lock" />
-            <input v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" class="w-full" />
-            <slot name="icon-append"></slot>
-          </label>
-        </div>
-        <div class="flex justify-center">
-          <button type="submit" class="btn btn-primary btn-wide">Login</button>
-        </div>
+  <form @submit.prevent="handleLogin" class="space-y-4">
+    <div v-if="error.msg" class="alert alert-error text-sm shadow-md py-3">
+      <div class="flex flex-col items-start gap-1">
+        <p class="font-bold">{{error.msg}}</p>
+        <button
+            v-if="error.type === LoginErrorType.EMAIL_NOT_CONFIRMED"
+            @click="handleConfirmationResend"
+            class="link link-hover text-xs uppercase font-black"
+        >Resend Confirmation Email</button>
       </div>
-    </form>
-  </div>
+    </div>
+
+    <div v-if="msg && !error" class="alert alert-success text-sm py-3 shadow-md">
+      <span class="font-bold">{{msg}}</span>
+    </div>
+
+    <div class="form-control">
+      <TextInput v-model="email" name="email" placeholder="Email address" type="email" autocomplete="email" :error="errors.email">
+        <template #icon-prepend><Icon name="mail" class="opacity-50" /></template>
+      </TextInput>
+    </div>
+
+    <div class="form-control">
+      <div class="label px-1 py-1 flex justify-between">
+        <span class="label-text-alt text-error font-bold">{{errors.password}}</span>
+        <RouterLink :to="{name: 'reset-password-request'}" class="label-text-alt link link-primary opacity-70 hover:opacity-100 font-bold">Forgot password?</RouterLink>
+      </div>
+      <label class="input input-bordered flex items-center gap-2 focus-within:input-primary transition-all" :class="{ 'input-error': !!errors.password }">
+        <Icon name="lock" class="opacity-50" />
+        <input v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" class="grow" />
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block shadow-lg mt-2">
+      Sign In
+    </button>
+  </form>
 </template>

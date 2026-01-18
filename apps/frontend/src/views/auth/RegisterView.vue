@@ -86,9 +86,6 @@ const handleRegister = async () => {
 
 <template>
   <div>
-    <div class="text-center">
-      <p class="text">Already have an account? <RouterLink class="btn btn-link btn-sm px-0" :to="{ name: 'login' }">Login here</RouterLink></p>
-    </div>
     <form @submit.prevent="handleRegister">
       <div class="flex flex-col gap-4">
         <TextInput v-model="username" name="username" placeholder="Username" autocomplete="username" :error="errors.username">

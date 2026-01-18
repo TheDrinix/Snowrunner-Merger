@@ -46,31 +46,45 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="card w-5/6 md:w-2/3 lg:w-1/2 mx-auto bg-base-200 shadow-xl">
-    <div class="card-header">
-      <span class="card-title">Email confirmation</span>
-    </div>
-    <div class="card-body pt-4">
-      <template v-if="loading">
-        <div class="flex flex-col items-center">
-          <h3 class="text-lg font-bold">Please wait while we verify your email</h3>
-          <span class="loading loading-bars loading-lg mt-2"></span>
-        </div>
-      </template>
-      <template v-else-if="err">
-        <div class="alert alert-error flex flex-col items-center gap-0">
-            <p class="text-lg font-bold">The confirmation link is either invalid or expired</p>
-            <p>Request a new link by trying to log in</p>
-            <p>You'll be redirected to login page in {{timer}} seconds</p>
-        </div>
-      </template>
-      <template v-else>
-        <div>
-          <h3 class="text-lg font-bold">Your email has been verified successfully</h3>
-          <p>You'll be able to login now</p>
-          <p>You'll be redirected to login page in {{timer}} seconds</p>
-        </div>
-      </template>
+  <div class="max-w-md mx-auto py-20 px-4">
+    <div class="card bg-base-200 shadow-2xl border border-base-300">
+      <div class="card-body text-center p-10">
+
+        <template v-if="loading">
+          <div class="flex flex-col items-center gap-6">
+            <span class="loading loading-ring w-20 h-20 text-primary"></span>
+            <div>
+              <h3 class="text-2xl font-black">Verifying...</h3>
+              <p class="opacity-60">Synchronizing with the Snowrunner servers</p>
+            </div>
+          </div>
+        </template>
+
+        <template v-else-if="err">
+          <div class="w-20 h-20 bg-error/10 text-error rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+          </div>
+          <h3 class="text-2xl font-black text-error">Link Expired</h3>
+          <p class="opacity-70 mt-2 mb-6 text-sm">The confirmation link is either invalid or has timed out.</p>
+
+          <div class="badge badge-outline gap-2 p-4 mx-auto">
+            Redirecting to Login in <span class="countdown font-mono">{{timer}}</span>s
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <h3 class="text-2xl font-black text-success">Verified!</h3>
+          <p class="opacity-70 mt-2 mb-6">Your engine is primed and your account is ready to go.</p>
+
+          <RouterLink :to="{ name: 'login' }" class="btn btn-primary btn-block">
+            Login Now ({{timer}}s)
+          </RouterLink>
+        </template>
+
+      </div>
     </div>
   </div>
 </template>
