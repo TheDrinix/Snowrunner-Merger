@@ -78,7 +78,7 @@ onMounted(() => {
           <button
               v-for="provider in oauthProviders"
               :key="provider"
-              class="btn btn-outline border-base-300 hover:bg-base-300 gap-2 font-bold capitalize"
+              class="btn btn-outline border-base-300 gap-2 font-bold capitalize"
               @click="() => handleOauthSignIn(provider)"
           >
             <img class="w-5 h-5" :src="`/${provider}.svg`" :alt="`${provider} icon`" />
