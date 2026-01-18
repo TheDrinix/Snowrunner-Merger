@@ -108,7 +108,7 @@ public partial class SavesService : ISavesService
                 var match = KnownRegionRegex().Match(visitedLevel);
                 if (!match.Success) continue;
                 
-                var mapId = $"{match.Groups[1].Value}_{match.Groups[2].Value}";
+                var mapId = $"{match.Groups[1].Value}_{match.Groups[2].Value}".ToUpper();
                 knownMapsIds.Add(mapId);
             }
             
@@ -177,7 +177,7 @@ public partial class SavesService : ISavesService
 
         try
         {
-            await _storageService.StoreTmpSave(sessionData.Id, data.Save, storedSaveNumber);   
+            await _storageService.StoreTmpSave(sessionData.Id, data.Save, data.SaveNumber);   
         } 
         catch (InvalidDataException ex)
         {

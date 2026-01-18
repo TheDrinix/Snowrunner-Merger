@@ -209,6 +209,11 @@ public class FileStorageService : IStorageService
             .GetFiles(sourceDir)
             .Where(f => mapDataFilesRegex.IsMatch(Path.GetFileName(f)));
 
+        if (!Directory.Exists(destDir))
+        {
+            Directory.CreateDirectory(destDir);
+        }
+
         foreach (var file in mapDataFiles)
         {
             var sourceFileName = Path.GetFileName(file);
