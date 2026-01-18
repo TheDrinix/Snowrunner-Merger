@@ -190,7 +190,7 @@ public class AuthService : IAuthService
                 Secure = true,
                 SameSite = _sameSiteMode,
                 Expires = session.ExpiresAt,
-                Path = "/api/auth/refresh"
+                Path = "/api/auth"
             };
 
             _httpContextAccessor.HttpContext?.Response.Cookies.Append("refresh_token", refreshTokenData.Token, cookieOptions);
@@ -427,17 +427,16 @@ public class AuthService : IAuthService
     /// </summary>
     public async Task Logout()
     {
-        var principal = _httpContextAccessor.HttpContext?.User;
-        var sessionId = principal.FindFirstValue(ClaimTypes.PrimarySid) ?? "";
-        
-        var session = await _dbContext.UserSessions
-            .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.Id == Guid.Parse(sessionId));
-        
-        if (session is not null)
+        var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
+        if (refreshToken is not null)
         {
-            _dbContext.UserSessions.Remove(session);
-            await _dbContext.SaveChangesAsync();
+            var session = await _tokenService.GetUserSessionFromRefreshToken(refreshToken);
+        
+            if (session is not null)
+            {
+                _dbContext.UserSessions.Remove(session);
+                await _dbContext.SaveChangesAsync();
+            }
         }
         
         _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refresh_token", new CookieOptions() { SameSite = _sameSiteMode, Secure = true });

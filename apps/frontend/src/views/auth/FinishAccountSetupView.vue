@@ -23,7 +23,7 @@ const provider = computed(() => {
 });
 
 if (!route.query.token || !route.query.email) {
-  createToast('Invalid linking token', 'error');
+  createToast('Invalid completion token', 'Your completion token is missing', 'error');
   router.push({ name: 'login' });
 }
 
@@ -37,7 +37,7 @@ const email = computed(() => {
 
 watch([completionToken, email], () => {
   if (!route.query.token || !route.query.email) {
-    createToast('Invalid linking token', 'error');
+    createToast('Invalid completion token', 'Your completion token is missing', 'error');
     router.push({ name: 'login' });
   }
 })
@@ -75,8 +75,7 @@ const handleAccountCompletion = async () => {
   }
 
   if (!yup.string().email().validateSync(email.value)) {
-    createToast('Invalid email address', 'error');
-    await router.push({ name: 'login' });
+    createToast('Invalid email address', '', 'error');
     return;
   }
 
@@ -89,61 +88,76 @@ const handleAccountCompletion = async () => {
       password: password.value
     });
 
-    createToast('Account setup complete', 'success');
+    createToast('Account setup complete', 'Your account has been finished', 'success');
 
     userStore.signIn(res.data);
-    await router.push({ name: 'groups' });
+    router.push({ name: 'groups' });
   } catch (e) {
     if (e instanceof AxiosError && e.response?.status === 401) {
-      createToast('Invalid or expired completion token', 'error');
-      return await router.push({ name: 'login' });
+      createToast('Invalid or expired completion token', '', 'error');
+      return router.push({ name: 'login' });
+    } else if (e instanceof AxiosError && e.response?.status === 400) {
+      createToast('Account setup failed', e.response.data.message || 'Failed to finish account setup, please try again later', 'error');
+      return router.push({ name: 'login' });
     }
 
-    createToast(`Failed to link ${provider.value} account, please try again later`, 'error');
-    await router.push({ name: 'login' });
+    createToast('Account setup failed', `Failed to finish ${provider.value} account setup, please try again later`, 'error');
+    router.push({ name: 'login' });
   }
 }
 </script>
 
 <template>
-  <div class="card w-5/6 md:w-2/3 lg:w-1/2 mx-auto bg-base-200 shadow-xl">
-    <div class="card-header">
-      <h3 class="text-lg font-medium">
-        Finish setting up your account
-      </h3>
-    </div>
+  <div class="max-w-md mx-auto my-12 px-4">
+    <div class="card bg-base-200 shadow-2xl border border-base-300">
+      <div class="card-body p-8">
+        <div class="text-center mb-8">
+          <div class="badge badge-primary font-black mb-2 px-4 uppercase tracking-tighter">Phase 2: Identity</div>
+          <h2 class="text-3xl font-black uppercase">Finalize Account</h2>
+          <p class="text-sm opacity-60 mt-1">We've linked your account. Just a few more details to get your engine started.</p>
+        </div>
 
-    <div class="card-body pt-4">
-      <div class="flex flex-col">
-        <form @submit.prevent="handleAccountCompletion">
-          <div class="flex flex-col gap-4">
-            <TextInput v-model="email" disabled name="email" placeholder="Email">
-              <template #icon-prepend>
-                <Icon name="mail" />
-              </template>
-            </TextInput>
-            <TextInput v-model="username" name="username" placeholder="Username" autocomplete="username" :error="errors.username">
-              <template #icon-prepend>
-                <Icon name="person" />
-              </template>
-            </TextInput>
-            <TextInput v-model="password" name="password" placeholder="Password" type="password" autocomplete="password" :error="errors.password">
-              <template #icon-prepend>
-                <Icon name="lock" />
-              </template>
-            </TextInput>
-            <TextInput v-model="confirmPassword" name="confirmPassword" placeholder="Confirm password" type="password" autocomplete="password" :error="errors.confirmPassword">
-              <template #icon-prepend>
-                <Icon name="lock" />
-              </template>
-            </TextInput>
-            <div class="flex justify-center">
-              <button :disabled="loading" type="submit" class="btn btn-primary btn-wide transition-all">
-                Finish setup
-                <span v-if="loading" class="loading loading-dots" />
-              </button>
+        <form @submit.prevent="handleAccountCompletion" class="space-y-4">
+          <div class="form-control">
+            <h3 class="label px-1 py-1">
+              <span class="label-text-alt opacity-50 font-bold uppercase tracking-widest">Verified Email</span>
+            </h3>
+            <div class="relative group">
+              <label class="transition-all input input-bordered flex items-center gap-2">
+                <Icon name="mail" class="opacity-30" />
+                <input disabled v-model="email" type="text" class="w-full bg-base-300 opacity-80 cursor-not-allowed border-dashed" name="email" placeholder="Email" />
+              </label>
+              <div class="absolute right-4 top-3 tooltip tooltip-left" data-tip="Provided by external service">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
             </div>
           </div>
+
+          <div class="space-y-1">
+            <TextInput v-model="username" name="username" placeholder="Choose Username" autocomplete="username" :error="errors.username">
+              <template #icon-prepend><Icon name="person" class="opacity-50" /></template>
+            </TextInput>
+
+            <TextInput v-model="password" name="password" placeholder="Set Password" type="password" autocomplete="password" :error="errors.password">
+              <template #icon-prepend><Icon name="lock" class="opacity-50" /></template>
+            </TextInput>
+
+            <TextInput v-model="confirmPassword" name="confirmPassword" placeholder="Confirm Password" type="password" autocomplete="password" :error="errors.confirmPassword">
+              <template #icon-prepend><Icon name="lock" class="opacity-50" /></template>
+            </TextInput>
+          </div>
+
+          <button :disabled="loading" type="submit" class="btn btn-primary btn-block shadow-lg mt-4 h-14">
+            <span v-if="loading" class="loading loading-dots"></span>
+            <span v-else class="flex items-center gap-2">
+            Complete Setup
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </span>
+          </button>
         </form>
       </div>
     </div>

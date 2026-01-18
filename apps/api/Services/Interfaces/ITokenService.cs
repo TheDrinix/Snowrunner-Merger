@@ -72,4 +72,11 @@ public interface ITokenService
     /// <returns>The generated JWT token.</returns>
     /// <exception cref="ArgumentNullException">Thrown if the JWT secret is not found in the configuration.</exception>
     string GenerateJwt(Guid userId, string role = "User");
+    
+    /// <summary>
+    ///    Retrieves the user session associated with the provided refresh token.
+    /// </summary>
+    /// <param name="refreshToken">The refresh token used to look up the user session.</param>
+    /// <returns>A <see cref="UserSession"/> object containing the user session data if found, null otherwise.</returns>
+    Task<UserSession?> GetUserSessionFromRefreshToken(string refreshToken);
 }

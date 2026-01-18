@@ -27,14 +27,6 @@ const router = createRouter({
             }
         },
         {
-            path: '/auth/google/link',
-            name: 'google-link',
-            component: () => import('../views/auth/GoogleLinkCallbackView.vue'),
-            meta: {
-                bypassAuth: true
-            }
-        },
-        {
             path: '/auth/register-confirm',
             name: 'register-confirm',
             component: () => import('../views/auth/RegisterConfirmationView.vue'),
@@ -133,14 +125,6 @@ const router = createRouter({
                     component: GroupView
                 },
                 {
-                    path: 'manage',
-                    name: 'group-manage',
-                   component: () => import('../views/groups/GroupManageView.vue'),
-                    meta: {
-                        validateGroupOwner: true
-                    }
-                },
-                {
                     path: 'merge',
                     name: 'group-save-merge',
                     component: () => import('../views/groups/SaveMergeView.vue'),
@@ -152,6 +136,11 @@ const router = createRouter({
                     meta: {
                         validateGroupOwner: true
                     }
+                },
+                {
+                    path: 'merge/success',
+                    name: 'group-save-merge-success',
+                    component: () => import('../views/groups/PostMergeView.vue'),
                 }
             ],
         },
@@ -193,6 +182,11 @@ router.beforeEach(async (to, from, next) => {
 
         if (!userStore.isAuthenticated) {
             next({ name: 'login' });
+            return;
+        }
+    } else {
+        if (!userStore.accessTokenExpires) {
+            userStore.refreshToken();
         }
     }
 
@@ -202,6 +196,7 @@ router.beforeEach(async (to, from, next) => {
 
         if (!groupsStore.isGroupOwner(groupId)) {
             next({ name: 'group', params: { id: groupId } });
+            return;
         }
     }
 
