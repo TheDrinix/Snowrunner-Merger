@@ -290,7 +290,7 @@ public class TokenService : ITokenService
                     Secure = true,
                     SameSite = _sameSiteMode,
                     Expires = session.ExpiresAt,
-                    Path = "/api/auth/refresh"
+                    Path = "/api/auth"
                 };
 
                 _httpContextAccessor.HttpContext?.Response.Cookies.Append("refresh_token", token, cookieOptions);
@@ -364,6 +364,22 @@ public class TokenService : ITokenService
         // If we reach here, it means we failed to generate a unique token after max retries
         _logger.LogError("Failed to generate new refresh token after {MaxRetries} attempts", MaxRetries);
         throw new HttpResponseException(HttpStatusCode.InternalServerError, "Failed to generate new refresh token");
+    }
+
+    /// <summary>
+    ///    Retrieves the user session associated with the provided refresh token.
+    /// </summary>
+    /// <param name="refreshToken">The refresh token used to look up the user session.</param>
+    /// <returns>A <see cref="UserSession"/> object containing the user session data if found, null otherwise.</returns>
+    public async Task<UserSession?> GetUserSessionFromRefreshToken(string refreshToken)
+    {
+        var encryptedToken = EncryptRefreshToken(refreshToken);
+
+        var session = await _dbContext.UserSessions
+            .Include(s => s.User)
+            .FirstOrDefaultAsync(s => s.RefreshToken == encryptedToken);
+
+        return session;
     }
 
     /// <summary>
