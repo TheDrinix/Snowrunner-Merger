@@ -69,7 +69,7 @@ const groupId = computed(() => {
             <div role="tablist" class="tabs tabs-lifted tabs-sm">
               <input type="radio" name="success_path_tabs" role="tab" class="tab" aria-label="Steam" checked />
               <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-4">
-                <code class="text-xs break-all block mb-2 font-mono">userdata/&lt;steam_id&gt;/1465360/remote</code>
+                <code class="text-xs break-all block mb-2 font-mono">Steam/userdata/&lt;steam_id&gt;/1465360/remote</code>
               </div>
 
               <input type="radio" name="success_path_tabs" role="tab" class="tab" aria-label="Epic/Other" />

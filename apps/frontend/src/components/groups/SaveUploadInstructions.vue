@@ -14,7 +14,7 @@
             <div role="tablist" class="tabs tabs-lifted tabs-sm mt-2">
               <input type="radio" name="path_tabs" role="tab" class="tab" aria-label="Steam" checked />
               <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-3">
-                <code class="text-xs break-all opacity-80">userdata/&lt;steam_id&gt;/1465360/remote</code>
+                <code class="text-xs break-all opacity-80">Steam/userdata/&lt;steam_id&gt;/1465360/remote</code>
               </div>
 
               <input type="radio" name="path_tabs" role="tab" class="tab" aria-label="Epic/Other" />

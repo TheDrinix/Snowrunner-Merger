@@ -31,7 +31,7 @@
     <main id="features" class="container mx-auto px-6 py-20">
       <div class="text-center mb-16">
         <h3 class="text-xs font-black uppercase tracking-[0.3em] text-primary mb-2">Capabilities</h3>
-        <h2 class="text-4xl font-bold">Engineered for Drivers</h2>
+        <h2 class="text-2xl font-bold">Engineered for those who like to Mud Up</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
