@@ -158,7 +158,7 @@ const handleSaveUpload = async () => {
               </div>
             </div>
 
-            <div class="pt-4">
+            <div class="pt-4 flex justify-center">
               <button :disabled="!canUpload || loading" type="submit" class="btn btn-primary btn-block lg:btn-wide transition-all shadow-lg">
                 <span v-if="loading" class="loading loading-dots" />
                 <span v-else>Upload</span>

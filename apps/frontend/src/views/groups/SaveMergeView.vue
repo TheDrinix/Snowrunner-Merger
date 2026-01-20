@@ -181,7 +181,7 @@ onMounted(() => {
                 <input class="file-input file-input-bordered file-input-primary w-full" ref="fileInput" type="file" webkitdirectory directory @change="handleFolderChange" />
               </div>
 
-              <div class="transition-all duration-500 ease-in-out" :class="{'opacity-100 max-h-screen': !availableSaves.length, 'opacity-0 max-h-0': !availableSaves.length}">
+              <div class="transition-all duration-500 ease-in-out" :class="{'opacity-100 max-h-screen': availableSaves.length, 'opacity-0 max-h-0': !availableSaves.length}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="form-control w-full">
                     <div class="label">
@@ -207,7 +207,7 @@ onMounted(() => {
 
               
               
-              <div class="pt-4">
+              <div class="pt-4 flex justify-center">
                 <button :disabled="!canMerge || loading" type="submit" class="btn btn-primary btn-block lg:btn-wide transition-all shadow-lg">
                   <span v-if="loading" class="loading loading-dots"></span>
                   <span v-else>Merge Saves</span>
