@@ -21,11 +21,13 @@ const isModalOpen = ref(false);
 const handleGroupLeave = () => {
   http.delete(`/groups/${props.group.id}/leave`)
       .then(res => {
-        groupsStore.removeGroup(props.group.id.value);
+        groupsStore.removeGroup(props.group.id);
+        
+        createToast('Left group', `You have left the group ${props.group.name}.`, 'success');
       })
       .catch(e => {
         if (e.response.data.title) {
-          createToast(e.response.data.title, 'error');
+          createToast(e.response.data.title, '', 'error');
         }
       });
 

@@ -21,9 +21,11 @@ const isModalOpen = ref(false);
 
 const handleGroupDelete = async () => {
   try {
-    await http.delete(`/groups/${props.group.id.value}`);
+    await http.delete(`/groups/${props.group.id}`);
 
-    groupsStore.removeGroup(props.group.id.value);
+    groupsStore.removeGroup(props.group.id);
+    
+    createToast('Group deleted', `The group ${props.group.name} has been deleted successfully.`, 'success');
   } catch (e: any) {
     if (e.response.data.title) {
       createToast(e.response.data.title, e.response.data.message || '', 'error');
