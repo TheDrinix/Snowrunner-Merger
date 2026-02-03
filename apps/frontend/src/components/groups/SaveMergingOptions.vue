@@ -40,8 +40,8 @@ const createOption = (option: SaveMergingOptions) => {
 const missionProgressOpt = createOption(SaveMergingOptions.MissionProgress);
 const contestTimesOpt = createOption(SaveMergingOptions.ContestTimes);
 const mapProgressOpt = createOption(SaveMergingOptions.MapProgress);
-const discoveredVehiclesOpt = createOption(SaveMergingOptions.DiscoveredVehicles);
-const unlockedUpgradesOpt = createOption(SaveMergingOptions.UnlockedUpgrades);
+const discoveredVehiclesAndUpgradesOpt = createOption(SaveMergingOptions.DiscoveredVehiclesUpgrades);
+const garageContentOpt = createOption(SaveMergingOptions.GarageContents);
 const worldVehiclesOpt = createOption(SaveMergingOptions.VehiclesInWorld);
 
 const handleMapsChange = (value: string[]) => {
@@ -78,16 +78,16 @@ const handleMapsChange = (value: string[]) => {
           </div>
 
           <div class="flex flex-row items-center form-control">
-            <input v-model="discoveredVehiclesOpt" type="checkbox" id="discovered-vehicles" name="discovered-vehicles" class="checkbox checkbox-primary">
+            <input v-model="discoveredVehiclesAndUpgradesOpt" type="checkbox" id="discovered-vehicles" name="discovered-vehicles" class="checkbox checkbox-primary">
             <label for="discovered-vehicles" class="label cursor-pointer">
-              <span class="label-text">Discovered Vehicles</span>
+              <span class="label-text">Discovered Vehicles and Upgrades</span>
             </label>
           </div>
 
           <div class="flex flex-row items-center form-control">
-            <input v-model="unlockedUpgradesOpt" type="checkbox" id="unlocked-upgrades" name="unlocked-upgrades" class="checkbox checkbox-primary">
+            <input v-model="garageContentOpt" type="checkbox" id="unlocked-upgrades" name="unlocked-upgrades" class="checkbox checkbox-primary">
             <label for="unlocked-upgrades" class="label cursor-pointer">
-              <span class="label-text">Unlocked Upgrades</span>
+              <span class="label-text">Garage Content</span>
             </label>
           </div>
 

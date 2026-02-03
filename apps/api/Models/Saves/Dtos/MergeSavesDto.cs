@@ -13,6 +13,6 @@ public record MergeSavesDto
     [Required]
     public int OutputSaveNumber { get; init; }
 
-    public MergeOptions Options { get; init; } = MergeOptions.All;
+    public MergeOptions Options { get; init; } = MergeOptions.AllExceptGarageContents;
     public string[] MergedMaps { get; init; } = [];
 };

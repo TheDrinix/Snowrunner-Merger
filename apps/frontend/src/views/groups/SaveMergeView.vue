@@ -52,7 +52,7 @@ const formData = ref<{
 }>({
   mergeConfig: {
     maps: [],
-    options: TSaveMergingOptions.All
+    options: TSaveMergingOptions.AllExceptGarageContents
   }
 });
 const canMerge = computed(() => {
