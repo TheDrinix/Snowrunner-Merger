@@ -21,7 +21,7 @@ public abstract class IStorageService
     public abstract void RemoveTmpStorage(Guid userId);
     public abstract void RemoveGroupSave(StoredSaveInfo save);
     public abstract void CopyTmpSaveMapDataToOutput(Guid userId, int sourceSaveSlot, int outputSaveSlot);
-    public abstract void CopyGroupSaveMapDataToOutput(Guid userId, StoredSaveInfo storedSaveInfo, int outputSaveSlot);
+    public abstract void CopyGroupSaveMapDataToOutput(Guid userId, StoredSaveInfo storedSaveInfo, int outputSaveSlot, string type, string[] maps);
     public abstract void StoreOutputSaveData(Guid userId, Dictionary<string, dynamic> saveData, int outputSaveSlot);
     public abstract MemoryStream ZipOutputSaveDataStream(Guid userId);
 

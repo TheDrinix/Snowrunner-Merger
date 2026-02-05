@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using SnowrunnerMerger.Api.Data;
 using SnowrunnerMerger.Api.Exceptions;
 using SnowrunnerMerger.Api.Models.Saves;
@@ -198,7 +199,7 @@ public partial class SavesService : ISavesService
             throw new HttpResponseException(HttpStatusCode.BadRequest, "Save is invalid");
         }
         
-        var outputSaveData = MergeSaveData(uploadedSave, storedSave, data.OutputSaveNumber);
+        var outputSaveData = MergeSaveData(uploadedSave, storedSave, data.OutputSaveNumber, data.Options, data.MergedMaps);
         
         if (outputSaveData is null)
         {
@@ -213,6 +214,14 @@ public partial class SavesService : ISavesService
         };
         
         _storageService.StoreOutputSaveData(sessionData.Id, outputSave, data.OutputSaveNumber);
+        if (data.Options.HasFlag(MergeOptions.MapProgress))
+        {
+            _storageService.CopyGroupSaveMapDataToOutput(sessionData.Id, storedSaveData, data.OutputSaveNumber, "fog", data.MergedMaps);
+        }
+        if (data.Options.HasFlag(MergeOptions.VehiclesInWorld))
+        {
+            _storageService.CopyGroupSaveMapDataToOutput(sessionData.Id, storedSaveData, data.OutputSaveNumber, "sts", data.MergedMaps);
+        }
 
         return _storageService.ZipOutputSaveDataStream(sessionData.Id);
     }
@@ -266,39 +275,312 @@ public partial class SavesService : ISavesService
     /// <param name="uploadedSave">A <see cref="Save"/> to merge with stored save.</param>
     /// <param name="storedSave">A <see cref="Save"/> to merge with uploaded save.</param>
     /// <param name="outputSaveNumber">The save slot number of the output save.</param>
+    /// <param name="opt">The <see cref="MergeOptions"/> flags indicating which parts of the save to merge.</param>
+    /// <param name="mergedMaps">An array of map IDs to merge. If empty, all maps will be merged.</param>
     /// <returns>A <see cref="SaveData"/> object containing the merged save data.</returns>
-    private SaveData? MergeSaveData(Save uploadedSave, Save storedSave, int outputSaveNumber)
+    private SaveData? MergeSaveData(Save uploadedSave, Save storedSave, int outputSaveNumber, MergeOptions opt, string[] mergedMaps)
     {
         if (uploadedSave.SaveData is null || storedSave.SaveData is null) return null;
         
-        var uploadedProfileData = uploadedSave.SaveData.SslValue.persistentProfileData;
-        var storedProfileData = storedSave.SaveData.SslValue.persistentProfileData;
+        var outputSaveData = mergedMaps.Length > 0 ? 
+            MergeSaveDataWithSpecifiedMaps(uploadedSave, storedSave, outputSaveNumber, opt, mergedMaps) : 
+            MergeSaveDataAllMaps(uploadedSave, storedSave, outputSaveNumber, opt);
 
-        uploadedProfileData.newTrucks = uploadedProfileData.newTrucks.Union(storedProfileData.newTrucks).ToList();
-
-        uploadedProfileData.discoveredUpgrades = Helpers.MergeDictionaries(
-            uploadedProfileData.discoveredUpgrades,
-            storedProfileData.discoveredUpgrades
-        );
-
-        uploadedProfileData.discoveredUpgrades = Helpers.MergeDictionaries(
-            uploadedProfileData.discoveredUpgrades,
-            storedProfileData.discoveredUpgrades
-        );
-
-        uploadedProfileData.contestTimes = Helpers.MergeDictionaries(
-            uploadedProfileData.contestTimes,
-            storedProfileData.contestTimes
-        );
-
-        var outputSaveData = storedSave.SaveData;
-        outputSaveData.SslValue.persistentProfileData = uploadedProfileData;
-        outputSaveData.SslValue.gameStat = uploadedSave.SaveData.SslValue.gameStat;
-        // outputSaveData.SslValue.garagesData = uploadedSave.SaveData.SslValue.garagesData;
-        outputSaveData.SslValue.waypoints = uploadedSave.SaveData.SslValue.waypoints;
-        outputSaveData.SslValue.saveId = outputSaveNumber;
+        outputSaveData!.SslValue.saveId = outputSaveNumber;
         
         return outputSaveData;
+    }
+
+    private SaveData MergeSaveDataAllMaps(Save uploadedSave, Save storedSave, int outputSaveNumber, MergeOptions opt)
+    {
+        var uploadedSaveData = uploadedSave.SaveData!.SslValue;
+        var storedSaveData = storedSave.SaveData!.SslValue;
+        
+        if (opt.HasFlag(MergeOptions.MissionProgress))
+        {
+            // cargoLoadingCount merging
+            foreach (var (key, value) in storedSaveData.cargoLoadingCounts)
+            {
+                uploadedSaveData.cargoLoadingCounts[key] = value;
+            }
+
+            // discoveredObjectives merging
+            uploadedSaveData.discoveredObjectives.AddRange(storedSaveData.discoveredObjectives);
+
+            // objectiveStates merging
+            foreach (var (key, value) in storedSaveData.objectiveStates)
+            {
+                uploadedSaveData.objectiveStates[key] = value;
+            }
+
+            // savedCargoNeedToBeRemovedOnRestart merging
+            foreach (var (key, value) in storedSaveData.savedCargoNeedToBeRemovedOnRestart)
+            {
+                uploadedSaveData.savedCargoNeedToBeRemovedOnRestart[key] = value;
+            }
+
+            // hiddenCargoes merging
+            foreach (var (key, value) in storedSaveData.hiddenCargoes)
+            {
+                uploadedSaveData.hiddenCargoes[key] = value;
+            }
+
+            // persistentProfileData.contestTimes merging
+            foreach (var (key, value) in storedSaveData.persistentProfileData.contestTimes)
+            {
+                uploadedSaveData.persistentProfileData.contestTimes.TryAdd(key, value);
+            }
+
+            // persistentProfileData.contestLastTimes merging
+            foreach (var (key, value) in storedSaveData.persistentProfileData.contestLastTimes)
+            {
+                uploadedSaveData.persistentProfileData.contestLastTimes.TryAdd(key, value);
+            }
+
+            // finishedObjs merging
+            uploadedSaveData.finishedObjs.AddRange(storedSaveData.finishedObjs);
+        }
+        
+        if (opt.HasFlag(MergeOptions.MissionProgress) || opt.HasFlag(MergeOptions.MapProgress))
+        {
+            // visitedLevels merging
+            uploadedSaveData.visitedLevels.AddRange(storedSaveData.visitedLevels);
+            
+            // persistentProfileData.knownRegions merging
+            uploadedSaveData.persistentProfileData.knownRegions.AddRange(storedSaveData.persistentProfileData.knownRegions);
+        }
+
+        if (opt.HasFlag(MergeOptions.MapProgress))
+        {
+            // watchPointsData merging
+            foreach (var (key, value) in storedSaveData.watchPointsData.data)
+            {
+                uploadedSaveData.watchPointsData.data[key] = value;
+            }
+
+            // levelGarageStatuses merging
+            foreach (var (key, value) in storedSaveData.levelGarageStatuses)
+            {
+                uploadedSaveData.levelGarageStatuses[key] = value;
+            }
+            
+            // discoveredObjects merging
+            uploadedSaveData.discoveredObjects.AddRange(storedSaveData.discoveredObjects);
+            
+            // upgradableGarages merging
+            foreach (var (key, value) in storedSaveData.upgradableGarages)
+            {
+                uploadedSaveData.upgradableGarages[key] = value;
+            }
+        }
+        
+        if (opt.HasFlag(MergeOptions.DiscoveredVehiclesUpgrades))
+        {
+            MergeDiscoveredTrucksAndObjects(uploadedSaveData, storedSaveData);
+        }
+        
+        if (opt.HasFlag(MergeOptions.GarageContents))
+        {
+            foreach (var (key, value) in storedSaveData.garagesData)
+            {
+                uploadedSaveData.garagesData[key] = value;
+            }
+        }
+        
+        return new SaveData
+        {
+            SslType = uploadedSave.SaveData.SslType,
+            SslValue = uploadedSaveData
+        };
+    }
+
+    private SaveData MergeSaveDataWithSpecifiedMaps(Save uploadedSave, Save storedSave, int outputSaveNumber,
+        MergeOptions opt, string[] mergedMaps)
+    {
+        var uploadedSaveData = uploadedSave.SaveData!.SslValue;
+        var storedSaveData = storedSave.SaveData!.SslValue;
+
+        foreach (var mergedMap in mergedMaps)
+        {
+            var levelLowerPrefix = $"level_{mergedMap.ToLowerInvariant()}_";
+            var levelUpperPrefix = $"{mergedMap.ToUpperInvariant()}_";
+            
+            if (opt.HasFlag(MergeOptions.MissionProgress))
+            {
+                // cargoLoadingCount merging
+                foreach (var key in storedSaveData.cargoLoadingCounts.Keys)
+                {
+                    if (key.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                    {
+                        uploadedSaveData.cargoLoadingCounts[key] = storedSaveData.cargoLoadingCounts[key];
+                    }
+                }
+
+                // discoveredObjectives merging
+                uploadedSaveData.discoveredObjectives.AddRange(
+                    storedSaveData.discoveredObjectives
+                        .Where(objId => objId.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                );
+
+                // objectiveStates merging
+                foreach (var key in storedSaveData.objectiveStates.Keys)
+                {
+                    if (key.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.objectiveStates[key] = storedSaveData.objectiveStates[key];
+                }
+
+                // savedCargoNeedToBeRemovedOnRestart merging
+                foreach (var key in storedSaveData.savedCargoNeedToBeRemovedOnRestart.Keys)
+                {
+                    if (key.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.savedCargoNeedToBeRemovedOnRestart[key] = storedSaveData.savedCargoNeedToBeRemovedOnRestart[key];
+                }
+
+                // hiddenCargoes merging
+                foreach (var key in storedSaveData.hiddenCargoes.Keys)
+                {
+                    if (key.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.hiddenCargoes[key] = storedSaveData.hiddenCargoes[key];
+                }
+
+                // persistentProfileData.contestTimes merging
+                foreach (var key in storedSaveData.persistentProfileData.contestLastTimes.Keys)
+                {
+                    if (key.StartsWith(levelUpperPrefix, StringComparison.Ordinal) && 
+                        !uploadedSaveData.persistentProfileData.contestTimes.ContainsKey(key))
+                    {
+                        uploadedSaveData.persistentProfileData.contestTimes[key] = storedSaveData.persistentProfileData.contestTimes[key];
+                    }
+                }
+
+                // persistentProfileData.contestLastTimes merging
+                foreach (var key in storedSaveData.persistentProfileData.contestLastTimes.Keys)
+                {
+                    if (key.StartsWith(levelUpperPrefix, StringComparison.Ordinal) && 
+                        !uploadedSaveData.persistentProfileData.contestLastTimes.ContainsKey(key))
+                    {
+                        uploadedSaveData.persistentProfileData.contestLastTimes[key] = storedSaveData.persistentProfileData.contestLastTimes[key];
+                    }
+                }
+
+                // finishedObjs merging
+                uploadedSaveData.finishedObjs.AddRange(
+                    storedSaveData.finishedObjs
+                        .Where(objId => objId.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                );
+            }
+
+            if (opt.HasFlag(MergeOptions.MissionProgress) || opt.HasFlag(MergeOptions.MapProgress))
+            {
+                // visitedLevels merging
+                uploadedSaveData.visitedLevels.AddRange(
+                    storedSaveData.visitedLevels
+                        .Where(level => level.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                );
+                
+                // persistentProfileData.knownRegions merging
+                uploadedSaveData.persistentProfileData.knownRegions.AddRange(
+                    storedSaveData.persistentProfileData.knownRegions
+                        .Where(region => region.StartsWith(mergedMap, StringComparison.CurrentCultureIgnoreCase))
+                );
+            }
+
+            if (opt.HasFlag(MergeOptions.MapProgress))
+            {
+                // watchPointsData merging
+                foreach (var key in storedSaveData.watchPointsData.data.Keys)
+                {
+                    if (key.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.watchPointsData.data[key] = storedSaveData.watchPointsData.data[key];
+                }
+
+                // levelGarageStatuses merging
+                foreach (var key in storedSaveData.levelGarageStatuses.Keys)
+                {
+                    if (key.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.levelGarageStatuses[key] = storedSaveData.levelGarageStatuses[key];
+                }
+                
+                // discoveredObjects merging
+                uploadedSaveData.discoveredObjects.AddRange(
+                    storedSaveData.discoveredObjects
+                        .Where(objId => objId.StartsWith(levelUpperPrefix, StringComparison.Ordinal))
+                );
+                
+                // upgradableGarages merging
+                foreach (var key in storedSaveData.upgradableGarages.Keys)
+                {
+                    if (key.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.upgradableGarages[key] = storedSaveData.upgradableGarages[key];
+                }
+            }
+
+            if (opt.HasFlag(MergeOptions.DiscoveredVehiclesUpgrades))
+            {
+                MergeDiscoveredTrucksAndObjects(uploadedSaveData, storedSaveData);
+            }
+
+            if (opt.HasFlag(MergeOptions.GarageContents))
+            {
+                foreach (var key in storedSaveData.garagesData.Keys)
+                {
+                    if (key.StartsWith(levelLowerPrefix, StringComparison.Ordinal))
+                        uploadedSaveData.garagesData[key] = storedSaveData.garagesData[key];
+                }
+            }
+        }
+
+        return new SaveData
+        {
+            SslType = uploadedSave.SaveData.SslType,
+            SslValue = uploadedSaveData
+        };
+    }
+    
+    private void MergeDiscoveredTrucksAndObjects(SslValue uploadedSaveData, SslValue storedSaveData)
+    {
+        // Unlocked vehicles mergin
+        var storedUnlockedItems = storedSaveData.persistentProfileData.unlockedItemNames.Keys.ToHashSet();
+        var uploadedUnlockedItems = uploadedSaveData.persistentProfileData.unlockedItemNames.Keys.ToHashSet();
+                
+        var missingUnlockedItems = storedUnlockedItems.Except(uploadedUnlockedItems);
+        foreach (var item in missingUnlockedItems)
+        {
+            uploadedSaveData.persistentProfileData.unlockedItemNames[item] = true;
+        }
+                
+        // Discovered upgrades merging
+        var storedSaveKeys = storedSaveData.upgradesGiverData.Keys.ToHashSet();
+        var uploadedSaveKeys = uploadedSaveData.upgradesGiverData.Keys.ToHashSet();
+                
+        var commonKeys = storedSaveKeys.Intersect(uploadedSaveKeys);
+        var storedOnlyKeys = storedSaveKeys.Except(uploadedSaveKeys);
+                
+        foreach (var key in commonKeys)
+        {
+            var storedUpgrades = storedSaveData.upgradesGiverData[key];
+            var uploadedUpgrades = uploadedSaveData.upgradesGiverData[key];
+                    
+            foreach (var upgradeKey in storedUpgrades.Keys)
+            {
+                if (!uploadedUpgrades.ContainsKey(upgradeKey) || storedUpgrades[upgradeKey] > uploadedUpgrades[upgradeKey])
+                {
+                    uploadedUpgrades[upgradeKey] = storedUpgrades[upgradeKey];
+                }
+            }
+        }
+                
+        foreach (var key in storedOnlyKeys)
+        {
+            uploadedSaveData.upgradesGiverData[key] = storedSaveData.upgradesGiverData[key];
+        }
+        
+        uploadedSaveData.persistentProfileData.newTrucks = uploadedSaveData.persistentProfileData.newTrucks.Union(storedSaveData.persistentProfileData.newTrucks).ToHashSet();
+
+        uploadedSaveData.persistentProfileData.discoveredUpgrades = Helpers.MergeDictionaries(
+            uploadedSaveData.persistentProfileData.discoveredUpgrades,
+            storedSaveData.persistentProfileData.discoveredUpgrades
+        );
     }
 
     [GeneratedRegex(@"level_(\w+?)_(\d+?)_\d+")]

@@ -64,12 +64,20 @@ public class FileStorageService : IStorageService
         CopySaveMapDataToOutput(sourceDir, destDir, sourceSaveSlot, outputSaveSlot);
     }
 
-    public override void CopyGroupSaveMapDataToOutput(Guid userId, StoredSaveInfo storedSaveInfo, int outputSaveSlot)
+    public override void CopyGroupSaveMapDataToOutput(Guid userId, StoredSaveInfo storedSaveInfo, int outputSaveSlot, string type, string[] maps)
     {
         var sourceDir = Path.Join(StorageDir, storedSaveInfo.Id.ToString());
-        var destDir = Path.Join(StorageDir, userId.ToString(), "output");
+        var destDir = Path.Join(TmpStorageDir, userId.ToString(), "output");
         
-        CopySaveMapDataToOutput(sourceDir, destDir, storedSaveInfo.SaveNumber, outputSaveSlot);
+        if (maps.Length == 0)
+        {
+            CopySaveMapDataToOutput(sourceDir, destDir, storedSaveInfo.SaveNumber, outputSaveSlot, type);
+        }
+        else
+        {
+            FilteredCopySaveMapDataToOutput(sourceDir, destDir, storedSaveInfo.SaveNumber, outputSaveSlot, type, maps);
+        }
+        
     }
 
     public override void StoreOutputSaveData(Guid userId, Dictionary<string, dynamic> saveData, int outputSaveSlot)
@@ -202,9 +210,9 @@ public class FileStorageService : IStorageService
     /// <param name="destDir">The destination directory where the map data files will be copied to.</param>
     /// <param name="sourceSaveSlot">The save slot number of the source files.</param>
     /// <param name="outputSaveSlot">The save slot number for the output files.</param>
-    private void CopySaveMapDataToOutput(string sourceDir, string destDir, int sourceSaveSlot, int outputSaveSlot)
+    private void CopySaveMapDataToOutput(string sourceDir, string destDir, int sourceSaveSlot, int outputSaveSlot, string type = "fog|sts")
     {
-        var mapDataFilesRegex = new Regex($@"\b({(sourceSaveSlot > 0 ? sourceSaveSlot.ToString() + '_' : "")}(fog|sts)_.*\.dat)\b", RegexOptions.Multiline);
+        var mapDataFilesRegex = new Regex($@"\b({(sourceSaveSlot > 0 ? sourceSaveSlot.ToString() + '_' : "")}({type})_.*\.dat)\b", RegexOptions.Multiline);
         var mapDataFiles = Directory
             .GetFiles(sourceDir)
             .Where(f => mapDataFilesRegex.IsMatch(Path.GetFileName(f)));
@@ -217,6 +225,43 @@ public class FileStorageService : IStorageService
         foreach (var file in mapDataFiles)
         {
             var sourceFileName = Path.GetFileName(file);
+            if (sourceSaveSlot > 0)
+            {
+                sourceFileName = sourceFileName[2..];
+            }
+            
+            var outputPrefix = outputSaveSlot > 0 ? outputSaveSlot.ToString() + '_' : "";
+            
+            var destFileName = outputPrefix + sourceFileName;
+            var destFilePath = Path.Join(destDir, destFileName);
+            
+            File.Copy(file, destFilePath, true);
+        }
+    }
+
+    private void FilteredCopySaveMapDataToOutput(
+        string sourceDir, 
+        string destDir, 
+        int sourceSaveSlot,
+        int outputSaveSlot, 
+        string type, 
+        string[] maps
+    )
+    {
+        var mapDataFilesRegex = new Regex($@"\b({(sourceSaveSlot > 0 ? sourceSaveSlot.ToString() + '_' : "")}({type})_.*\.dat)\b", RegexOptions.Multiline);
+        var mapDataFiles = Directory
+            .GetFiles(sourceDir)
+            .Where(f => mapDataFilesRegex.IsMatch(Path.GetFileName(f)));
+
+        var mapsSet = maps.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var prefixLength = (sourceSaveSlot > 0 ? 2 : 0) + 10; // Prefix is either "X_fog_level_{map_id}..." or "sts_level_{map_id}...", so 10 characters after the optional 2-character slot prefix
+        foreach (var file in mapDataFiles)
+        {
+            var sourceFileName = Path.GetFileName(file);
+            var mapId = sourceFileName[prefixLength..(prefixLength + 5)]; // Extract map ID by skipping the prefix and taking the next 4 characters
+            
+            if (!mapsSet.Contains(mapId)) continue;
+            
             if (sourceSaveSlot > 0)
             {
                 sourceFileName = sourceFileName[2..];
