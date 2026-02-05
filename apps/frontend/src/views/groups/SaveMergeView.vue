@@ -108,7 +108,12 @@ const handleSaveMerge = async () => {
   body.set('outputSaveNumber', formData.value.outputSaveNumber.toString());
   body.set('save', zipBlob);
   body.set('options', formData.value.mergeConfig.options.toString());
-  body.set('maps', JSON.stringify(formData.value.mergeConfig.maps));
+  
+  for (let map of formData.value.mergeConfig.maps) {
+    body.append('mergedMaps[]', map);
+  }
+  
+  // body.set('mergedMaps', JSON.stringify(formData.value.mergeConfig.maps));
 
   const cfg: AxiosRequestConfig = {
     headers: {
