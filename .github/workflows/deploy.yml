@@ -26,7 +26,7 @@ jobs:
           context: ./apps/api
           file: ./apps/api/Dockerfile
           push: true
-          tags: ${{ secrets.REGISTRY_URL }}/snowrunner-merger/api:latest
+          tags: ${{ secrets.REGISTRY_URL }}/snowrunner-merger/api:${{ github.sha }} , ${{ secrets.REGISTRY_URL }}/snowrunner-merger/api:latest
 
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
@@ -34,7 +34,7 @@ jobs:
           context: ./apps/frontend
           file: ./apps/frontend/Dockerfile
           push: true
-          tags: ${{ secrets.REGISTRY_URL }}/snowrunner-merger/frontend:latest
+          tags: ${{ secrets.REGISTRY_URL }}/snowrunner-merger/frontend:${{ github.sha }} , ${{ secrets.REGISTRY_URL }}/snowrunner-merger/frontend:latest
           
   deploy-to-vps:
     needs: build-and-publish
