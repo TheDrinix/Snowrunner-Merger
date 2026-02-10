@@ -47,7 +47,7 @@ services:
       - Authentication__OAuth__discord__RedirectUrl=${DISCORD_REDIRECT_URL}
       - SMTP__Username=${SMTP_USERNAME}
       - SMTP__Password=${SMTP_PASSWORD}
-      - SMTP__Password=${SMTP_HOST}
+      - SMTP__Host=${SMTP_HOST}
       - SMTP__Port=${SMTP_PORT}
       - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USERNAME};Password=${DB_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=Production
