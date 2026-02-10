@@ -6,6 +6,7 @@ export interface GroupData {
     members: GroupMember[];
     owner: GroupMember;
     ownerId: string;
+    inviteCode: string;
 }
 
 export interface Group {
