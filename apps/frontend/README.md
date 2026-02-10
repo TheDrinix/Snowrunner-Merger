@@ -3,10 +3,6 @@
 A Vue.js frontend application for the Snowrunner Merger service. This web application provides a user interface for managing Snowrunner save files, groups, and merging functionality.
 As Snowrunner does not share progress when playing coop, this application allows players to merge their save files with their friends' save files to keep their progress in sync.
 
-## Related Repositories
-
-This is the frontend web app for the Snowrunner Merger project. For the backend api, see [Snowrunner Merger Api](https://github.com/TheDrinix/snowrunner-merger-api).
-
 ## Technologies Used
 
 - Vue 3 (Vite)
@@ -118,19 +114,3 @@ src/
 
 ### Production
 - No environment variables needed as the application assumes the API is under the same domain
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please [create an issue here](https://github.com/TheDrinix/snowrunner-merger-web/issues).

@@ -3,9 +3,6 @@
 A .NET Web API service that handles save file merging functionality for Snowrunner game saves. The API provides endpoints for user authentication, group management, and save file operations.
 As Snowrunner does not share progress when playing coop, this application allows players to merge their save files with their friends' save files to keep their progress in sync.
 
-## Related Repositories
-This is the backend API for the Snowrunner Merger project. For the frontend application, see [Snowrunner Merger Frontend](https://github.com/TheDrinix/snowrunner-merger-web).
-
 ## Technologies Used
 
 - ASP.NET Core Web API (.NET 8.0)
@@ -146,19 +143,3 @@ dotnet ef database update
 ```bash
 dotnet build
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please [create an issue here](https://github.com/TheDrinix/snowrunner-merger-api/issues).
