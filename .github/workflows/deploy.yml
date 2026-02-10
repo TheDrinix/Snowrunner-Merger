@@ -67,19 +67,21 @@ jobs:
             # Create .env file with secrets
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
             echo "REFRESH_SECRET=${{ secrets.REFRESH_SECRET }}" >> .env
-            echo "GOOGLE_CLIENT_SECRETt=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
             echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
             echo "GOOGLE_REDIRECT_URL=${{ vars.GOOGLE_REDIRECT_URL }}" >> .env
             echo "DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}" >> .env
             echo "DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}" >> .env
             echo "DISCORD_REDIRECT_URL=${{ vars.DISCORD_REDIRECT_URL }}" >> .env
-            echo "SMTP_Username=${{ secrets.SMTP_USERNAME }}" >> .env
-            echo "SMTP_Password=${{ secrets.SMTP_PASSWORD }}" >> .env
-            echo "SMTP_Host=${{ secrets.SMTP_HOST }}" >> .env
-            echo "SMTP_Port=${{ secrets.SMTP_PORT }}" >> .env
+            echo "SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}" >> .env
+            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
+            echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
+            echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+            echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> .env
 
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d --remove-orphans
