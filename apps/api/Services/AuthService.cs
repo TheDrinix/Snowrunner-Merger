@@ -258,7 +258,7 @@ public class AuthService : IAuthService
             .OfType<AccountCompletionToken>()
             .FirstOrDefaultAsync(t => t.Token == data.CompletionToken);
         
-        if (completionTokenEntry is null || completionTokenEntry.ExpiresAt < DateTime.UtcNow || completionTokenEntry.Provider != "google")
+        if (completionTokenEntry is null || completionTokenEntry.ExpiresAt < DateTime.UtcNow || completionTokenEntry.Provider != oauthService.ProviderName)
         {
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
