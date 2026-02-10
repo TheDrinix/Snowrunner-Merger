@@ -49,6 +49,7 @@ services:
       - SMTP__Password=${SMTP_PASSWORD}
       - SMTP__Host=${SMTP_HOST}
       - SMTP__Port=${SMTP_PORT}
+      - SMTP__Address=${SMTP_ADDRESS}
       - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USERNAME};Password=${DB_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
