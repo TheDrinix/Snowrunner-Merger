@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
+import {useRoute, useRouter, type RouteLocationRaw} from "vue-router";
 import {computed, ref} from "vue";
 import {useGroupsStore} from "@/stores/groupsStore";
 import GroupSave from "@/components/groups/GroupSave.vue";
@@ -7,6 +7,8 @@ import GroupSaveLoading from "@/components/groups/GroupSaveLoading.vue";
 import {useUserStore} from "@/stores/userStore";
 import GroupLeaveModal from "@/components/groups/GroupLeaveModal.vue";
 import GroupDeleteModal from "@/components/groups/GroupDeleteModal.vue";
+import GroupHeader from "@/components/groups/header/GroupHeader.vue";
+import type { NavigationLink } from "@/types/navigation";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,6 +32,13 @@ if (!group.value) {
   router.push({name: 'groups'});
 }
 
+const links = computed<NavigationLink[]>(() => {
+  return [
+    { name: 'Groups', to: { name: 'groups' } },
+    { name: group.value?.name || '', to: { name: 'group', params: { id: groupId.value } } }
+  ];
+});
+
 const isOwner = computed(() => {
   return group.value?.ownerId === userStore.user?.id;
 });
@@ -43,18 +52,7 @@ groupsStore.fetchGroupSaves(groupId.value);
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div>
-        <div class="text-sm breadcrumbs mb-1 opacity-60">
-          <ul>
-            <li><RouterLink to="/groups">Groups</RouterLink></li>
-            <li>Save Group</li>
-          </ul>
-        </div>
-        <h2 class="text-3xl font-black flex items-center gap-3">
-          <div class="w-3 h-8 bg-secondary rounded-full"></div>
-          {{ loading ? 'Loading...' : group?.name }}
-        </h2>
-      </div>
+      <GroupHeader :groupName="group?.name || ''" :loading="loading" :links />
 
       <div v-if="!loading" class="flex gap-2">
         <template v-if="isOwner">
