@@ -27,13 +27,9 @@ const year = new Date().getFullYear();
 
     <nav>
       <h6 class="footer-title opacity-100 text-primary">Development</h6>
-      <a href="https://github.com/TheDrinix/snowrunner-merger-api" target="_blank" class="link link-hover flex items-center gap-2">
-        <Icon name="code" class="w-4 h-4" />
-        API Source
-      </a>
-      <a href="https://github.com/TheDrinix/snowrunner-merger-web" target="_blank" class="link link-hover flex items-center gap-2">
-        <Icon name="terminal" class="w-4 h-4" />
-        Web Source
+      <a href="https://github.com/TheDrinix/Snowrunner-Merger" target="_blank" class="link link-hover flex items-center gap-1">
+        <Icon name="code" />
+        <span>Source Code</span>
       </a>
     </nav>
 
