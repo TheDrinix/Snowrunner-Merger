@@ -52,7 +52,7 @@ groupsStore.fetchGroupSaves(groupId.value);
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <GroupHeader :groupName="group?.name || ''" :loading="loading" :links />
+      <GroupHeader :title="group?.name || ''" :loading="loading" :links />
 
       <div v-if="!loading" class="flex gap-2">
         <template v-if="isOwner">

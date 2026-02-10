@@ -7,6 +7,7 @@ import JSZip from "jszip";
 import {useHttp} from "@/composables/useHttp";
 import {useToaster} from "@/stores/toastStore";
 import SaveUploadInstructions from "@/components/groups/SaveUploadInstructions.vue";
+import GroupHeader from "@/components/groups/header/GroupHeader.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -118,14 +119,23 @@ const handleSaveUpload = async () => {
 
   loading.value = false;
 }
+
+const links = computed(() => {
+  return [
+    { name: 'Groups', to: { name: 'groups' } },
+    { name: group.value?.name || '', to: { name: 'group', params: { id: groupId.value } } },
+    { name: 'Upload Save', to: { name: 'group-save-upload', params: { id: groupId.value }, query: saveSlot.value !== undefined ? { saveNumber: saveSlot.value.toString() } : {} } }
+  ];
+})
 </script>
 
 <template>
-  <div class="card mx-auto w-11/12 md:w-5/6 lg:w-full bg-base-200 shadow-xl border border-base-300">
-    <div class="card-body">
-      <h2 class="card-title text-2xl font-bold mb-6 border-b border-base-300 pb-2">Upload save</h2>
-      <div class="flex flex-col-reverse lg:flex-row gap-8">
-        <div class="w-full lg:w-3/5">
+  <div class="flex flex-col gap-6 mb-8 px-4">
+    <GroupHeader title="Upload Save" :loading="loading" :links />
+    
+    <div class="flex flex-col lg:flex-row mx-auto w-11/12 md:w-5/6 lg:w-full gap-6">
+      <div class="card lg:w-3/5 bg-base-200 shadow-xl border border-base-300">
+        <div class="card-body">
           <form @submit.prevent="handleSaveUpload">
             <div class="flex flex-col gap-4">
               <div class="alert alert-error" v-if="error">
@@ -166,11 +176,9 @@ const handleSaveUpload = async () => {
             </div>
           </form>
         </div>
-
-        <div class="divider lg:divider-horizontal mx-0"></div>
-        
-        <SaveUploadInstructions />
       </div>
+
+      <SaveUploadInstructions />
     </div>
   </div>
 </template>

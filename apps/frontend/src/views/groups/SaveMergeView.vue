@@ -10,6 +10,7 @@ import type { AxiosRequestConfig } from "axios";
 import SaveMergingInstructions from "@/components/groups/SaveMergingInstructions.vue";
 import SaveMergingOptions from "@/components/groups/SaveMergingOptions.vue";
 import type {SaveMergingConfig} from "@/types/saves";
+import GroupHeader from "@/components/groups/header/GroupHeader.vue";
 
 
 const route = useRoute();
@@ -37,8 +38,6 @@ const save = computed(() => {
 if (!group.value || !save.value) {
   router.push({name: 'groups'});
 }
-
-
 
 const loading = ref(false);
 
@@ -113,8 +112,6 @@ const handleSaveMerge = async () => {
     body.append('mergedMaps[]', map);
   }
   
-  // body.set('mergedMaps', JSON.stringify(formData.value.mergeConfig.maps));
-
   const cfg: AxiosRequestConfig = {
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -163,15 +160,23 @@ onMounted(() => {
     formData.value.mergeConfig.options = parseInt(savedOptions);
   }
 })
+
+const links = computed(() => {
+  return [
+    { name: 'Groups', to: { name: 'groups' } },
+    { name: group.value?.name || '', to: { name: 'group', params: { id: groupId.value } } },
+    { name: `Merge Save ${saveNumber.value + 1}`, to: { name: 'group-save-merge', params: { id: groupId.value }, query: { saveNumber: saveNumber.value } } }
+  ];
+});
 </script>
 
 <template>
-  <div class="card mx-auto w-11/12 md:w-5/6 lg:w-full bg-base-200 shadow-xl border border-base-300">
-    <div class="card-body">
-      <h2 class="card-title text-2xl font-bold mb-6 border-b border-base-300 pb-2">Merge save</h2>
+  <div class="flex flex-col gap-6 mb-8 px-4" v-if="save">
+    <GroupHeader title="Merge Save" :loading="loading" :links />
 
-      <div class="flex flex-col-reverse lg:flex-row gap-8">
-        <div class="w-full lg:w-3/5">
+    <div class="flex flex-col lg:flex-row mx-auto w-11/12 md:w-5/6 lg:w-full gap-6">
+      <div class="card lg:w-3/5 bg-base-200 shadow-xl border border-base-300">
+        <div class="card-body">
           <form @submit.prevent="handleSaveMerge">
             <div class="flex flex-col gap-4">
               <div class="alert alert-error" v-if="error">
@@ -221,12 +226,8 @@ onMounted(() => {
             </div>
           </form>
         </div>
-
-        <div class="divider lg:divider-horizontal mx-0"></div>
-
-        <SaveMergingInstructions />
-
       </div>
+      <SaveMergingInstructions />
     </div>
   </div>
 </template>

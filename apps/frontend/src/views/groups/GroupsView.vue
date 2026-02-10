@@ -57,7 +57,7 @@ const handleJoinGroup = () => {
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:p-0">
 
-    <div class="lg:col-span-7 flex flex-col gap-4">
+    <div class="lg:col-span-6 xl:col-span-7 flex flex-col gap-4">
       <div class="card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-body p-6">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -87,7 +87,7 @@ const handleJoinGroup = () => {
       </div>
     </div>
 
-    <div class="lg:col-span-5">
+    <div class="lg:col-span-6 xl:col-span-5">
       <div class="card bg-base-200 border border-base-300 shadow-sm sticky top-4">
         <div class="card-body p-6">
           <div class="flex justify-between items-center mb-4">
