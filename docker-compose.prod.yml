@@ -5,13 +5,13 @@ services:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -53,6 +53,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
       - "8085:8080"
+    volumes:
+      - save_data:/app/storage
 
   client:
     image: ${REGISTRY_URL}/snowrunner-merger/frontend:latest
@@ -64,5 +66,6 @@ services:
 
 volumes:
   db_data:
+  save_data:
 
     
