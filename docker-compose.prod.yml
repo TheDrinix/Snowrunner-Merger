@@ -25,7 +25,7 @@ services:
         condition: service_healthy
     entrypoint: ["./efbundle"]
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USERNAME};Password=${DB_PASSWORD}
 
 
   api:
@@ -49,7 +49,7 @@ services:
       - SMTP__Password=${SMTP_PASSWORD}
       - SMTP__Password=${SMTP_HOST}
       - SMTP__Port=${SMTP_PORT}
-      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USERNAME};Password=${DB_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
       - "8085:8080"
