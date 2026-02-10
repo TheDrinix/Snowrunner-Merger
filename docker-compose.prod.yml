@@ -37,8 +37,8 @@ services:
       migrator:
         condition: service_completed_successfully
     environment:
-      - AppSettings__JwtSecret=${JWT_SECRET}
-      - AppSettings__RefreshSecret=${REFRESH_SECRET}
+      - Authentication__JwtSecret=${JWT_SECRET}
+      - Authentication__RefreshSecret=${REFRESH_SECRET}
       - Authentication__OAuth__google__ClientSecret=${GOOGLE_CLIENT_SECRET}
       - Authentication__OAuth__google__ClientId=${GOOGLE_CLIENT_ID}
       - Authentication__OAuth__google__RedirectUrl=${GOOGLE_REDIRECT_URL}
