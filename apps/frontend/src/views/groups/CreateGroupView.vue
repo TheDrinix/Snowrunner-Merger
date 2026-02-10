@@ -29,30 +29,26 @@ const ownedGroups = computed(() => groupsStore.getOwnedGroups());
 
 const groupName = ref("");
 
-const handleCreateGroup = () => {
+const handleCreateGroup = async () => {
   sentLoading.value = true;
 
-  http.post("/groups", {name: groupName.value})
-    .then(res => {
-      groupsStore.storeGroup(res.data);
-      groupName.value = "";
+  try {
+    const res = await http.post<IGroup>("/groups", {name: groupName.value});
+    groupName.value = "";
 
-      router.push({name: 'group-manage', params: {id: res.data.id}});
-    })
-    .catch((e: any) => {
-      if (e.response.status === 401) {
-        router.push({name: 'login'});
-      } else if (e.response.status === 409) {
-        err.value = "You already own maximum amount of groups"
-      } else {
-        if (e.response.data.title) {
-          createToast(e.response.data.title, 'error');
-        }
+    router.push({name: 'group', params: {id: res.data.id}});
+  } catch (e: any) {
+    if (e.response.status === 401) {
+      router.push({name: 'login'});
+    } else if (e.response.status === 409) {
+      err.value = "You already own maximum amount of groups"
+    } else {
+      if (e.response.data.title) {
+        createToast(e.response.data.title, 'error');
       }
-    })
-    .finally(() => {
-      sentLoading.value = false;
-    });
+    }
+  }
+  sentLoading.value = false;
 }
 </script>
 
