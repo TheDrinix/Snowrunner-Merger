@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    
+
+  migrator:
+    image: ${REGISTRY_URL}/snowrunner-merger/api:latest
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["./efbundle"]
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+
+
+  api:
+    image: ${REGISTRY_URL}/snowrunner-merger/api:latest
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      - AppSettings__JwtSecret=${JWT_SECRET}
+      - AppSettings__RefreshSecret=${REFRESH_SECRET}
+      - Authentication__OAuth__google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - Authentication__OAuth__google__ClientId=${GOOGLE_CLIENT_ID}
+      - Authentication__OAuth__google__RedirectUrl=${GOOGLE_REDIRECT_URL}
+      - Authentication__OAuth__discord__ClientSecret=${DISCORD_CLIENT_SECRET}
+      - Authentication__OAuth__discord__ClientId=${DISCORD_CLIENT_ID}
+      - Authentication__OAuth__discord__RedirectUrl=${DISCORD_REDIRECT_URL}
+      - SMTP__Username=${SMTP_USERNAME}
+      - SMTP__Password=${SMTP_PASSWORD}
+      - SMTP__Password=${SMTP_HOST}
+      - SMTP__Port=${SMTP_PORT}
+      - ConnectionStrings__DefaultConnection=Host=db;Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "8085:8080"
+
+  client:
+    image: ${REGISTRY_URL}/snowrunner-merger/frontend:latest
+    restart: always
+    ports:
+      - "8086:80"
+    depends_on:
+      - api
+
+volumes:
+  db_data:
+
+    
