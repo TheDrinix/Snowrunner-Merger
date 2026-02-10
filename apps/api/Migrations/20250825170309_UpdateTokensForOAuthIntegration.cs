@@ -66,7 +66,7 @@ namespace SnowrunnerMerger.Api.Migrations
                     ""GoogleId"" AS ""ProviderAccountId"",
                     ""Id"" AS ""UserId""
                 FROM ""Users"" 
-                WHERE ""googleId"" IS NOT NULL
+                WHERE ""GoogleId"" IS NOT NULL
             ");
         }
 
