@@ -1,5 +1,6 @@
 ﻿
 using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Shared.Models;
 
 namespace SnowrunnerMerger.Api.Services.Interfaces;
 

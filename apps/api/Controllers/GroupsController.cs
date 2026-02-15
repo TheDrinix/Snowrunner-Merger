@@ -6,6 +6,7 @@ using SnowrunnerMerger.Api.Models.Saves;
 using SnowrunnerMerger.Api.Models.Saves.Dtos;
 using SnowrunnerMerger.Api.Services;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Shared.DTOs.Groups;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace SnowrunnerMerger.Api.Controllers
@@ -54,14 +55,14 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerResponse(StatusCodes.Status401Unauthorized)]
         [SwaggerResponse(StatusCodes.Status403Forbidden, "User is not a member of this group")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
-        public async Task<ActionResult<ICollection<StoredSaveInfo>>> GetGroupSaves(Guid groupId)
+        public async Task<ActionResult<ICollection<StoredSaveDto>>> GetGroupSaves(Guid groupId)
         {
             var sessionData = userService.GetUserSessionData();
             
             var saves = await groupsService.GetGroupSaves(groupId, sessionData.Id);
             var sortedSaves = saves.OrderByDescending(s => s.UploadedAt);
             
-            return Ok(sortedSaves);
+            return Ok(mapper.Map<IEnumerable<StoredSaveDto>>(sortedSaves));
         }
         
         [HttpPost]
@@ -69,13 +70,13 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Group data", typeof(SaveGroup))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized)]
         [SwaggerResponse(StatusCodes.Status403Forbidden, "User is not authorized to create a group")]
-        public async Task<ActionResult<SaveGroup>> CreateGroup([FromBody] CreateGroupDto data)
+        public async Task<ActionResult<GroupDto>> CreateGroup([FromBody] CreateGroupDto data)
         {
             var sessionData = userService.GetUserSessionData();
             
             var group = await groupsService.CreateGroup(data.Name, sessionData.Id);
             
-            return Ok(group);
+            return Ok(mapper.Map<GroupDto>(group));
         }
         
         [HttpPost("join")]
@@ -110,13 +111,13 @@ namespace SnowrunnerMerger.Api.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Uploaded data are invalid or too large")]
         [SwaggerResponse(StatusCodes.Status401Unauthorized)]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Group not found")]
-        public async Task<IActionResult> UploadSave([FromRoute] Guid groupId, [FromForm] UploadSaveDto data, [FromQuery] int saveSlot = -1)
+        public async Task<ActionResult<StoredSaveDto>> UploadSave([FromRoute] Guid groupId, [FromForm] UploadSaveDto data, [FromQuery] int saveSlot = -1)
         {
             if (data.Save.Length > IStorageService.MaxSaveSize) return BadRequest();
             
             var save = await savesService.StoreSave(groupId, data, saveSlot);
             
-            return Ok(save);
+            return Ok(mapper.Map<StoredSaveDto>(save));
         }
 
         [HttpPost("{groupid:guid}/merge")]

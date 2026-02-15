@@ -9,6 +9,7 @@ using SnowrunnerMerger.Api.Exceptions;
 using SnowrunnerMerger.Api.Models.Saves;
 using SnowrunnerMerger.Api.Models.Saves.Dtos;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Shared.Models;
 
 namespace SnowrunnerMerger.Api.Services;
 

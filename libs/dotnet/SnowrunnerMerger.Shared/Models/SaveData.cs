@@ -1,4 +1,4 @@
-﻿namespace SnowrunnerMerger.Api.Models.Saves;
+﻿namespace SnowrunnerMerger.Shared.Models;
 
 public class SaveData
 {

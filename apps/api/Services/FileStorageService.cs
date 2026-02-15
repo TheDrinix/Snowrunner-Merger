@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using SnowrunnerMerger.Api.Models.Saves;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Shared.Models;
 
 namespace SnowrunnerMerger.Api.Services;
 

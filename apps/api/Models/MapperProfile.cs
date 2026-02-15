@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Saves;
-using SnowrunnerMerger.Api.Models.Saves.Dtos;
+using SnowrunnerMerger.Shared.DTOs.Groups;
 
 namespace SnowrunnerMerger.Api.Models;
 
@@ -11,5 +11,6 @@ public class MapperProfile : Profile
     {
         CreateMap<User, GroupMemberDto>();
         CreateMap<SaveGroup, GroupDto>();
+        CreateMap<StoredSaveInfo, StoredSaveDto>();
     }
 }

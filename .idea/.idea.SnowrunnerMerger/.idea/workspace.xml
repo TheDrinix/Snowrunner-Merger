@@ -14,9 +14,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3365c7ba-69be-48c8-817e-e2c647131b33" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/libs/dotnet/SnowrunnerMerger.Shared/DTOs/Groups/StoredSaveDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/dotnet/SnowrunnerMerger.Shared/Enums/MergeOptions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/dotnet/SnowrunnerMerger.Shared/Models/Map.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SnowrunnerMerger.sln" beforeDir="false" afterPath="$PROJECT_DIR$/SnowrunnerMerger.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/api/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Controllers/GroupsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Controllers/GroupsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/MapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Models/MapperProfile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/Saves/Dtos/CreateGroupDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Models/Saves/Dtos/CreateGroupDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/Saves/Dtos/GroupDto.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/Saves/Dtos/GroupMemberDto.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/Saves/Save.cs" beforeDir="false" afterPath="$PROJECT_DIR$/libs/dotnet/SnowrunnerMerger.Shared/Models/Save.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Models/Saves/SaveData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/libs/dotnet/SnowrunnerMerger.Shared/Models/SaveData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Services/FileStorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Services/FileStorageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Services/Interfaces/IStorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Services/Interfaces/IStorageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/Services/SavesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/Services/SavesService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/SnowrunnerMerger.Api.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,40 +86,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor": "Debug",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe",
-    "XThreadsFramesViewSplitterKey": "0.67828107",
-    "git-widget-placeholder": "feature/desktop-app",
-    "ignore.virus.scanning.warn.message": "true",
-    "javascript.preferred.runtime.type.id": "node",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "npm.SnowrunnerMerger.Frontend: run.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "ts.external.directory.path": "F:\\Dev\\Shenanigens\\SnowrunnerMergerMonorepo\\apps\\frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.67828107&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/desktop-app&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;npm.SnowrunnerMerger.Frontend: run.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;F:\\Dev\\Shenanigens\\SnowrunnerMergerMonorepo\\apps\\frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql&quot;
     ],
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express">
     <configuration name="SnowrunnerMerger.Api: docker.drinix.xyz" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="docker.drinix.xyz.pubxml" pubxml_path="$PROJECT_DIR$/apps/api/Properties/PublishProfiles/docker.drinix.xyz.pubxml" user_name="drinix" uuid_high="2341269316303471226" uuid_low="-7483953391123389503" />
@@ -252,15 +265,8 @@
       <workItem from="1770737310144" duration="9832000" />
       <workItem from="1770759585954" duration="19000" />
       <workItem from="1770835629584" duration="16000" />
-      <workItem from="1771187945209" duration="344000" />
-    </task>
-    <task id="LOCAL-00009" summary="[Api] Add Discord OAuth service implementation and integrate with OAuth service factory">
-      <option name="closed" value="true" />
-      <created>1756242227740</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1756242227740</updated>
+      <workItem from="1771187945209" duration="1810000" />
+      <workItem from="1771195847616" duration="855000" />
     </task>
     <task id="LOCAL-00010" summary="[Api] Update environment variable/appsettings examples">
       <option name="closed" value="true" />
@@ -646,7 +652,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770746613375</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Create desktop project">
+      <option name="closed" value="true" />
+      <created>1771188360203</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1771188360203</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -667,7 +681,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="[Frontend] Rework upload and merging forms with their instructions" />
     <MESSAGE value="[Frontend] Create a view for post merge instructions" />
     <MESSAGE value="[Frontend] Reworked the designs of group and group saves views" />
     <MESSAGE value="[Frontend] Reworked the style of header" />
@@ -692,7 +705,8 @@
     <MESSAGE value="[Api] Reworked merging logic to use merging filters" />
     <MESSAGE value="[Api] Remove SPA proxy from the api" />
     <MESSAGE value="Fix case sensitivity in SQL query for GoogleId in UpdateTokensForOAuthIntegration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix case sensitivity in SQL query for GoogleId in UpdateTokensForOAuthIntegration" />
+    <MESSAGE value="Create desktop project" />
+    <option name="LAST_COMMIT_MESSAGE" value="Create desktop project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

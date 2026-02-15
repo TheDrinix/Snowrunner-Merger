@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SnowrunnerMerger.Api.Models.Auth.Dtos;
+namespace SnowrunnerMerger.Api.Models.Saves.Dtos;
 
 public record CreateGroupDto
 {

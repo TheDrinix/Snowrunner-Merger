@@ -6,6 +6,8 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SnowrunnerMerger.Frontend",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowrunnerMerger.Desktop", "apps\desktop\SnowrunnerMerger.Desktop.csproj", "{9F48133B-8A59-4B4E-B8F0-6ADF66CC555D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowrunnerMerger.Shared", "libs\dotnet\SnowrunnerMerger.Shared\SnowrunnerMerger.Shared.csproj", "{2BFA3354-E302-4103-9A57-1F6F309E4FA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{9F48133B-8A59-4B4E-B8F0-6ADF66CC555D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F48133B-8A59-4B4E-B8F0-6ADF66CC555D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F48133B-8A59-4B4E-B8F0-6ADF66CC555D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BFA3354-E302-4103-9A57-1F6F309E4FA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BFA3354-E302-4103-9A57-1F6F309E4FA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BFA3354-E302-4103-9A57-1F6F309E4FA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BFA3354-E302-4103-9A57-1F6F309E4FA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
