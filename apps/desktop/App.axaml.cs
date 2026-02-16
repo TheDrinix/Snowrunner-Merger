@@ -1,9 +1,15 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using SnowrunnerMerger.Desktop.Data;
+using SnowrunnerMerger.Desktop.Factories;
+using SnowrunnerMerger.Desktop.Services;
+using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
 using SnowrunnerMerger.Desktop.Views;
 
@@ -18,6 +24,26 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddSingleton<MainWindowViewModel>();
+        serviceCollection.AddTransient<HomeViewModel>();
+        
+        serviceCollection.AddSingleton<Func<PageName, PageViewModel>>(provider => name =>
+        {
+            return name switch
+            {
+                PageName.Home => provider.GetRequiredService<HomeViewModel>(),
+                PageName.Unknown => throw new ArgumentOutOfRangeException(nameof(name), name, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
+            };
+        });
+
+        serviceCollection.AddSingleton<PageFactory>();
+        serviceCollection.AddSingleton<IRouterService, RouterService>();
+        
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
@@ -25,7 +51,7 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
             };
         }
 

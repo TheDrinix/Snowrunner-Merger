@@ -1,6 +1,25 @@
-﻿namespace SnowrunnerMerger.Desktop.ViewModels;
+﻿using System.ComponentModel;
+using SnowrunnerMerger.Desktop.Services.Interfaces;
+
+namespace SnowrunnerMerger.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public string Greeting { get; } = "Welcome to Avalonia!";
+    private readonly IRouterService _routerService;
+    
+    public MainWindowViewModel(IRouterService routerService)
+    {
+        _routerService = routerService;
+        _routerService.PropertyChanged += OnRouterPropertyChanged;
+    }
+    
+    public PageViewModel CurrentView => _routerService.CurrentView;
+
+    private void OnRouterPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(_routerService.CurrentView))
+        {
+            OnPropertyChanged(nameof(CurrentView));
+        }
+    }
 }
