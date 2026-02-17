@@ -59,22 +59,6 @@ namespace SnowrunnerMerger.Api.Controllers
 
             return Created();
         }
-
-        [HttpGet("refresh")]
-        [SwaggerOperation(Summary = "Gets long-lived refresh token", Description = "Gets long-lived refresh token for a user to use in frontend (desktop app)")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Refresh token retrieved successfully", typeof(RefreshTokenDto))]
-        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
-        [Authorize]
-        public async Task<ActionResult<RefreshTokenDto>> GetLongLivedRefreshToken()
-        {
-            var userData = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            if (userData is null) return Unauthorized();
-            
-            var data = await authService.GetLongLivedRefreshToken(Guid.Parse(userData));
-            
-            return Ok(data);
-        }
         
         [HttpPost("refresh")]
         [SwaggerOperation(Summary = "Refreshes JWT token", Description = "Refreshes JWT token using refresh token")]
