@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {computed, onBeforeMount} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {useHttp} from "@/composables/useHttp";
-import type {GoogleLoginRes, OAuthLoginRes} from "@/types/auth";
-import {useUserStore} from "@/stores/userStore";
+import { computed, onBeforeMount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useHttp } from "@/composables/useHttp";
+import type { GoogleLoginRes, OAuthLoginRes } from "@/types/auth";
+import { useUserStore } from "@/stores/userStore";
+import { loginRedirect } from "@/helpers/loginRedirect";
 
 const route = useRoute();
 const router = useRouter();
@@ -18,65 +19,75 @@ onBeforeMount(async () => {
   const { code, state } = route.query;
 
   if (!code || !state) {
-    router.push({ name: 'login' });
+    router.push({ name: "login" });
   }
 
   // Exchange the OAuth provider code for an access token
   try {
-    let redirectUrl = new URL(`/auth/${provider.value}/callback`, window.location.origin);
+    let redirectUrl = new URL(
+      `/auth/${provider.value}/callback`,
+      window.location.origin,
+    );
 
-    const res = await http.get<OAuthLoginRes>(`/auth/${provider.value}/callback`, {
-      params: {
-        code,
-        state,
-        callbackUrl: redirectUrl.toString(),
+    const res = await http.get<OAuthLoginRes>(
+      `/auth/${provider.value}/callback`,
+      {
+        params: {
+          code,
+          state,
+          callbackUrl: redirectUrl.toString(),
+        },
+        withCredentials: true,
       },
-      withCredentials: true
-    });
+    );
 
     // TokenType = ACCESS_TOKEN
     if (res.data.tokenType === 1) {
       userStore.signIn(res.data.data);
 
-      await router.push({ name: 'groups' });
+      loginRedirect(router);
     }
     // TokenType = LINKING_TOKEN
     else if (res.data.tokenType === 2) {
       const linkingToken = res.data.data.token;
       const email = res.data.data.user.email;
 
-      router.push({ 
-        name: 'link-oauth-account', 
+      router.push({
+        name: "link-oauth-account",
         query: {
           token: linkingToken,
           email: email,
         },
         params: {
           provider: provider.value,
-        }
+        },
       });
-    }  
+    }
     // TokenType = COMPLETION_TOKEN
     else if (res.data.tokenType === 4) {
       const completionToken = res.data.data.token;
       const email = res.data.data.email;
 
-      router.push({ 
-        name: 'complete-account', 
+      router.push({
+        name: "complete-account",
         query: {
           token: completionToken,
           email: email,
         },
         params: {
           provider: provider.value,
-        }
+        },
       });
     }
-
-
   } catch (e) {
-    console.error('Failed to exchange Google code for access token');
-    router.push({ name: 'login', query: { error: 'There was an error trying to sign you in. Please try again later or try signing in using you email and password' } });
+    console.error("Failed to exchange Google code for access token");
+    router.push({
+      name: "login",
+      query: {
+        error:
+          "There was an error trying to sign you in. Please try again later or try signing in using you email and password",
+      },
+    });
   }
 });
 </script>
@@ -85,21 +96,25 @@ onBeforeMount(async () => {
   <div class="flex items-center justify-center min-h-[60vh] px-6">
     <div class="text-center">
       <div class="relative flex items-center justify-center mb-8">
-        <span class="loading loading-ring w-32 h-32 text-primary opacity-20"></span>
-        <span class="loading loading-ring w-24 h-24 text-primary absolute opacity-40"></span>
-        <span class="loading loading-ring w-16 h-16 text-primary absolute"></span>
+        <span
+          class="loading loading-ring w-32 h-32 text-primary opacity-20"
+        ></span>
+        <span
+          class="loading loading-ring w-24 h-24 text-primary absolute opacity-40"
+        ></span>
+        <span
+          class="loading loading-ring w-16 h-16 text-primary absolute"
+        ></span>
       </div>
 
       <h2 class="text-2xl font-black uppercase tracking-widest animate-pulse">
         Authenticating<span class="text-primary">...</span>
       </h2>
       <p class="text-xs font-mono opacity-50 mt-2 uppercase tracking-[0.2em]">
-        Securing Handshake with {{ provider || 'Service' }}
+        Securing Handshake with {{ provider || "Service" }}
       </p>
     </div>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

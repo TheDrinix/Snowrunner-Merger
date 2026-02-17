@@ -14,19 +14,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3365c7ba-69be-48c8-817e-e2c647131b33" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Data/PageName.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Factories/PageFactory.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Services/Interfaces/IRouterService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Services/RouterService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/ViewModels/HomeViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/ViewModels/PageViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Views/HomeView.axaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/desktop/Views/HomeView.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SnowrunnerMerger/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/desktop/App.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/App.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/desktop/SnowrunnerMerger.Desktop.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/SnowrunnerMerger.Desktop.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/desktop/ViewModels/MainWindowViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/ViewModels/MainWindowViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/desktop/Views/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/Views/MainWindow.axaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +55,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/apps/api/Models/Auth/AuthCode.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/apps/api/Models/Auth/Dtos/TokenRequestDto.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/apps/api/Models/Auth/Dtos/TokensDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/apps/api/Models/Saves/Dtos/GroupJoinDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/apps/desktop/Data/PageName.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/apps/desktop/Factories/PageFactory.cs" root0="FORCE_HIGHLIGHTING" />
@@ -90,40 +82,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor": "Run",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe",
-    "XThreadsFramesViewSplitterKey": "0.67828107",
-    "git-widget-placeholder": "feature/desktop-app",
-    "ignore.virus.scanning.warn.message": "true",
-    "javascript.preferred.runtime.type.id": "node",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "npm.SnowrunnerMerger.Frontend: run.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "ts.external.directory.path": "F:\\Dev\\Shenanigens\\SnowrunnerMergerMonorepo\\apps\\frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.SnowrunnerMerger.Api: IIS Express.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Project.SnowrunnerMerger.Desktop.executor&quot;: &quot;Run&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\jmsjm\\AppData\\Roaming\\JetBrains\\Rider2024.3\\plugins\\Shell Script\\shellcheck.exe&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.67828107&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/desktop-app&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;npm.SnowrunnerMerger.Frontend: run.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;F:\\Dev\\Shenanigens\\SnowrunnerMergerMonorepo\\apps\\frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql&quot;
     ],
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.SnowrunnerMerger.Desktop">
     <configuration name="SnowrunnerMerger.Api: docker.drinix.xyz" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="docker.drinix.xyz.pubxml" pubxml_path="$PROJECT_DIR$/apps/api/Properties/PublishProfiles/docker.drinix.xyz.pubxml" user_name="drinix" uuid_high="2341269316303471226" uuid_low="-7483953391123389503" />
@@ -280,31 +273,11 @@
       <workItem from="1770835629584" duration="16000" />
       <workItem from="1771187945209" duration="1810000" />
       <workItem from="1771195847616" duration="927000" />
-      <workItem from="1771256458283" duration="2909000" />
-    </task>
-    <task id="LOCAL-00012" summary="[Api] Refactor JWT Bearer authentication events to simplify token validation logic">
-      <option name="closed" value="true" />
-      <created>1756288259523</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1756288259523</updated>
-    </task>
-    <task id="LOCAL-00013" summary="[Api] Refactor JWT Bearer authentication events to simplify token validation logic">
-      <option name="closed" value="true" />
-      <created>1756288271993</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1756288271993</updated>
-    </task>
-    <task id="LOCAL-00014" summary="[Api] Refactor JWT generation to simplify token creation and remove unnecessary data">
-      <option name="closed" value="true" />
-      <created>1756288424724</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1756288424724</updated>
+      <workItem from="1771256458283" duration="8073000" />
+      <workItem from="1771275178011" duration="238000" />
+      <workItem from="1771275667848" duration="309000" />
+      <workItem from="1771338746921" duration="3284000" />
+      <workItem from="1771345668845" duration="1987000" />
     </task>
     <task id="LOCAL-00015" summary="[Api] Add endpoint to retrieve available OAuth providers">
       <option name="closed" value="true" />
@@ -674,7 +647,31 @@
       <option name="project" value="LOCAL" />
       <updated>1771196774299</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="[Desktop] Setup dependency injection and view routing">
+      <option name="closed" value="true" />
+      <created>1771260554376</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1771260554376</updated>
+    </task>
+    <task id="LOCAL-00062" summary="[Api] Implement OAuth authorization code flow with token exchange">
+      <option name="closed" value="true" />
+      <created>1771346684535</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1771346684535</updated>
+    </task>
+    <task id="LOCAL-00063" summary="[Api] Remove unused refresh token endpoint from AuthController">
+      <option name="closed" value="true" />
+      <created>1771346810123</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1771346810123</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -695,9 +692,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="[Frontend] Reworked the designs of group and group saves views" />
-    <MESSAGE value="[Frontend] Reworked the style of header" />
-    <MESSAGE value="[Frontend] Update home view and footer design" />
     <MESSAGE value="[Frontend] Update account view and group creation view designs" />
     <MESSAGE value="[Api] Fix issue with loading session in logout" />
     <MESSAGE value="[Frontend] Update the basic auth views designs" />
@@ -720,7 +714,10 @@
     <MESSAGE value="Fix case sensitivity in SQL query for GoogleId in UpdateTokensForOAuthIntegration" />
     <MESSAGE value="Create desktop project" />
     <MESSAGE value="Moved output dtos to a shared library for future utilization in desktop app" />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved output dtos to a shared library for future utilization in desktop app" />
+    <MESSAGE value="[Desktop] Setup dependency injection and view routing" />
+    <MESSAGE value="[Api] Implement OAuth authorization code flow with token exchange" />
+    <MESSAGE value="[Api] Remove unused refresh token endpoint from AuthController" />
+    <option name="LAST_COMMIT_MESSAGE" value="[Api] Remove unused refresh token endpoint from AuthController" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
