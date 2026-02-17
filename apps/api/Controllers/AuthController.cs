@@ -381,8 +381,8 @@ namespace SnowrunnerMerger.Api.Controllers
             var authCode = authService.GenerateAuthCode(userData.Id, codeChallenge);
             
             var destUrl = $"{redirectUri}?code={authCode}";
-            
-            return Redirect(destUrl);
+
+            return Ok(destUrl);
         }
 
         [HttpPost("oauth/token")]
