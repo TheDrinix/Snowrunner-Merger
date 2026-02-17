@@ -1,17 +1,12 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
+﻿using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using NuGet.Protocol;
 using SnowrunnerMerger.Api.Data;
 using SnowrunnerMerger.Api.Exceptions;
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
-using SnowrunnerMerger.Api.Models.Auth.Google;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
 using SnowrunnerMerger.Api.Services.Interfaces;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -552,6 +547,86 @@ public class AuthService : IAuthService
         await _dbContext.SaveChangesAsync();
         
         return user;
+    }
+
+    public string GenerateAuthCode(Guid userId, string codeChallenge)
+    {
+        var rng = RandomNumberGenerator.Create();
+
+        for (var retry = 0; retry < 5; retry++)
+        {
+            try
+            {
+                var authCodeBytes = new byte[32];
+                rng.GetBytes(authCodeBytes);
+                var authCode = Convert.ToBase64String(authCodeBytes);
+
+                var hash = SHA256.HashData(Encoding.UTF8.GetBytes(authCode));
+                var hashedAuthCode = Convert.ToBase64String(hash);
+
+                var authCodeEntry = new AuthCode
+                {
+                    Code = hashedAuthCode,
+                    UserId = userId,
+                    CodeChallenge = codeChallenge,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(10)
+                };
+
+                _dbContext.AuthCodes.Add(authCodeEntry);
+                _dbContext.SaveChanges();
+
+                return authCode;
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is Npgsql.PostgresException { SqlState: "23505" })
+                {
+                    _logger.LogError($"Auth code collision detected, retrying... Attempt {retry + 1}");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+        
+        _logger.LogError("Failed to generate unique auth code after 5 attempts");
+        throw new Exception("Failed to generate unique auth code, please try again");
+    }
+
+    public async Task<TokensDto> ExchangeAuthCode(string code, string codeVerifier)
+    {
+        var hashedCode = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(code)));
+        var authCodeEntry = _dbContext
+            .AuthCodes
+            .Include(c => c.User)
+            .FirstOrDefault(c => c.Code == hashedCode);
+        
+        if (authCodeEntry is null || authCodeEntry.ExpiresAt < DateTime.UtcNow)
+        {
+            throw new HttpResponseException(HttpStatusCode.Unauthorized, "Invalid or expired authorization code");
+        }
+        
+        var codeVerifierHash = Convert.ToBase64String(
+            SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier)));
+
+        if (codeVerifierHash != authCodeEntry.CodeChallenge)
+        {
+            throw new HttpResponseException(HttpStatusCode.Unauthorized, "Invalid code verifier");
+        }
+        
+        _dbContext.AuthCodes.Remove(authCodeEntry);
+        await _dbContext.SaveChangesAsync();
+
+        var refreshTokenData = await _tokenService.GenerateRefreshToken(authCodeEntry.User, true, false);
+        var jwt = _tokenService.GenerateJwt(authCodeEntry.User.Id);
+        
+        return new TokensDto(
+            jwt, 
+            refreshTokenData.Token, 
+            ITokenService.AccessTokenLifetime, 
+            ITokenService.RefreshTokenLifetime
+        );
     }
 
     /// <summary>

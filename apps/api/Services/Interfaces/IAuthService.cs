@@ -1,6 +1,5 @@
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
-using SnowrunnerMerger.Api.Models.Auth.Google;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
 
 namespace SnowrunnerMerger.Api.Services.Interfaces;
@@ -89,5 +88,20 @@ public interface IAuthService
     /// <param name="data">A <see cref="UpdatePasswordDto"/> object containing the user's current password and new password.</param>
     /// <returns>The updated user.</returns>
     Task<User> UpdatePassword(User user, UpdatePasswordDto data);
+    
+    /// <summary>
+    ///     Generates an authorization code for the user with the provided ID and code challenge.
+    /// </summary>
+    /// <param name="userId">The ID of the user to generate the authorization code for.</param>
+    /// <param name="codeChallenge"></param>
+    /// <returns></returns>
+    string GenerateAuthCode(Guid userId, string codeChallenge);
+    /// <summary>
+    ///     Exchanges the provided authorization code for an access token and refresh token.
+    /// </summary>
+    /// <param name="code">The authorization code to retrieve the data for.</param>
+    /// <param name="codeVerifier">The code verifier to validate against the code challenge stored with the authorization code. This is used to ensure that the request is coming from the same client that initiated the authorization request.</param>
+    /// <returns>A <see cref="TokensDto"/> object containing the access token, refresh token, and expiration time on success.</returns>
+    Task<TokensDto> ExchangeAuthCode(string code, string codeVerifier);
 }
 

@@ -16,6 +16,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
     public DbSet<SaveGroup> SaveGroups { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
     public DbSet<Map> Maps { get; set; }
+    public DbSet<AuthCode> AuthCodes { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -147,5 +148,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : DbContext(opt)
             .Entity<StoredSaveInfo>()
             .HasMany(s => s.DiscoveredMaps)
             .WithMany();
+        
+        modelBuilder
+            .Entity<AuthCode>()
+            .HasKey(c => c.Code);
     }
 }

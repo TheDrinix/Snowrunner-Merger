@@ -7,7 +7,6 @@ using SnowrunnerMerger.Api.Services.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using SnowrunnerMerger.Api.Models.Auth;
-using SnowrunnerMerger.Api.Models.Auth.Google;
 using SnowrunnerMerger.Api.Models.Auth.OAuth;
 
 namespace SnowrunnerMerger.Api.Controllers
@@ -377,6 +376,47 @@ namespace SnowrunnerMerger.Api.Controllers
             var providers = oauthServiceFactory.ProviderNames;
             
             return Ok(providers);
+        }
+
+        [HttpGet("oauth/authorize")]
+        [Authorize]
+        public IActionResult Authorize(string responseType, string clientId, string redirectUri, string codeChallenge)
+        {
+            if (clientId != "smd")
+            {
+                return BadRequest("Invalid client id");
+            }
+
+            if (responseType != "code")
+            {
+                return BadRequest("Invalid response type");
+            }
+
+            var userData = userService.GetUserSessionData();
+            
+            var authCode = authService.GenerateAuthCode(userData.Id, codeChallenge);
+            
+            var destUrl = $"{redirectUri}?code={authCode}";
+            
+            return Redirect(destUrl);
+        }
+
+        [HttpPost("oauth/token")]
+        public async Task<IActionResult> Token([FromBody] TokenRequestDto data)
+        {
+            if (data.ClientId != "smd")
+            {
+                return BadRequest("Invalid client id");
+            }
+
+            if (data.GrantType != "authorization_code")
+            {
+                return BadRequest("Invalid grant type");
+            }
+
+            var tokens = await authService.ExchangeAuthCode(data.Code, data.CodeVerifier);
+            
+            return Ok(tokens);
         }
     }
 }
