@@ -3,5 +3,6 @@
 public enum PageName
 {
     Unknown,
-    Home
+    Home,
+    Login
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SnowrunnerMerger.Desktop.Data;
 using SnowrunnerMerger.Desktop.Factories;
 using SnowrunnerMerger.Desktop.Services;
+using SnowrunnerMerger.Desktop.Services.Auth;
 using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
 using SnowrunnerMerger.Desktop.Views;
@@ -28,12 +29,14 @@ public partial class App : Application
 
         serviceCollection.AddSingleton<MainWindowViewModel>();
         serviceCollection.AddTransient<HomeViewModel>();
+        serviceCollection.AddTransient<LoginViewModel>();
         
         serviceCollection.AddSingleton<Func<PageName, PageViewModel>>(provider => name =>
         {
             return name switch
             {
                 PageName.Home => provider.GetRequiredService<HomeViewModel>(),
+                PageName.Login => provider.GetRequiredService<LoginViewModel>(),
                 PageName.Unknown => throw new ArgumentOutOfRangeException(nameof(name), name, null),
                 _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
             };
@@ -41,6 +44,12 @@ public partial class App : Application
 
         serviceCollection.AddSingleton<PageFactory>();
         serviceCollection.AddSingleton<IRouterService, RouterService>();
+        serviceCollection.AddSingleton<IAuthService, AuthService>();
+
+        serviceCollection.AddHttpClient("api", client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:44303/api");
+        }).AddHttpMessageHandler<AuthHeaderHandler>();
         
         var serviceProvider = serviceCollection.BuildServiceProvider();
         
