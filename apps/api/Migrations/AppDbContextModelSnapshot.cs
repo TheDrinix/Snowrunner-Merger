@@ -52,6 +52,28 @@ namespace SnowrunnerMerger.Api.Migrations
                     b.ToTable("SaveGroupUser");
                 });
 
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.AuthCode", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CodeChallenge")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuthCodes");
+                });
+
             modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.OAuth.OAuthConnection", b =>
                 {
                     b.Property<string>("Provider")
@@ -459,6 +481,17 @@ namespace SnowrunnerMerger.Api.Migrations
                         .HasForeignKey("MembersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.AuthCode", b =>
+                {
+                    b.HasOne("SnowrunnerMerger.Api.Models.Auth.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SnowrunnerMerger.Api.Models.Auth.OAuth.OAuthConnection", b =>
