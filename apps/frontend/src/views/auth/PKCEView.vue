@@ -10,17 +10,19 @@ const http = useHttp();
 const toaster = useToaster();
 
 onBeforeMount(async () => {
-  const { challenge_code, redirect_uri, client_id } = route.query;
-  if (!challenge_code) {
-    router.push({ name: "home" });
+  const { code_challenge, redirect_uri, client_id, scope, state } = route.query;
+  if (!code_challenge) {
+    // router.push({ name: "home" });
   }
 
   try {
-    const res = await http.get("oauth/authorize", {
+    const res = await http.get("auth/oauth/authorize", {
       params: {
-        codeChallenge: challenge_code,
+        codeChallenge: code_challenge,
         redirectUri: redirect_uri,
         clientId: client_id,
+        scope,
+        state,
         responseType: "code",
       },
       withCredentials: true,
@@ -34,7 +36,7 @@ onBeforeMount(async () => {
       "An error occurred during OAuth authorization. Please try again.",
       "error",
     );
-    router.push({ name: "home" });
+    // router.push({ name: "home" });
   }
 });
 </script>

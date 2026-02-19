@@ -19,7 +19,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/oauth/token",
+      path: "/oauth/authorize",
       name: "pkce-token",
       component: () => import("../views/auth/PKCEView.vue"),
       meta: {
