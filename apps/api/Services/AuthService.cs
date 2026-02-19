@@ -611,7 +611,7 @@ public class AuthService : IAuthService
         var codeVerifierHash = Convert.ToBase64String(
             SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier)));
 
-        if (codeVerifierHash != authCodeEntry.CodeChallenge)
+        if (codeVerifierHash.Equals(authCodeEntry.CodeChallenge, StringComparison.InvariantCultureIgnoreCase))
         {
             throw new HttpResponseException(HttpStatusCode.Unauthorized, "Invalid code verifier");
         }
