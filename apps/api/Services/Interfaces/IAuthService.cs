@@ -1,6 +1,7 @@
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Api.Services.Interfaces;
 

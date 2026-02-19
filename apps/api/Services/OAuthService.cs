@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using SnowrunnerMerger.Api.Data;
 using SnowrunnerMerger.Api.Exceptions;
 using SnowrunnerMerger.Api.Models.Auth;
-using SnowrunnerMerger.Api.Models.Auth.Dtos;
 using SnowrunnerMerger.Api.Models.Auth.OAuth;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Api.Services;
 
@@ -79,7 +79,7 @@ public abstract class OAuthService(
         {
             AccessToken = jwt,
             ExpiresIn = ITokenService.AccessTokenLifetime,
-            User = existingUser
+            User = existingUser.ToDto()
         });
     }
 
@@ -131,7 +131,7 @@ public abstract class OAuthService(
         {
             AccessToken = jwt,
             ExpiresIn = ITokenService.AccessTokenLifetime,
-            User = user
+            User = user.ToDto()
         };
     }
     

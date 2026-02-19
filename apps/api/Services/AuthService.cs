@@ -9,6 +9,7 @@ using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
 using SnowrunnerMerger.Api.Models.Auth.Tokens;
 using SnowrunnerMerger.Api.Services.Interfaces;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace SnowrunnerMerger.Api.Services;
@@ -153,7 +154,7 @@ public class AuthService : IAuthService
         {
             AccessToken = token,
             ExpiresIn = ITokenService.AccessTokenLifetime,
-            User = user
+            User = user.ToDto()
         };
     }
     
@@ -198,7 +199,7 @@ public class AuthService : IAuthService
         {
             AccessToken = token,
             ExpiresIn = ITokenService.AccessTokenLifetime,
-            User = session.User,
+            User = session.User.ToDto(),
             RefreshToken = isCookieToken ? null : refreshTokenData.Token
         };
     }
@@ -302,7 +303,7 @@ public class AuthService : IAuthService
         {
             AccessToken = token,
             ExpiresIn = ITokenService.AccessTokenLifetime,
-            User = user
+            User = user.ToDto()
         };
     }
 
@@ -624,8 +625,7 @@ public class AuthService : IAuthService
         return new TokensDto(
             jwt, 
             refreshTokenData.Token, 
-            ITokenService.AccessTokenLifetime, 
-            ITokenService.RefreshTokenLifetime
+            ITokenService.AccessTokenLifetime
         );
     }
 

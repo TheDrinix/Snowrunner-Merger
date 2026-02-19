@@ -1,5 +1,5 @@
-﻿using SnowrunnerMerger.Api.Models.Auth.Dtos;
-using SnowrunnerMerger.Api.Models.Auth.Tokens;
+﻿using SnowrunnerMerger.Api.Models.Auth.Tokens;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Api.Models.Auth.OAuth;
 

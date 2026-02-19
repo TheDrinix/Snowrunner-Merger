@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using SnowrunnerMerger.Api.Models.Auth;
 using SnowrunnerMerger.Api.Models.Auth.OAuth;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Api.Controllers
 {
@@ -364,7 +365,7 @@ namespace SnowrunnerMerger.Api.Controllers
 
         [HttpGet("oauth/authorize")]
         [Authorize]
-        public IActionResult Authorize(string responseType, string clientId, string redirectUri, string codeChallenge)
+        public IActionResult Authorize(string responseType, string clientId, string redirectUri, string codeChallenge, string state, string scope)
         {
             if (clientId != "smd")
             {
@@ -380,7 +381,7 @@ namespace SnowrunnerMerger.Api.Controllers
             
             var authCode = authService.GenerateAuthCode(userData.Id, codeChallenge);
             
-            var destUrl = $"{redirectUri}?code={authCode}";
+            var destUrl = $"{redirectUri}?code={WebUtility.UrlEncode(authCode)}&state={WebUtility.UrlEncode(state)}&scope={WebUtility.UrlEncode(scope)}";
 
             return Ok(destUrl);
         }

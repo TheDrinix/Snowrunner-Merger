@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SnowrunnerMerger.Api.Models.Saves;
+using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Api.Models.Auth;
 
@@ -28,4 +29,9 @@ public class User
     public List<SaveGroup> JoinedGroups { get; set; }
     [JsonIgnore]
     public List<SaveGroup> OwnedGroups { get; set; }
+
+    public UserDto ToDto()
+    {
+        return new UserDto(Id, Username, Email, CreatedAt);
+    }
 }
