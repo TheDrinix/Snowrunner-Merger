@@ -21,25 +21,44 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
     private AccessTokenData? _accessTokenData = null;
     
 
-    public async Task<bool> IsAuthenticatedAsync() => string.IsNullOrEmpty(await GetAccessTokenAsync());
+    public async Task<bool> IsAuthenticatedAsync() => !string.IsNullOrEmpty(await GetAccessTokenAsync());
 
     public async Task<bool> LoginAsync()
     {
         var state = GenerateRandomKey();
         var pkce = new Pkce(GenerateRandomKey());
 
-        var uriBuilder = new UriBuilder("http://localhost:5173/oauth/authorize");
+        var port = 7890;
+        // Check if the port is available
+        while (true)
+        {
+            try
+            {
+                using var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, port);
+                listener.Start();
+                break; // Port is available
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                port++; // Try the next port
+            }
+        }
+        
+        var redirectUri = $"http://127.0.0.1:{port}";
 
-        // TODO: Use configured values instead of hardcoded ones
-        uriBuilder.Query = "response_type=code" +
-                           "&client_id=smd" +
-                           "&redirect_uri=http://127.0.0.1:7890" +
-                           "&scope=openid profile offline_access" +
-                           $"&state={state}" +
-                           $"&code_challenge={pkce.CodeChallenge}";
+        var uriBuilder = new UriBuilder("http://localhost:5173/oauth/authorize")
+        {
+            // TODO: Use configured values instead of hardcoded ones
+            Query = "response_type=code" +
+                    "&client_id=smd" +
+                    $"&redirect_uri={redirectUri}" +
+                    "&scope=openid profile offline_access" +
+                    $"&state={state}" +
+                    $"&code_challenge={pkce.CodeChallenge}"
+        };
 
 
-        var browserOptions = new BrowserOptions(uriBuilder.ToString(), "http://127.0.0.1:7890/");
+        var browserOptions = new BrowserOptions(uriBuilder.ToString(), redirectUri);
         var browser = new SystemBrowser();
 
         var browserResult = await browser.InvokeAsync(browserOptions);
@@ -74,12 +93,14 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
         
         return true;
     }
+    
+    public string? GetAccessToken() => GetAccessTokenAsync().GetAwaiter().GetResult();
 
     public async Task<string?> GetAccessTokenAsync()
     {
         if (_accessTokenData is null || _accessTokenData.ExpiresAt <= DateTime.Now)
         {
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = httpClientFactory.CreateClient("api");
             
             var provider = DataProtectionProvider.Create(
                 new DirectoryInfo(Path.Combine(AppDataPath, "keys"))
@@ -100,16 +121,18 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
             
             var content = JsonContent.Create(data);
 
-            var response = await httpClient.PostAsync("/auth/refresh", content);
+            var response = await httpClient.PostAsync("auth/refresh", content);
             
             if (!response.IsSuccessStatusCode)
             {
+                tokenStore.Clear();
                 return null;
             }
             
             var tokens = await response.Content.ReadFromJsonAsync<RefreshResponseDto>();
             if (tokens == null)
             {
+                tokenStore.Clear();
                 return null;
             }
             
@@ -162,9 +185,9 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
             pkce.CodeVerifier
         );
         
-        var httpClient = httpClientFactory.CreateClient();
+        var httpClient = httpClientFactory.CreateClient("api");
         
-        var response = await httpClient.PostAsJsonAsync("https://localhost:44303/api/auth/oauth/token", tokenRequest);
+        var response = await httpClient.PostAsJsonAsync("auth/oauth/token", tokenRequest);
         
         if (!response.IsSuccessStatusCode)
         {

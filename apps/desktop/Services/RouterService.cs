@@ -7,14 +7,14 @@ using SnowrunnerMerger.Desktop.ViewModels;
 
 namespace SnowrunnerMerger.Desktop.Services;
 
-public partial class RouterService(PageFactory pageFactory) : ObservableObject, IRouterService
+public partial class RouterService(Func<PageName, PageViewModel> pageFactory) : ObservableObject, IRouterService
 {
     [ObservableProperty]
-    private PageViewModel _currentView = pageFactory.GetPageModel(PageName.Home);
+    private PageViewModel? _currentView = null;
 
     public void NavigateTo(PageName pageName)
     {
         Console.WriteLine("Navigating to " + pageName);
-        CurrentView = pageFactory.GetPageModel(pageName);
+        CurrentView = pageFactory(pageName);
     }
 }

@@ -1,15 +1,14 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using SnowrunnerMerger.Desktop.Data;
-using SnowrunnerMerger.Desktop.Factories;
-using SnowrunnerMerger.Desktop.Services;
-using SnowrunnerMerger.Desktop.Services.Auth;
+using SnowrunnerMerger.Desktop.Extensions;
 using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
 using SnowrunnerMerger.Desktop.Views;
@@ -27,34 +26,45 @@ public partial class App : Application
     {
         var serviceCollection = new ServiceCollection();
 
-        serviceCollection.AddSingleton<MainWindowViewModel>();
-        serviceCollection.AddTransient<HomeViewModel>();
-        serviceCollection.AddTransient<LoginViewModel>();
-        
-        serviceCollection.AddSingleton<Func<PageName, PageViewModel>>(provider => name =>
-        {
-            return name switch
-            {
-                PageName.Home => provider.GetRequiredService<HomeViewModel>(),
-                PageName.Login => provider.GetRequiredService<LoginViewModel>(),
-                PageName.Unknown => throw new ArgumentOutOfRangeException(nameof(name), name, null),
-                _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
-            };
-        });
-
-        serviceCollection.AddSingleton<PageFactory>();
-        serviceCollection.AddSingleton<IRouterService, RouterService>();
-        serviceCollection.AddSingleton<IAuthService, AuthService>();
-
-        serviceCollection.AddHttpClient("api", client =>
-        {
-            client.BaseAddress = new Uri("https://localhost:44303/api");
-        }).AddHttpMessageHandler<AuthHeaderHandler>();
+        serviceCollection.ConfigureServices();
         
         var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        // After building the provider, initialize the router to the Login page to avoid circular DI
+        var router = serviceProvider.GetRequiredService<IRouterService>();
+        router.NavigateTo(PageName.Login);
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var authService = serviceProvider.GetRequiredService<IAuthService>();
+            
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var isAuthenticated = await authService.IsAuthenticatedAsync();
+
+                    // marshal back to the UI thread to navigate
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        if (!isAuthenticated)
+                        {
+                            router.NavigateTo(PageName.Login);
+                        }
+                        else
+                        {
+                            router.NavigateTo(PageName.Home);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Auth check failed: {ex}");
+                    // on failure just navigate to login (safest default)
+                    await Dispatcher.UIThread.InvokeAsync(() => router.NavigateTo(PageName.Login));
+                }
+            });
+            
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();

@@ -6,6 +6,6 @@ namespace SnowrunnerMerger.Desktop.Services.Interfaces;
 
 public interface IRouterService : INotifyPropertyChanged
 {
-    public PageViewModel CurrentView { get; set; }
+    public PageViewModel? CurrentView { get; set; }
     public void NavigateTo(PageName pageName);
 }
