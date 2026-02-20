@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
 using SnowrunnerMerger.Desktop.Models.Auth;
 using SnowrunnerMerger.Desktop.Services.Interfaces;
@@ -14,7 +15,7 @@ using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Desktop.Services.Auth;
 
-public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
+public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration config) : IAuthService
 {
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
     private static readonly string AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnowrunnerMerger");
@@ -46,9 +47,10 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
         
         var redirectUri = $"http://127.0.0.1:{port}";
 
-        var uriBuilder = new UriBuilder("http://localhost:5173/oauth/authorize")
+        var baseFrontendUrl = config.GetValue<string>("FrontendBaseUrl") ?? "http://localhost:5173/";
+        
+        var uriBuilder = new UriBuilder($"{baseFrontendUrl}oauth/authorize")
         {
-            // TODO: Use configured values instead of hardcoded ones
             Query = "response_type=code" +
                     "&client_id=smd" +
                     $"&redirect_uri={redirectUri}" +
@@ -94,8 +96,6 @@ public class AuthService(IHttpClientFactory httpClientFactory) : IAuthService
         return true;
     }
     
-    public string? GetAccessToken() => GetAccessTokenAsync().GetAwaiter().GetResult();
-
     public async Task<string?> GetAccessTokenAsync()
     {
         if (_accessTokenData is null || _accessTokenData.ExpiresAt <= DateTime.Now)
