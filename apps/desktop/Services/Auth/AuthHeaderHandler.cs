@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 
 namespace SnowrunnerMerger.Desktop.Services.Auth;
 

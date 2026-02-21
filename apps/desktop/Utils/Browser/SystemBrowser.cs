@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using SnowrunnerMerger.Desktop.Interfaces;
 
 namespace SnowrunnerMerger.Desktop.Utils.Browser;
 

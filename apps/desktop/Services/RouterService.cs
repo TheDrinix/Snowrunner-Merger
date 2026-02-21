@@ -1,7 +1,7 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 using SnowrunnerMerger.Desktop.ViewModels;
 
 namespace SnowrunnerMerger.Desktop.Services;

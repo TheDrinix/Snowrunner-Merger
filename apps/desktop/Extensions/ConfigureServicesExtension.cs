@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 using SnowrunnerMerger.Desktop.Models.Config;
 using SnowrunnerMerger.Desktop.Services;
 using SnowrunnerMerger.Desktop.Services.Auth;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
 
 namespace SnowrunnerMerger.Desktop.Extensions;

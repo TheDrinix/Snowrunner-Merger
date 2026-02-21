@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using SnowrunnerMerger.Desktop.ViewModels;
 
-namespace SnowrunnerMerger.Desktop.Services.Interfaces;
+namespace SnowrunnerMerger.Desktop.Interfaces.Services;
 
 public interface IRouterService : INotifyPropertyChanged
 {

@@ -8,7 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using SnowrunnerMerger.Desktop.Extensions;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 using SnowrunnerMerger.Desktop.ViewModels;
 using SnowrunnerMerger.Desktop.Views;
 

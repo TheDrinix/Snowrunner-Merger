@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 using SnowrunnerMerger.Desktop.Models.Auth;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.Utils.Browser;
 using SnowrunnerMerger.Shared.DTOs.Auth;
 

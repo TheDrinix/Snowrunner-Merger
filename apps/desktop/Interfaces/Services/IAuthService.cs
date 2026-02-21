@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SnowrunnerMerger.Desktop.Services.Interfaces;
+namespace SnowrunnerMerger.Desktop.Interfaces.Services;
 
 public interface IAuthService
 {

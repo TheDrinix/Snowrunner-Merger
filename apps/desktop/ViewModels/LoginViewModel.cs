@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
-using SnowrunnerMerger.Desktop.Services.Interfaces;
+using SnowrunnerMerger.Desktop.Interfaces.Services;
 
 namespace SnowrunnerMerger.Desktop.ViewModels;
 
