@@ -47,11 +47,11 @@ public partial class App : Application
                     {
                         if (!isAuthenticated)
                         {
-                            router.NavigateTo<LoginViewModel>();
+                            router.NavigateTo<LoginPageViewModel>();
                         }
                         else
                         {
-                            router.NavigateTo<HomeViewModel>();
+                            router.NavigateTo<HomePageViewModel>();
                         }
                     });
                 }
@@ -59,7 +59,7 @@ public partial class App : Application
                 {
                     Console.WriteLine($"Auth check failed: {ex}");
                     // on failure just navigate to login (safest default)
-                    await Dispatcher.UIThread.InvokeAsync(() => router.NavigateTo<LoginViewModel>());
+                    await Dispatcher.UIThread.InvokeAsync(() => router.NavigateTo<LoginPageViewModel>());
                 }
             });
             

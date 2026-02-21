@@ -4,7 +4,7 @@ using SnowrunnerMerger.Desktop.Interfaces.Services;
 
 namespace SnowrunnerMerger.Desktop.ViewModels;
 
-public partial class LoginViewModel(IAuthService authService, IRouterService routerService) : PageViewModel
+public partial class LoginPageViewModel(IAuthService authService, IRouterService routerService) : PageViewModel
 {
     [RelayCommand]
     private async Task LoginAsync()
@@ -13,7 +13,7 @@ public partial class LoginViewModel(IAuthService authService, IRouterService rou
 
         if (res)
         {
-            routerService.NavigateTo<HomeViewModel>();
+            routerService.NavigateTo<HomePageViewModel>();
         }
     }
 }

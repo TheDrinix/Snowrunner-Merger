@@ -22,8 +22,8 @@ public static class ConfigureServicesExtension
         services.AddSingleton<IGroupStore, GroupStore>();
         
         services.AddSingleton<MainWindowViewModel>();
-        services.AddTransient<HomeViewModel>();
-        services.AddTransient<LoginViewModel>();
+        services.AddTransient<HomePageViewModel>();
+        services.AddTransient<LoginPageViewModel>();
 
         // Http Clients
         var baseApiUrl = config.GetSection("ApiSettings:BaseUrl").Value ?? "https://localhost:44303/api/";

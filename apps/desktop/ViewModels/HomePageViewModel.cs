@@ -1,10 +1,10 @@
 ﻿namespace SnowrunnerMerger.Desktop.ViewModels;
 
-public class HomeViewModel : PageViewModel
+public class HomePageViewModel : PageViewModel
 {
     public string Greeting { get; } = "Welcome to Avalonia!";
     
-    public HomeViewModel()
+    public HomePageViewModel()
     {
     }
 }

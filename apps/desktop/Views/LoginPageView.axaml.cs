@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace SnowrunnerMerger.Desktop.Views;
 
-public partial class HomeView : UserControl
+public partial class LoginPageView : UserControl
 {
-    public HomeView()
+    public LoginPageView()
     {
         InitializeComponent();
     }
