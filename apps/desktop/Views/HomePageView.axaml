@@ -1,10 +1,61 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:SnowrunnerMerger.Desktop.Views"
              xmlns:vm="using:SnowrunnerMerger.Desktop.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SnowrunnerMerger.Desktop.Views.HomePageView"
              x:DataType="vm:HomePageViewModel">
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+   
+    <Grid ColumnDefinitions="* *" >
+        <StackPanel Grid.ColumnSpan="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding IsLoading}">
+            <ProgressBar IsIndeterminate="True" Margin="0,0,0,10" />
+            <TextBlock Text="Loading Groups..." Foreground="Gray" />
+        </StackPanel>
+        
+        <Border Grid.Column="0" Margin="10" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="2" CornerRadius="15" Padding="12">
+            <Grid ColumnDefinitions="Auto *" RowDefinitions="Auto *">
+                <TextBlock 
+                    Grid.Row="0" 
+                    Grid.Column="0" 
+                    Text="Joined Groups" 
+                    VerticalAlignment="Center" 
+                    FontSize="24" 
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource SystemAccentColor}" 
+                />
+                
+                <Border 
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2" 
+                    BorderThickness="2" 
+                    BorderBrush="{DynamicResource SystemBaseLowColor}" 
+                    Padding="8" 
+                    CornerRadius="10" 
+                    Margin="0,10,0, 0"
+                >
+                    <ItemsControl 
+                        ItemsSource="{Binding Groups}" 
+                        IsVisible="{Binding !IsLoading}" 
+                        Background="Transparent" 
+                        BorderThickness="0"
+                    >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" /> 
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:GroupViewModel">
+                                <v:GroupView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>
