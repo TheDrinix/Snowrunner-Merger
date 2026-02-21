@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SnowrunnerMerger.Desktop.Data;
-using SnowrunnerMerger.Desktop.Factories;
 using SnowrunnerMerger.Desktop.Models.Config;
+using SnowrunnerMerger.Desktop.Services;
 using SnowrunnerMerger.Desktop.Services.Auth;
+using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
 
 namespace SnowrunnerMerger.Desktop.Extensions;
@@ -15,13 +15,13 @@ public static class ConfigureServicesExtension
     {
         var config = services.LoadConfiguration();
         
+        services.AddSingleton<IRouterService, RouterService>();
+        services.AddSingleton<IAuthService, AuthService>();
+        
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<HomeViewModel>();
         services.AddTransient<LoginViewModel>();
 
-        // Routing
-        services.RegisterPageFactory();
-        services.AddSingleton<PageFactory>();
         // Http Clients
         var baseApiUrl = config.GetSection("ApiSettings:BaseUrl").Value ?? "https://localhost:44303/api/";
         services.RegisterHttpClients(baseApiUrl);
@@ -43,23 +43,6 @@ public static class ConfigureServicesExtension
         services.Configure<ApiSettings>(config.GetSection("ApiSettings"));
         
         return config;
-    }
-    
-    private static IServiceCollection RegisterPageFactory(this IServiceCollection services)
-    {
-        // Register the Page factory as before
-        services.AddSingleton<Func<PageName, PageViewModel>>(provider => name =>
-        {
-            return name switch
-            {
-                PageName.Home => provider.GetRequiredService<HomeViewModel>(),
-                PageName.Login => provider.GetRequiredService<LoginViewModel>(),
-                PageName.Unknown => throw new ArgumentOutOfRangeException(nameof(name), name, null),
-                _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
-            };
-        });
-
-        return services;
     }
 
     private static IServiceCollection RegisterHttpClients(this IServiceCollection services, string baseApiUrl)

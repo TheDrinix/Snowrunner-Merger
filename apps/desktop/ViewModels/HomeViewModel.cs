@@ -1,6 +1,4 @@
-﻿using SnowrunnerMerger.Desktop.Data;
-
-namespace SnowrunnerMerger.Desktop.ViewModels;
+﻿namespace SnowrunnerMerger.Desktop.ViewModels;
 
 public class HomeViewModel : PageViewModel
 {
@@ -8,6 +6,5 @@ public class HomeViewModel : PageViewModel
     
     public HomeViewModel()
     {
-        Name = PageName.Home;
     }
 }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using SnowrunnerMerger.Desktop.Data;
 using SnowrunnerMerger.Desktop.Extensions;
 using SnowrunnerMerger.Desktop.Services.Interfaces;
 using SnowrunnerMerger.Desktop.ViewModels;
@@ -32,7 +31,6 @@ public partial class App : Application
 
         // After building the provider, initialize the router to the Login page to avoid circular DI
         var router = serviceProvider.GetRequiredService<IRouterService>();
-        router.NavigateTo(PageName.Login);
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -49,11 +47,11 @@ public partial class App : Application
                     {
                         if (!isAuthenticated)
                         {
-                            router.NavigateTo(PageName.Login);
+                            router.NavigateTo<LoginViewModel>();
                         }
                         else
                         {
-                            router.NavigateTo(PageName.Home);
+                            router.NavigateTo<HomeViewModel>();
                         }
                     });
                 }
@@ -61,7 +59,7 @@ public partial class App : Application
                 {
                     Console.WriteLine($"Auth check failed: {ex}");
                     // on failure just navigate to login (safest default)
-                    await Dispatcher.UIThread.InvokeAsync(() => router.NavigateTo(PageName.Login));
+                    await Dispatcher.UIThread.InvokeAsync(() => router.NavigateTo<LoginViewModel>());
                 }
             });
             
