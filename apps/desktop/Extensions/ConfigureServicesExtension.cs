@@ -2,9 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SnowrunnerMerger.Desktop.Interfaces.Services;
+using SnowrunnerMerger.Desktop.Interfaces.Stores;
 using SnowrunnerMerger.Desktop.Models.Config;
 using SnowrunnerMerger.Desktop.Services;
 using SnowrunnerMerger.Desktop.Services.Auth;
+using SnowrunnerMerger.Desktop.Stores;
 using SnowrunnerMerger.Desktop.ViewModels;
 
 namespace SnowrunnerMerger.Desktop.Extensions;
@@ -17,6 +19,7 @@ public static class ConfigureServicesExtension
         
         services.AddSingleton<IRouterService, RouterService>();
         services.AddSingleton<IAuthService, AuthService>();
+        services.AddSingleton<IGroupStore, GroupStore>();
         
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<HomeViewModel>();
@@ -52,7 +55,8 @@ public static class ConfigureServicesExtension
         {
             client.BaseAddress = new Uri(baseApiUrl);
         });
-        services.AddHttpClient("api-auth", client =>
+        
+        services.AddHttpClient<IApiHttpClient, ApiHttpClient>(client =>
         {
             client.BaseAddress = new Uri(baseApiUrl);
         }).AddHttpMessageHandler<AuthHeaderHandler>();
