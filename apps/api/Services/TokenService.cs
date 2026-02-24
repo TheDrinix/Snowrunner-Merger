@@ -321,7 +321,7 @@ public class TokenService : ITokenService
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.RefreshToken == encryptedToken);
         
-        if (session is null || session.ExpiresAt < DateTime.UtcNow)
+        if (session is null || session.ExpiresAt < DateTime.UtcNow || session.IsRevoked)
         {
             return null;
         }
