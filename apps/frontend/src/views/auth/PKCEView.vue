@@ -12,9 +12,10 @@ const toaster = useToaster();
 onBeforeMount(async () => {
   const { code_challenge, redirect_uri, client_id, scope, state } = route.query;
   if (!code_challenge) {
-    // router.push({ name: "home" });
+    router.push({ name: "home" });
   }
 
+  let redirectUrl: string;
   try {
     const res = await http.get("auth/oauth/authorize", {
       params: {
@@ -28,15 +29,41 @@ onBeforeMount(async () => {
       withCredentials: true,
     });
 
-    const redirectUrl = new URL(res.data);
-    window.location.href = redirectUrl.toString();
+    redirectUrl = res.data;
   } catch (error) {
+    console.log("Error during auth code request");
+    console.log(error);
+
     toaster.createToast(
       "OAuth Authorization Failed",
       "An error occurred during OAuth authorization. Please try again.",
       "error",
     );
-    // router.push({ name: "home" });
+    router.push({ name: "home" });
+    return;
+  }
+
+  try {
+    const res = await fetch(redirectUrl, {
+      method: "GET",
+    });
+
+    toaster.createToast(
+      "OAuth Authorization Successful",
+      "You have been successfully authorized. You can now return to the application.",
+      "success",
+    );
+    router.push({ name: "home" });
+  } catch (error) {
+    console.log("Error during delivering auth code");
+    console.log(error);
+
+    toaster.createToast(
+      "OAuth Authorization Failed",
+      "An error occurred during OAuth authorization. Please try again.",
+      "error",
+    );
+    router.push({ name: "home" });
   }
 });
 </script>

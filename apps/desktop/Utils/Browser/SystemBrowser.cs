@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,11 +24,13 @@ public class SystemBrowser(int port = 7890) : IBrowser
         var context = await listener.GetContextAsync();
 
         var res = context.Response;
-        var resString = "<html><body><h1>Login successful! You can close this window.</h1></body></html>";
-        var buffer = System.Text.Encoding.UTF8.GetBytes(resString);
+        var buffer = Array.Empty<byte>();
+        
         res.ContentLength64 = buffer.Length;
         
         var resOutput = res.OutputStream;
+        
+        res.AddHeader("Access-Control-Allow-Origin", "*");
         await resOutput.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
         resOutput.Close();
 
