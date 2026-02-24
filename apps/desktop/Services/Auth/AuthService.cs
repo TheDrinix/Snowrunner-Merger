@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SnowrunnerMerger.Api.Models.Auth.Dtos;
 using SnowrunnerMerger.Desktop.Interfaces.Services;
 using SnowrunnerMerger.Desktop.Models.Auth;
@@ -15,13 +16,12 @@ using SnowrunnerMerger.Shared.DTOs.Auth;
 
 namespace SnowrunnerMerger.Desktop.Services.Auth;
 
-public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration config) : IAuthService
+public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration config, IServiceProvider serviceProvider) : IAuthService
 {
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
     private static readonly string AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnowrunnerMerger");
     private AccessTokenData? _accessTokenData = null;
     
-
     public async Task<bool> IsAuthenticatedAsync() => !string.IsNullOrEmpty(await GetAccessTokenAsync());
 
     public async Task<bool> LoginAsync()
@@ -45,7 +45,7 @@ public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration co
             }
         }
         
-        var redirectUri = $"http://127.0.0.1:{port}";
+        var redirectUri = $"http://127.0.0.1:{port}/";
 
         var baseFrontendUrl = config.GetValue<string>("FrontendBaseUrl") ?? "http://localhost:5173/";
         
@@ -158,16 +158,11 @@ public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration co
             _accessTokenData = null;
             return;
         }
-        
-        var httpClient = httpClientFactory.CreateClient("api");
-        var data = new RefreshDto()
-        {
-            Token = refreshToken
-        };
-        
-        var content = JsonContent.Create(data);
-        
-        await httpClient.PostAsync("auth/logout", content);
+
+        // Get a http client with the access token to call the logout endpoint
+        var httpClient = serviceProvider.GetRequiredService<IApiHttpClient>();
+
+        await httpClient.LogoutAsync(refreshToken);
         
         tokenStore.Clear();
         _accessTokenData = null;

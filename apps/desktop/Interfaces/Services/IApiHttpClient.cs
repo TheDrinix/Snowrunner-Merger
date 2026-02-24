@@ -7,4 +7,5 @@ namespace SnowrunnerMerger.Desktop.Interfaces.Services;
 public interface IApiHttpClient
 {
     Task<IEnumerable<GroupDto>> GetGroupsAsync();
+    Task LogoutAsync(string refreshToken);
 }
