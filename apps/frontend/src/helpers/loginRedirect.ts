@@ -6,6 +6,7 @@ export const loginRedirect = (router: Router) => {
   if (intendedRoute) {
     localStorage.removeItem("redirectAfterLogin");
     router.push(intendedRoute);
+    return;
   }
 
   router.push({ name: "groups" });
