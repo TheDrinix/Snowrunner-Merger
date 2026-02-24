@@ -143,9 +143,34 @@ public class AuthService(IHttpClientFactory httpClientFactory, IConfiguration co
         return _accessTokenData?.Token;
     }
 
-    public Task LogoutAsync()
+    public async Task LogoutAsync()
     {
-        throw new System.NotImplementedException();
+        var provider = DataProtectionProvider.Create(
+            new DirectoryInfo(Path.Combine(AppDataPath, "keys"))
+        );
+        
+        var tokenStore = new SecureTokenStore(provider, AppDataPath);
+        
+        var refreshToken = tokenStore.Load();
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _accessTokenData = null;
+            return;
+        }
+        
+        var httpClient = httpClientFactory.CreateClient("api");
+        var data = new RefreshDto()
+        {
+            Token = refreshToken
+        };
+        
+        var content = JsonContent.Create(data);
+        
+        await httpClient.PostAsync("auth/logout", content);
+        
+        tokenStore.Clear();
+        _accessTokenData = null;
     }
 
     private string GenerateRandomKey(int length = 32)

@@ -99,8 +99,6 @@ public class UserService(
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task DeleteUser()
     {
-        await authService.Logout();
-        
         var user = await GetCurrentUser();
         
         dbContext.Users.Remove(user);

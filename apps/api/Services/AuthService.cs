@@ -421,21 +421,24 @@ public class AuthService : IAuthService
     /// <summary>
     ///     Logs out the current user by removing the session from the database and deleting the refresh token cookie.
     /// </summary>
-    public async Task Logout()
+    /// 
+    /// <param name="refreshToken">The refresh token to invalidate. This is used to ensure that the token cannot be used to generate new access tokens after the user has logged out. </param>
+    /// <param name="isCookieToken">A boolean indicating whether the refresh token is stored in a cookie. If true, the cookie will be deleted after logout.</param>
+    public async Task Logout(string refreshToken, bool isCookieToken = true)
     {
-        var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
-        if (refreshToken is not null)
+        var session = await _tokenService.GetUserSessionFromRefreshToken(refreshToken);
+        if (session is not null)
         {
-            var session = await _tokenService.GetUserSessionFromRefreshToken(refreshToken);
-        
-            if (session is not null)
-            {
-                _dbContext.UserSessions.Remove(session);
-                await _dbContext.SaveChangesAsync();
-            }
+            session.IsRevoked = true;
+            _dbContext.UserSessions.Update(session);
+            await _dbContext.SaveChangesAsync();
         }
-        
-        _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refresh_token", new CookieOptions() { SameSite = _sameSiteMode, Secure = true });
+
+        if (isCookieToken)
+        {
+            _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refresh_token",
+                new CookieOptions() { SameSite = _sameSiteMode, Secure = true, Path = "/api/auth" });
+        }
     }
 
     /// <summary>

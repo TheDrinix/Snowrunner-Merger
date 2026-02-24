@@ -63,7 +63,9 @@ public interface IAuthService
     /// <summary>
     ///     Logs out the current user by removing the session from the database and deleting the refresh token cookie.
     /// </summary>
-    Task Logout();
+    /// <param name="refreshToken">The refresh token to invalidate. This is used to ensure that the token cannot be used to generate new access tokens after the user has logged out. </param>
+    /// <param name="isCookieToken">A boolean indicating whether the refresh token is stored in a cookie. If true, the cookie will be deleted after logout.</param>
+    Task Logout(string refreshToken, bool isCookieToken = true);
     /// <summary>
     ///     Generates a confirmation token for the user with the provided email.
     /// </summary>

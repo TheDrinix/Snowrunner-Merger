@@ -266,9 +266,14 @@ namespace SnowrunnerMerger.Api.Controllers
         [Authorize]
         [SwaggerOperation(Summary = "Logs out a user", Description = "Logs out a user and invalidates refresh token")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Logged out successfully")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(RefreshDto body)
         {
-            await authService.Logout();
+            var isCookieToken = body.Token is null;
+            var token = body.Token ?? Request.Cookies["refresh_token"];
+            
+            if (string.IsNullOrEmpty(token)) return BadRequest();
+            
+            await authService.Logout(token, isCookieToken);
             
             return NoContent();
         }
