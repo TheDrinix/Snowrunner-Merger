@@ -1,5 +1,7 @@
 ﻿using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 using SnowrunnerMerger.Api.Models.Auth;
 
 namespace SnowrunnerMerger.Api.Services;
@@ -33,23 +35,22 @@ public class EmailSender : IEmailSender
             throw new ArgumentNullException(nameof(mailConfig));
         }
 
+        var msg = new MimeMessage();
+        msg.From.Add(new MailboxAddress("Snowrunner Merger", mailConfig.Address));
+        msg.To.Add(new MailboxAddress("", email));
+        msg.Subject = subject;
+        
+        msg.Body = new TextPart("html")
+        {
+            Text = message
+        };
+
         using var client = new SmtpClient();
 
-        client.Port = mailConfig.Port;
-        client.Host = mailConfig.Host;
-        client.EnableSsl = true;
-        client.DeliveryMethod = SmtpDeliveryMethod.Network;
-        client.UseDefaultCredentials = false;
-        client.Credentials = new NetworkCredential(mailConfig.Username, mailConfig.Password);
-        var mail = new MailMessage(from: mailConfig.Address, to: email)
-        {
-            Subject = subject,
-            Body = message,
-            IsBodyHtml = true
-        };
-            
-        mail.From = new MailAddress(mailConfig.Address, "Snowrunner Merger");
-
-        await client.SendMailAsync(mail);
+        await client.ConnectAsync(mailConfig.Host, mailConfig.Port, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(mailConfig.Username, mailConfig.Password);
+        
+        await client.SendAsync(msg);
+        await client.DisconnectAsync(true);
     }
 }
